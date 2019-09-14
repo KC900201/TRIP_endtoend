@@ -7,3 +7,4 @@ Traffic Risk Provision Network project
 Updates
 -------
 2019/09/12 - Did the first commit and push to Github repository
+2019/09/14 - Draft first src code for end-to-end architecture. Mind mapping next stage
