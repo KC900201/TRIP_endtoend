@@ -27,8 +27,6 @@ from estimation.dataset_generator.object_detector import ObjectDetector
 if __name__ == '__main__':
     ## 10102019
     parser = argparse.ArgumentParser(description='dataset_maker')
-    parser.add_argument('--object_detection_threshold', type=float, default=0.1)
-    parser.add_argument('--gpu', type=int, default=0)
     
     dataset_file = input('Input dataset spec file (dataset_spec.txt): ')
     with open(dataset_file, 'r', encoding='utf-8') as f:
