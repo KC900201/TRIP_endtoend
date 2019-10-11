@@ -10,13 +10,13 @@ Created on Tue Sep 10 17:24:26 2019
 import chainer
 from chainer import serializers, iterators, cuda, optimizers
 import chainer.functions as F
-from trip_dataset import TripDataset
-from trip_lstm import TripLSTM
+from risk_prediction.trip_dataset import TripDataset
+from risk_prediction.trip_lstm import TripLSTM
 import numpy as np
 import time
 import os
 # <ADD>
-from trip_c_lstm import TripCLSTM
+from risk_prediction.trip_c_lstm import TripCLSTM
 # </ADD>
 
 class TripTrainer(object):

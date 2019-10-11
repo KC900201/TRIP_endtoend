@@ -9,6 +9,7 @@ Created on Thu Oct 10 18:48:56 2019
 Date          Comment
 ========================
 10102019      First revision
+10112019      Amend directory
 """
 
 import os
@@ -16,7 +17,7 @@ import numpy as np
 import cv2
 from chainer import serializers, Variable
 import chainer.functions as F
-from object_detector import ObjectDetector
+from estimation.dataset_generator.object_detector import ObjectDetector #10112019
 
 class DatasetGenerator(object): #Create class (10102019)
     def save_images(orig_img, bboxes, output_dir, file):

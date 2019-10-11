@@ -9,7 +9,7 @@ Created on Tue Sep 10 17:21:36 2019
 
 import chainer.functions as F
 import chainer.links as L
-from trip_lstm import TripLSTM
+from risk_prediction.trip_lstm import TripLSTM
 
 class TripCLSTM(TripLSTM):
     """A class of TRIP(Traffic Risk Prediction) model, which has a pooling layer on the input side
