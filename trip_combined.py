@@ -10,7 +10,7 @@ Date          Comment
 ========================
 09142019      First revision
 10102019      Coding for estimation part
-10112019      Coding for risk prediction part
+10112019      Coding for risk prediction part, add in path for object detection threshold and gpu
 """
 
 #Import libraries
@@ -45,6 +45,10 @@ if __name__ == '__main__':
             parser.add_argument('--object_model_path', default=line.split(':')[1].strip().split())
         elif line.startswith('object_cfg_path'):
             parser.add_argument('--object_cfg_path', default=line.split(':')[1].strip().split())
+        elif line.startswith('object_detection_threshold'): #10112019
+            parser.add_argument('--object_detection_threshold', type=float, default=float(line.split(':')[1].strip().split()))
+        elif line.startswith('gpu'): #10112019
+            parser.add_argument('--gpu', type=int, default=int(line.split(':')[1].strip().split()))
         elif line.startswith('input_dir'):
             parser.add_argument('--input_dir', default='r' + line.split(':')[1].strip().split(), help='input directory')
         elif line.startswith('output_dir'):

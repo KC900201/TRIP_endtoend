@@ -23,7 +23,7 @@ class TripCLSTM(TripLSTM):
         """
         super(TripCLSTM, self).__init__(input_size, hidden_size)
         with self.init_scope():
-            self.input_conv = L.Convolution2D(None, 512, ksize=3, stride=1, pad=1)
+            self.input_conv = L.Convolution2D(None, 512, ksize=3, stride=1, pad=1) #Modify part for adding new conv layer (10112019)
         self.model_arch = model_arch
     #
     def __call__(self, x):

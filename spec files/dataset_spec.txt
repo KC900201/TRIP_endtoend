@@ -1,0 +1,12 @@
+#object_model_type: yolo_v2
+object_model_type: yolo_v3
+object_model_path: ../estimation/model_v3/accident_KitDash_8000.npz
+object_label_path: ../estimation/model_v3/obj.names
+object_cfg_path: ../estimation/model_v3/yolo-obj.cfg
+object_detection_threshold: 0.1
+gpu: 0
+input_dir: E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3
+output_dir: E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3
+layer_name_list: conv33,conv39,conv45
+save_img: True
+video: True
