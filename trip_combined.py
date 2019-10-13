@@ -11,6 +11,7 @@ Date          Comment
 09142019      First revision
 10102019      Coding for estimation part
 10112019      Coding for risk prediction part, add in path for object detection threshold and gpu
+10132019      Use pathlib to fix Unix and Windows path directory input
 """
 
 #Import libraries
@@ -18,6 +19,7 @@ import os
 import cv2
 import argparse
 import numpy as np
+from pathlib import Path, WindowsPath #10132019
 
 from risk_prediction.trip_trainer import TripTrainer
 from estimation.dataset_generator.dataset_generator_function import DatasetGenerator
@@ -28,8 +30,11 @@ if __name__ == '__main__':
     ## 10102019
     parser = argparse.ArgumentParser(description='dataset_maker')
     
-    dataset_file = input('Input dataset spec file (dataset_spec.txt): ')
-    with open(dataset_file, 'r', encoding='utf-8') as f:
+#    dataset_file = input('Input dataset spec file (dataset_spec.txt): ') #Fix input error
+    dataset_file = "C:/Users/Ng Kwong Cheong/OneDrive/Documents/Soka University/Research Plan/Source Code/TRIP/TRIP_endtoend/spec files/dataset_spec.txt"
+    print("Filepath: " + dataset_file)
+#    with open(dataset_file.replace("\\", "\\"), "r", encoding='utf-8') as f: #Fix input error
+    with open(dataset_file, "r", encoding='utf-8') as f:
         lines = f.readlines()
     for line in lines:
         if line[0] == '#':
@@ -40,24 +45,26 @@ if __name__ == '__main__':
         elif line.startswith('object_model_path'):
             parser.add_argument('--object_model_path', default=line.split(':')[1].strip().split())
         elif line.startswith('object_label_path'):
-            parser.add_argument('--object_model_path', default=line.split(':')[1].strip().split())
+            parser.add_argument('--object_label_path', default=line.split(':')[1].strip().split())
         elif line.startswith('object_cfg_path'):
             parser.add_argument('--object_cfg_path', default=line.split(':')[1].strip().split())
         elif line.startswith('object_detection_threshold'): #10112019
-            parser.add_argument('--object_detection_threshold', type=float, default=float(line.split(':')[1].strip().split()))
+            parser.add_argument('--object_detection_threshold', type=float, default=float(line.split(':')[1]))
         elif line.startswith('gpu'): #10112019
-            parser.add_argument('--gpu', type=int, default=int(line.split(':')[1].strip().split()))
+            parser.add_argument('--gpu', type=int, default=int(line.split(':')[1]))
         elif line.startswith('input_dir'):
-            parser.add_argument('--input_dir', default='r' + line.split(':')[1].strip().split(), help='input directory')
+            parser.add_argument('--input_dir', default=line.split(':')[1], help='input directory')
         elif line.startswith('output_dir'):
-            parser.add_argument('--output_dir', default='r'+ line.split(':')[1].strip().split(), help='directory where the dataset will be created')
+            parser.add_argument('--output_dir', default=line.split(':')[1], help='directory where the dataset will be created')
         elif line.startswith('layer_name_list'):
             parser.add_argument('--layer_name_list', default=line.split(':')[1].strip().split(), help='list of hidden layers name to extract features')
         elif line.startswith('save_img'):
-            parser.add_argument('--save_img', type=bool, default=bool(line.split(':')[1].strip().split()), help='save_img option')
-        elif line.startsiwth('video'):
-            parser.add_argument('--video', type=bool, default=bool(line.split(':')[1].strip().split()), help='video option')
-
+            parser.add_argument('--save_img', type=bool, default=bool(line.split(':')[1]), help='save_img option')
+        elif line.startswith('video'):
+            parser.add_argument('--video', type=bool, default=bool(line.split(':')[1]), help='video option')
+    print("Parser:" + str(parser.parse_args))
+    print("Success!")
+    """ ##Temporary comment to test parser
     args = parser.parse_args()
     
     input_dir = args.input_dir
@@ -209,6 +216,8 @@ if __name__ == '__main__':
                 # specfileを保存 save specfile
                 #save_specfile(output_dir, img_features)        
     ## End estimation part -- 10102019
+    """
+    """
     ## 10112019
     training_spec_file = input('Input training spec file (training_spec.txt): ')
     with open(training_spec_file, 'r', encoding='utf-8') as f:
@@ -266,6 +275,7 @@ if __name__ == '__main__':
     else:
         tripTrainer.test_model()
     ##10112019
+    """
         
         
 
