@@ -15,3 +15,6 @@ Updates
 2019/09/14 - Draft first src code for end-to-end architecture. Mind mapping next stage
 2019/10/10 - Completed first draft of end-to-end architecture (estimation part)
 2019/10/11 - Begun first trial of end-to-end architecture (estimation part) coding
+2019/10/12 - Wrote a batch file to test run coding for end-to-end architecture. Commented risk prediction part.
+2019/10/13 - Fixing the single backslash "\" problem during input file reading. Problem persists
+2019/10/14 - Continue fixing input file reading problem. Attempted to replace double backslash
