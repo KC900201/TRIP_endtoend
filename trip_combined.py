@@ -12,6 +12,7 @@ Date          Comment
 10102019      Coding for estimation part
 10112019      Coding for risk prediction part, add in path for object detection threshold and gpu
 10132019      Use pathlib to fix Unix and Windows path directory input
+10142019      Input risk prediction input in beginning of main function
 """
 
 #Import libraries
@@ -27,18 +28,18 @@ from estimation.dataset_generator.object_detector import ObjectDetector
 
 #Main function
 if __name__ == '__main__':
-    ## 10102019
+    # Initialize parameters
     parser = argparse.ArgumentParser(description='dataset_maker')
     
-#    dataset_file = input('Input dataset spec file (dataset_spec.txt): ') #Fix input error
-    dataset_file = "C:/Users/Ng Kwong Cheong/OneDrive/Documents/Soka University/Research Plan/Source Code/TRIP/TRIP_endtoend/spec files/dataset_spec.txt"
-    print("Filepath: " + dataset_file)
-#    with open(dataset_file.replace("\\", "\\"), "r", encoding='utf-8') as f: #Fix input error
-    with open(dataset_file, "r", encoding='utf-8') as f:
+    spec_file = input('Input spec file (endtoend_spec.txt): ')
+#    dataset_file = "C:/Users/Ng Kwong Cheong/OneDrive/Documents/Soka University/Research Plan/Source Code/TRIP/TRIP_endtoend/spec files/dataset_spec.txt"
+#    print("Filepath: " + spec_file)
+    with open(spec_file, "r", encoding='utf-8') as f: 
         lines = f.readlines()
     for line in lines:
         if line[0] == '#':
             continue
+        # Dataset generator part
         elif line.startswith('object_model_type'):
 #            parser.add_argument('--object_model_type', choices=('yolo_v2', 'yolo_v3'), default='yolo_v3')
             parser.add_argument('--object_model_type', default=line.split(':')[1].strip().split())
@@ -62,9 +63,49 @@ if __name__ == '__main__':
             parser.add_argument('--save_img', type=bool, default=bool(line.split(':')[1]), help='save_img option')
         elif line.startswith('video'):
             parser.add_argument('--video', type=bool, default=bool(line.split(':')[1]), help='video option')
-    print("Parser:" + str(parser.parse_args))
-    print("Success!")
-    """ ##Temporary comment to test parser
+        # End dataset generator part
+        # Risk prediction part - 10142019
+        elif line.startswith('train_ds1:'):
+            train_ds_path1, train_spec_file_name1, train_risk1 = line.split(':')[1].strip().split()
+            train_ds_path1 = os.path.join(os.path.dirname(spec_file), train_ds_path1)
+            train_risk1 = int(train_risk1)
+        elif line.startswith('train_ds2:'):
+            train_ds_path2, train_spec_file_name2, train_risk2 = line.split(':')[1].strip().split()
+            train_ds_path2 = os.path.join(os.path.dirname(spec_file), train_ds_path2)
+            train_risk2 = int(train_risk2)
+        elif line.startswith('test_ds1:'):
+            test_ds_path1, test_spec_file_name1, test_risk1 = line.split(':')[1].strip().split()
+            test_ds_path1 = os.path.join(os.path.dirname(spec_file), test_ds_path1)
+            test_risk1 = int(test_risk1)
+        elif line.startswith('test_ds2:'):
+            test_ds_path2, test_spec_file_name2, test_risk2 = line.split(':')[1].strip().split()
+            test_ds_path2 = os.path.join(os.path.dirname(spec_file), test_ds_path2)
+            test_risk2 = int(test_risk2)
+        elif line.startswith('layer_name:'):
+            layer_name = line.split(':')[1].strip()
+        elif line.startswith('box_type:'):
+            box_type = line.split(':')[1].strip()
+        elif line.startswith('execution_mode:'):
+            execution_mode = line.split(':')[1].strip()
+        elif line.startswith('num_of_epoch:'):
+            num_of_epoch = int(line.split(':')[1].strip())
+        elif line.startswith('minibatch_size:'):
+            minibatch_size = int(line.split(':')[1].strip())
+        elif line.startswith('eval_interval:'):
+            eval_interval = int(line.split(':')[1].strip())
+        elif line.startswith('save_interval:'):
+            save_interval = int(line.split(':')[1].strip())
+        elif line.startswith('model_param_file:'):
+            model_param_file_path = line.split(':')[1].strip()
+            model_param_file_path = os.path.join(os.path.dirname(spec_file), model_param_file_path)
+        elif line.startswith('tlog_path:'):
+            tlog_path = line.split(':')[1].strip()
+            tlog_path = os.path.join(os.path.dirname(spec_file), tlog_path)
+        elif line.startswith('gpu_id:'):
+            gpu_id = int(line.split(':')[1].strip())
+        # End risk prediction part
+            
+    ## 10102019
     args = parser.parse_args()
     
     input_dir = args.input_dir
@@ -216,7 +257,6 @@ if __name__ == '__main__':
                 # specfileを保存 save specfile
                 #save_specfile(output_dir, img_features)        
     ## End estimation part -- 10102019
-    """
     """
     ## 10112019
     training_spec_file = input('Input training spec file (training_spec.txt): ')
