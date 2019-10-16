@@ -18,3 +18,4 @@ Updates
 2019/10/12 - Wrote a batch file to test run coding for end-to-end architecture. Commented risk prediction part.
 2019/10/13 - Fixing the single backslash "\" problem during input file reading. Problem persists
 2019/10/14 - Continue fixing input file reading problem. Attempted to replace double backslash
+2019/10/16 - Fix gpu and gpu_id attributes string conflict. Temporarily hardcode input and output directory for dataset generation

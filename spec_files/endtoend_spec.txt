@@ -3,16 +3,17 @@
 ###########################
 #object_model_type: yolo_v2
 object_model_type: yolo_v3
-object_model_path: ../estimation/model_v3/accident_KitDash_8000.npz
-object_label_path: ../estimation/model_v3/obj.names
-object_cfg_path: ../estimation/model_v3/yolo-obj.cfg
+object_model_path: C:\Users\atsumilab\OneDrive\Documents\Soka University\Research Plan\Source Code\TRIP\TRIP_endtoend\estimation\model_v3\accident_KitDash_8000.npz
+object_label_path: C:\Users\atsumilab\OneDrive\Documents\Soka University\Research Plan\Source Code\TRIP\TRIP_endtoend\estimation\model_v3\obj.names
+object_cfg_path: C:\Users\atsumilab\OneDrive\Documents\Soka University\Research Plan\Source Code\TRIP\TRIP_endtoend\estimation\model_v3\yolo-obj.cfg
 object_detection_threshold: 0.1
 gpu: 0
 #input_dir: E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3
 #output_dir: E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3
-input_dir: "C:\Users\Ng Kwong Cheong\OneDrive\Documents\Soka University\Research Plan\Source Code\TRIP\TRIP_endtoend\spec files"
-output_dir: "C:\Users\Ng Kwong Cheong\OneDrive\Documents\Soka University\Research Plan\Source Code\TRIP\TRIP_endtoend\spec files"
+input_dir: C:\Users\atsumilab\Pictures\TRIP_Dataset\YOLO_KitDash\images
+output_dir: C:\Users\atsumilab\Pictures\TRIP_Dataset\YOLO_KitDash\output
 layer_name_list: conv33,conv39,conv45
+#layer_name_list: conv33
 save_img: True
 video: True
 ########################

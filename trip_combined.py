@@ -13,6 +13,7 @@ Date          Comment
 10112019      Coding for risk prediction part, add in path for object detection threshold and gpu
 10132019      Use pathlib to fix Unix and Windows path directory input
 10142019      Input risk prediction input in beginning of main function
+10162019      Fix gpu and gpu_id attributes string conflict and layer name list, temporarily harcode input and output directory for dataset generation
 """
 
 #Import libraries
@@ -42,27 +43,34 @@ if __name__ == '__main__':
         # Dataset generator part
         elif line.startswith('object_model_type'):
 #            parser.add_argument('--object_model_type', choices=('yolo_v2', 'yolo_v3'), default='yolo_v3')
-            parser.add_argument('--object_model_type', default=line.split(':')[1].strip().split())
+            parser.add_argument('--object_model_type', type=str, default=str(line.split(':')[1].strip()))
         elif line.startswith('object_model_path'):
-            parser.add_argument('--object_model_path', default=line.split(':')[1].strip().split())
+#            parser.add_argument('--object_model_path', type=str, default=str(line.split(':')[1].strip().split()))
+            parser.add_argument('--object_model_path', default=r'estimation\model_v3\accident_KitDash_8000.npz')            
         elif line.startswith('object_label_path'):
-            parser.add_argument('--object_label_path', default=line.split(':')[1].strip().split())
+#            parser.add_argument('--object_label_path', type=str, default=str(line.split(':')[1].strip().split()))
+            parser.add_argument('--object_label_path', default=r'estimation\model_v3\obj.names')
         elif line.startswith('object_cfg_path'):
-            parser.add_argument('--object_cfg_path', default=line.split(':')[1].strip().split())
+#            parser.add_argument('--object_cfg_path', default=str(line.split(':')[1].strip().split()))
+            parser.add_argument('--object_cfg_path', default=r'estimation\model_v3\yolo-obj.cfg')            
+        elif line.startswith('gpu:'): #10112019 #10162019
+            parser.add_argument('--gpu', type=int, default=int(line.split(':')[1].strip()))
         elif line.startswith('object_detection_threshold'): #10112019
-            parser.add_argument('--object_detection_threshold', type=float, default=float(line.split(':')[1]))
-        elif line.startswith('gpu'): #10112019
-            parser.add_argument('--gpu', type=int, default=int(line.split(':')[1]))
+            parser.add_argument('--object_detection_threshold', type=float, default=float(line.split(':')[1].strip()))
         elif line.startswith('input_dir'):
-            parser.add_argument('--input_dir', default=line.split(':')[1], help='input directory')
+             parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_Dataset\YOLO_KitDash\images', help='input directory') #10162019
+        #    print(line.split(':'))
+        #    parser.add_argument('--input_dir', default=line.split(':')[1].strip(), help='input directory')
         elif line.startswith('output_dir'):
-            parser.add_argument('--output_dir', default=line.split(':')[1], help='directory where the dataset will be created')
+            parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_Dataset\YOLO_KitDash\output', help='directory where the dataset will be created') #10162019
+        #    print(line.split(':'))
+        #    parser.add_argument('--output_dir', default=line.split(':')[1].strip(), help='directory where the dataset will be created')
         elif line.startswith('layer_name_list'):
             parser.add_argument('--layer_name_list', default=line.split(':')[1].strip().split(), help='list of hidden layers name to extract features')
         elif line.startswith('save_img'):
-            parser.add_argument('--save_img', type=bool, default=bool(line.split(':')[1]), help='save_img option')
+            parser.add_argument('--save_img', type=bool, default=bool(line.split(':')[1].strip()), help='save_img option')
         elif line.startswith('video'):
-            parser.add_argument('--video', type=bool, default=bool(line.split(':')[1]), help='video option')
+            parser.add_argument('--video', type=bool, default=bool(line.split(':')[1].strip()), help='video option')
         # End dataset generator part
         # Risk prediction part - 10142019
         elif line.startswith('train_ds1:'):
@@ -107,9 +115,10 @@ if __name__ == '__main__':
             
     ## 10102019
     args = parser.parse_args()
-    
+    print(args)
     input_dir = args.input_dir
-    layer_name_list = args.layer_name_list.split(',')
+#    layer_name_list = args.layer_name_list.split(',').strip()
+    layer_name_list = args.layer_name_list #10162019
     output_dir = args.output_dir
     thresh = args.object_detection_threshold
     save_img = args.save_img
