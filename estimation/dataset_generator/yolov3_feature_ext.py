@@ -96,7 +96,7 @@ class Darknet53Extractor(chainer.ChainList):
         hs = []
         for i, link in enumerate(self):
             h = link(h)
-            if i in {33, 39, 45}:
+            if i in {33, 39, 45}: # fine tune if i in our necessary layers feature - 20191017
                 ys.append(h)
             elif i in {14, 23}:
                 hs.append(h)
