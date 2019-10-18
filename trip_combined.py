@@ -14,6 +14,7 @@ Date          Comment
 10132019      Use pathlib to fix Unix and Windows path directory input
 10142019      Input risk prediction input in beginning of main function
 10162019      Fix gpu and gpu_id attributes string conflict and layer name list, temporarily harcode input and output directory for dataset generation
+10182019      Amend error part (unknown object) in dataset_generator part, add in video risk prediction
 """
 
 #Import libraries
@@ -24,6 +25,7 @@ import numpy as np
 from pathlib import Path, WindowsPath #10132019
 
 from risk_prediction.trip_trainer import TripTrainer
+from risk_prediction.trip_vpredictor import TripVPredictor #10182019
 from estimation.dataset_generator.dataset_generator_function import DatasetGenerator
 from estimation.dataset_generator.object_detector import ObjectDetector
 
@@ -65,7 +67,7 @@ if __name__ == '__main__':
 #            print(line.split(':'))
             parser.add_argument('--output_dir', default=line.split(':')[1].strip() + ':' + line.split(':')[2].strip(), help='directory where the dataset will be created')
         elif line.startswith('layer_name_list'):
-            parser.add_argument('--layer_name_list', default=line.split(':')[1].strip().split(), help='list of hidden layers name to extract features')
+            parser.add_argument('--layer_name_list', default=line.split(':')[1].strip().split(','), help='list of hidden layers name to extract features')
         elif line.startswith('save_img'):
             parser.add_argument('--save_img', type=bool, default=bool(line.split(':')[1].strip()), help='save_img option')
         elif line.startswith('video'):
@@ -81,11 +83,17 @@ if __name__ == '__main__':
             train_ds_path2 = os.path.join(os.path.dirname(spec_file), train_ds_path2)
             train_risk2 = int(train_risk2)
         elif line.startswith('test_ds1:'):
-            test_ds_path1, test_spec_file_name1, test_risk1 = line.split(':')[1].strip().split()
+#            test_ds_path1, test_spec_file_name1, test_risk1 = line.split(':')[1].strip().split()
+            test_ds_path1 = 'C:/Users/atsumilab/Pictures/TRIP_Dataset/YOLO_KitDash/test0'
+            test_spec_file_name1 = 'ds_spec.txt' 
+            test_risk1 = 0
             test_ds_path1 = os.path.join(os.path.dirname(spec_file), test_ds_path1)
             test_risk1 = int(test_risk1)
         elif line.startswith('test_ds2:'):
-            test_ds_path2, test_spec_file_name2, test_risk2 = line.split(':')[1].strip().split()
+#            test_ds_path2, test_spec_file_name2, test_risk2 = line.split(':')[1].strip().split()
+            test_ds_path2 = 'C:/Users/atsumilab/Pictures/TRIP_Dataset/YOLO_KitDash/test1'
+            test_spec_file_name2 = 'ds_spec.txt'
+            test_risk2 = 0
             test_ds_path2 = os.path.join(os.path.dirname(spec_file), test_ds_path2)
             test_risk2 = int(test_risk2)
         elif line.startswith('layer_name:'):
@@ -115,8 +123,6 @@ if __name__ == '__main__':
     ## 10102019
     args = parser.parse_args()
 
-
-#   print(args)
     input_dir = args.input_dir
 #    layer_name_list = args.layer_name_list.split(',').strip()
     layer_name_list = args.layer_name_list #10162019
@@ -131,7 +137,7 @@ if __name__ == '__main__':
         files += len(filenames)
         folders += len(dirnames)
     
-    print('' + str(files) + 'files, ' + str(folders)+ 'folders found')
+    print('' + str(files) + ' files, ' + str(folders)+ ' folders found')
     
     predictor = ObjectDetector(args.object_model_type, args.object_model_path, 
                                args.object_label_path, args.object_cfg_path, args.object_detection_threshold,
@@ -226,7 +232,7 @@ if __name__ == '__main__':
                 # フォルダが無ければ新規作成 / Create a new folder if there is none previously
                 if not os.path.isdir(output_dir):
                     os.makedirs(output_dir)
-                for layer in layer_list:
+                for layer in layer_name_list:
                     if not os.path.isdir(os.path.join(output_dir, layer)):
                         os.mkdir(os.path.join(output_dir, layer))
                 if save_img and not os.path.isdir(os.path.join(output_dir, 'img')):
@@ -256,19 +262,21 @@ if __name__ == '__main__':
                         orig_img = cv2.resize(orig_img, (img_w, img_h))
 #
                     # 検出結果と特徴を取得 / retrieve detection results and features
-                    results, img_features = predictor(orig_img, thresh, layer_list)
+                    results, img_features = predictor(orig_img, thresh, layer_name_list)
 
                     # 検出結果を利用し、画像を切り取って保存 / Use the detection results to cut and save images
-                    if save_img: DatasetGenerator.save_images(orig_img, results, object_list, output_dir, file)
+#                    if save_img: DatasetGenerator.save_images(orig_img, results, object_list, output_dir, file) 
+                    if save_img: DatasetGenerator.save_images(orig_img, bboxes, output_dir, file) #10182019
                     # 特徴ファイルを保存 / save feature file
                     DatasetGenerator.save_feature(img_features, output_dir, file+'.npz')
                     # 指定した物体の座標を保存 / save specified object's coordinates
-                    DatasetGenerator.save_ebox(results, object_list, img_h, img_w, output_dir, 'e'+file+'.txt')
+#                    DatasetGenerator.save_ebox(results, object_list, img_h, img_w, output_dir, 'e'+file+'.txt')
+                    DatasetGenerator.save_ebox(bboxes, labels, layer_ids, img_h, img_w, output_dir, 'e'+file+'.txt') #10182019
                 # specfileを保存 save specfile
                 #save_specfile(output_dir, img_features)        
     ## End estimation part -- 10102019
-    """
     ## 10112019
+    """
     training_spec_file = input('Input training spec file (training_spec.txt): ')
     with open(training_spec_file, 'r', encoding='utf-8') as f:
         lines = f.readlines()
@@ -313,6 +321,7 @@ if __name__ == '__main__':
             tlog_path = os.path.join(os.path.dirname(training_spec_file), tlog_path)
         elif line.startswith('gpu_id:'):
             gpu_id = int(line.split(':')[1].strip())
+    """
     tripTrainer = TripTrainer(train_ds_path1, train_spec_file_name1, train_risk1,
                               train_ds_path2, train_spec_file_name2, train_risk2,
                               test_ds_path1, test_spec_file_name1, test_risk1,
@@ -324,8 +333,15 @@ if __name__ == '__main__':
         tripTrainer.learn_model()
     else:
         tripTrainer.test_model()
-    ##10112019
+    ## 10112019
+    ## 10182019
     """
+    trip_predictor = TripVPredictor(ds_path, ds_spec_file_name, layer_name, box_type, window_size, model_param_file_path, plog_path, gpu_id)
+    if video_out_path != '':
+        trip_predictor.set_video_out(video_out_path)
+    trip_predictor.vpredict()
+    """
+    ## 10182019
         
         
 
