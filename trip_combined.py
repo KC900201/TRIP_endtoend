@@ -15,6 +15,7 @@ Date          Comment
 10142019      Input risk prediction input in beginning of main function
 10162019      Fix gpu and gpu_id attributes string conflict and layer name list, temporarily harcode input and output directory for dataset generation
 10182019      Amend error part (unknown object) in dataset_generator part, add in video risk prediction
+10212019      Re-amend directory input path
 """
 
 #Import libraries
@@ -35,8 +36,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='dataset_maker')
     
     spec_file = input('Input spec file (endtoend_spec.txt): ')
-#    dataset_file = "C:/Users/Ng Kwong Cheong/OneDrive/Documents/Soka University/Research Plan/Source Code/TRIP/TRIP_endtoend/spec files/dataset_spec.txt"
-#    print("Filepath: " + spec_file)
     with open(spec_file, "r", encoding='utf-8') as f: 
         lines = f.readlines()
     for line in lines:
@@ -61,11 +60,12 @@ if __name__ == '__main__':
             parser.add_argument('--object_detection_threshold', type=float, default=float(line.split(':')[1].strip()))
         elif line.startswith('input_dir'):
         #     parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_Dataset\YOLO_KitDash\images', help='input directory') #10162019
-            parser.add_argument('--input_dir', default=line.split(':')[1].strip() + ':' + line.split(':')[2].strip(), help='input directory')
+        #    parser.add_argument('--input_dir', default=line.split(':')[1].strip() + ':' + line.split(':')[2].strip(), help='input directory')
+            parser.add_argument('--input_dir', default=line.split(':')[1].strip(), help='input directory') #10212019
         elif line.startswith('output_dir'):
         #    parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_Dataset\YOLO_KitDash\output', help='directory where the dataset will be created') #10162019
-#            print(line.split(':'))
-            parser.add_argument('--output_dir', default=line.split(':')[1].strip() + ':' + line.split(':')[2].strip(), help='directory where the dataset will be created')
+        #    parser.add_argument('--output_dir', default=line.split(':')[1].strip() + ':' + line.split(':')[2].strip(), help='directory where the dataset will be created')
+            parser.add_argument('--output_dir', default=line.split(':')[1].strip(), help='directory where the dataset will be created') #10212019
         elif line.startswith('layer_name_list'):
             parser.add_argument('--layer_name_list', default=line.split(':')[1].strip().split(','), help='list of hidden layers name to extract features')
         elif line.startswith('save_img'):
@@ -76,24 +76,20 @@ if __name__ == '__main__':
         # Risk prediction part - 10142019
         elif line.startswith('train_ds1:'):
             train_ds_path1, train_spec_file_name1, train_risk1 = line.split(':')[1].strip().split()
-            train_ds_path1 = os.path.join(os.path.dirname(spec_file), train_ds_path1)
+#            train_ds_path1 = os.path.join(os.path.dirname(spec_file), train_ds_path1)
+            train_ds_path1 = os.path.join(os.path.dirname(train_spec_file_name1), train_ds_path1) #10212019
             train_risk1 = int(train_risk1)
         elif line.startswith('train_ds2:'):
             train_ds_path2, train_spec_file_name2, train_risk2 = line.split(':')[1].strip().split()
-            train_ds_path2 = os.path.join(os.path.dirname(spec_file), train_ds_path2)
+#           train_ds_path2 = os.path.join(os.path.dirname(spec_file), train_ds_path2)
+            train_ds_path2 = os.path.join(os.path.dirname(train_spec_file_name2), train_ds_path2) #10212019
             train_risk2 = int(train_risk2)
         elif line.startswith('test_ds1:'):
-#            test_ds_path1, test_spec_file_name1, test_risk1 = line.split(':')[1].strip().split()
-            test_ds_path1 = 'C:/Users/atsumilab/Pictures/TRIP_Dataset/YOLO_KitDash/test0'
-            test_spec_file_name1 = 'ds_spec.txt' 
-            test_risk1 = 0
+            test_ds_path1, test_spec_file_name1, test_risk1 = line.split(':')[1].strip().split()
             test_ds_path1 = os.path.join(os.path.dirname(spec_file), test_ds_path1)
             test_risk1 = int(test_risk1)
         elif line.startswith('test_ds2:'):
-#            test_ds_path2, test_spec_file_name2, test_risk2 = line.split(':')[1].strip().split()
-            test_ds_path2 = 'C:/Users/atsumilab/Pictures/TRIP_Dataset/YOLO_KitDash/test1'
-            test_spec_file_name2 = 'ds_spec.txt'
-            test_risk2 = 0
+            test_ds_path2, test_spec_file_name2, test_risk2 = line.split(':')[1].strip().split()
             test_ds_path2 = os.path.join(os.path.dirname(spec_file), test_ds_path2)
             test_risk2 = int(test_risk2)
         elif line.startswith('layer_name:'):

@@ -36,3 +36,5 @@ Updates
 2019/10/14 - Continue fixing input file reading problem. Attempted to replace double backslash
 2019/10/16 - Fixed gpu and gpu_id attributes string conflict. Temporarily hardcode input and output directory for dataset generation
 2019/10/17 - Fixed directory path. Test run dataset_generation part successfully. Need minor fix on data processing (unknown attr)
+2019/10/21 - Tested successfully for dataset generation part. Able to create attributes for convolution 33, 39 and 45. 
+	     Need to retrieve training attributes for risk prediction training.

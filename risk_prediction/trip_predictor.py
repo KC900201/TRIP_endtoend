@@ -9,11 +9,11 @@ Created on Tue Sep 10 17:28:26 2019
 
 import chainer
 from chainer import serializers, cuda
-from trip_dataset import TripDataset
-from trip_lstm import TripLSTM
+from risk_prediction.trip_dataset import TripDataset
+from risk_prediction.trip_lstm import TripLSTM
 import os
 # <ADD>
-from trip_c_lstm import TripCLSTM
+from risk_prediction.trip_c_lstm import TripCLSTM
 # </ADD>
 
 class TripPredictor(object):
