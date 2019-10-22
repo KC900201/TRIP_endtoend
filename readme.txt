@@ -38,3 +38,6 @@ Updates
 2019/10/17 - Fixed directory path. Test run dataset_generation part successfully. Need minor fix on data processing (unknown attr)
 2019/10/21 - Tested successfully for dataset generation part. Able to create attributes for convolution 33, 39 and 45. 
 	     Need to retrieve training attributes for risk prediction training.
+2019/10/22 - Tested successfully the flow from dataset generation to risk prediction to video risk prediction. 
+	     Encountered pathnotfound exception in trip_dataset.py (line 28) while running video prediction (trip_vpredictor -> trip_predictor -> trip_dataset) 
+             due to coding style when reading spec_files directory and ds_spec). Need to change coding style to suit own file directory.
