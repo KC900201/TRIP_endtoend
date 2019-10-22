@@ -1,0 +1,9 @@
+# prediction spec
+#ds: ds3/test0 ds_spec.txt
+ds: dataset/train0 ds_spec.txt
+layer_name: conv33,conv39,conv45
+box_type: tbox
+window_size: 10
+model_param_file: model_tbox_param.txt
+plog_path: result/dashcam_test0_tlog.txt
+gpu_id: 0

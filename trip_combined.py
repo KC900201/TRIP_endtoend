@@ -36,6 +36,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='dataset_maker')
     
     spec_file = input('Input spec file (endtoend_spec.txt): ')
+    video_out_path = input('Input a video output path (if no video output, enter a return): ') #video risk prediction - 10182019
     with open(spec_file, "r", encoding='utf-8') as f: 
         lines = f.readlines()
     for line in lines:
@@ -86,11 +87,13 @@ if __name__ == '__main__':
             train_risk2 = int(train_risk2)
         elif line.startswith('test_ds1:'):
             test_ds_path1, test_spec_file_name1, test_risk1 = line.split(':')[1].strip().split()
-            test_ds_path1 = os.path.join(os.path.dirname(spec_file), test_ds_path1)
+#            test_ds_path1 = os.path.join(os.path.dirname(spec_file), test_ds_path1) #10212019
+            test_ds_path1 = os.path.join(os.path.dirname(test_spec_file_name1), test_ds_path1)
             test_risk1 = int(test_risk1)
         elif line.startswith('test_ds2:'):
             test_ds_path2, test_spec_file_name2, test_risk2 = line.split(':')[1].strip().split()
-            test_ds_path2 = os.path.join(os.path.dirname(spec_file), test_ds_path2)
+#            test_ds_path2 = os.path.join(os.path.dirname(spec_file), test_ds_path2) #10212019
+            test_ds_path2 = os.path.join(os.path.dirname(test_spec_file_name2), test_ds_path2)
             test_risk2 = int(test_risk2)
         elif line.startswith('layer_name:'):
             layer_name = line.split(':')[1].strip()
@@ -111,10 +114,29 @@ if __name__ == '__main__':
             model_param_file_path = os.path.join(os.path.dirname(spec_file), model_param_file_path)
         elif line.startswith('tlog_path:'):
             tlog_path = line.split(':')[1].strip()
-            tlog_path = os.path.join(os.path.dirname(spec_file), tlog_path)
+#            tlog_path = os.path.join(os.path.dirname(spec_file), tlog_path)
         elif line.startswith('gpu_id:'):
             gpu_id = int(line.split(':')[1].strip())
         # End risk prediction part
+        # Video prediction part - 10182019
+        elif line.startswith('ds:'):
+            ds_path, ds_spec_file_name = line.split(':')[1].strip().split()
+            ds_path = os.path.join(os.path.dirname(spec_file), ds_path)
+        elif line.startswith('v_layer_name:'):
+            v_layer_name = line.split(':')[1].strip()
+        elif line.startswith('v_box_type:'):
+            v_box_type = line.split(':')[1].strip()
+        elif line.startswith('window_size:'):
+            window_size = int(line.split(':')[1].strip())
+        elif line.startswith('v_model_param_file:'):
+            v_model_param_file_path = line.split(':')[1].strip()
+            v_model_param_file_path = os.path.join(os.path.dirname(spec_file), model_param_file_path)
+        elif line.startswith('plog_path'):
+            plog_path = line.split(':')[1].strip()
+            plog_path = os.path.join(os.path.dirname(spec_file), plog_path)
+        elif line.startswith('v_gpu_id:'):
+            v_gpu_id = int(line.split(':')[1].strip())
+        # End video prediction part
             
     ## 10102019
     args = parser.parse_args()
@@ -272,52 +294,6 @@ if __name__ == '__main__':
                 #save_specfile(output_dir, img_features)        
     ## End estimation part -- 10102019
     ## 10112019
-    """
-    training_spec_file = input('Input training spec file (training_spec.txt): ')
-    with open(training_spec_file, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-    for line  in lines:
-        if line[0] == '#':
-            continue
-        elif line.startswith('train_ds1'):
-            train_ds_path1, train_spec_file_name1, train_risk1 = line.split(':')[1].strip().split()
-            train_ds_path1 = os.path.join(os.path.dirname(training_spec_file), train_ds_path1)
-            train_risk1 = int(train_risk1)
-        elif line.startswith('train_ds2:'):
-            train_ds_path2, train_spec_file_name2, train_risk2 = line.split(':')[1].strip().split()
-            train_ds_path2 = os.path.join(os.path.dirname(training_spec_file), train_ds_path2)
-            train_risk2 = int(train_risk2)
-        elif line.startswith('test_ds1:'):
-            test_ds_path1, test_spec_file_name1, test_risk1 = line.split(':')[1].strip().split()
-            test_ds_path1 = os.path.join(os.path.dirname(training_spec_file), test_ds_path1)
-            test_risk1 = int(test_risk1)
-        elif line.startswith('test_ds2:'):
-            test_ds_path2, test_spec_file_name2, test_risk2 = line.split(':')[1].strip().split()
-            test_ds_path2 = os.path.join(os.path.dirname(training_spec_file), test_ds_path2)
-            test_risk2 = int(test_risk2)
-        elif line.startswith('layer_name:'):
-            layer_name = line.split(':')[1].strip()
-        elif line.startswith('box_type:'):
-            box_type = line.split(':')[1].strip()
-        elif line.startswith('execution_mode:'):
-            execution_mode = line.split(':')[1].strip()
-        elif line.startswith('num_of_epoch:'):
-            num_of_epoch = int(line.split(':')[1].strip())
-        elif line.startswith('minibatch_size:'):
-            minibatch_size = int(line.split(':')[1].strip())
-        elif line.startswith('eval_interval:'):
-            eval_interval = int(line.split(':')[1].strip())
-        elif line.startswith('save_interval:'):
-            save_interval = int(line.split(':')[1].strip())
-        elif line.startswith('model_param_file:'):
-            model_param_file_path = line.split(':')[1].strip()
-            model_param_file_path = os.path.join(os.path.dirname(training_spec_file), model_param_file_path)
-        elif line.startswith('tlog_path:'):
-            tlog_path = line.split(':')[1].strip()
-            tlog_path = os.path.join(os.path.dirname(training_spec_file), tlog_path)
-        elif line.startswith('gpu_id:'):
-            gpu_id = int(line.split(':')[1].strip())
-    """
     tripTrainer = TripTrainer(train_ds_path1, train_spec_file_name1, train_risk1,
                               train_ds_path2, train_spec_file_name2, train_risk2,
                               test_ds_path1, test_spec_file_name1, test_risk1,
@@ -331,12 +307,10 @@ if __name__ == '__main__':
         tripTrainer.test_model()
     ## 10112019
     ## 10182019
-    """
-    trip_predictor = TripVPredictor(ds_path, ds_spec_file_name, layer_name, box_type, window_size, model_param_file_path, plog_path, gpu_id)
+    trip_predictor = TripVPredictor(ds_path, ds_spec_file_name, v_layer_name, v_box_type, window_size, v_model_param_file_path, plog_path, v_gpu_id)
     if video_out_path != '':
         trip_predictor.set_video_out(video_out_path)
     trip_predictor.vpredict()
-    """
     ## 10182019
         
         

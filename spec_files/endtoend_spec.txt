@@ -43,11 +43,21 @@ save_interval: 10
 # tlog_path: result/dashcam_tbox_tlog.txt
 #model_param_file: model_tbox_param_no_do.txt
 #tlog_path: result/yolov3/dashcam_tbox_no_do_tlog.txt
-model_param_file: spec_files/risk_prediction/model_tbox_param1.txt
-model_param_file: spec_files/risk_prediction/model_tbox_param2.txt
-model_param_file: spec_files/risk_prediction/model_tbox_param3.txt
-model_param_file: spec_files/risk_prediction/model_tbox_param4.txt
-model_param_file: spec_files/risk_prediction/model_tbox_param5.txt
+model_param_file: risk_prediction/model_tbox_param1.txt
+model_param_file: risk_prediction/model_tbox_param2.txt
+model_param_file: risk_prediction/model_tbox_param3.txt
+model_param_file: risk_prediction/model_tbox_param4.txt
+model_param_file: risk_prediction/model_tbox_param5.txt
 #tlog_path: result/yolov3/dashcam_tbox_tlog_conv33_adadelta_bak20190514.txt
 tlog_path: result/yolov3/dashcam_tbox_tlog_conv33_adadelta.txt
 gpu_id: 0
+########################
+#Risk Prediction Config
+########################
+ds: dataset/train0 ds_spec.txt
+v_layer_name: conv33,conv39,conv45
+v_box_type: tbox
+v_gpu_id: 0
+v_model_param_file: risk_prediction/model_tbox_param5.txt
+window_size: 10
+plog_path: result/yolov3/dashcam/dashcam_test0_tlog.txt
