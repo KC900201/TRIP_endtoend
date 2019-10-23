@@ -5,6 +5,11 @@ Created on Tue Sep 10 17:28:26 2019
 @author: setsu
 @filename: trip_predictor.py
 @coding: utf-8
+========================
+Date          Comment
+========================
+09142019      First revision
+10232019      Amend file path for npz file
 """
 
 import chainer
@@ -70,7 +75,9 @@ class TripPredictor(object):
                 continue
             param = line.split(':')
             if param[0].strip() == 'model_path':
-                self.model_path = os.path.join(os.path.dirname(model_param_file_path), param[1].strip())
+#                self.model_path = os.path.join(os.path.dirname(model_param_file_path), param[1].strip())
+                npz_path =  line.split(':')[1].strip().split() #10232019
+                self.model_path = os.path.normpath(''.join(npz_path))
             # <ADD>
             elif param[0].strip() == 'model_arch':
                 self.model_arch = param[1].strip()

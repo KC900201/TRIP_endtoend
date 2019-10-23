@@ -41,3 +41,4 @@ Updates
 2019/10/22 - Tested successfully the flow from dataset generation to risk prediction to video risk prediction. 
 	     Encountered pathnotfound exception in trip_dataset.py (line 28) while running video prediction (trip_vpredictor -> trip_predictor -> trip_dataset) 
              due to coding style when reading spec_files directory and ds_spec). Need to change coding style to suit own file directory.
+2019/10/23 - Amend directory file input for video prediction part (trip_combined.py - plog_path, ds_path; trip_predictor.py)

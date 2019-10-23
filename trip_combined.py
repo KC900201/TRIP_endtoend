@@ -24,7 +24,7 @@ import cv2
 import argparse
 import numpy as np
 from pathlib import Path, WindowsPath #10132019
-
+#Import module 
 from risk_prediction.trip_trainer import TripTrainer
 from risk_prediction.trip_vpredictor import TripVPredictor #10182019
 from estimation.dataset_generator.dataset_generator_function import DatasetGenerator
@@ -121,7 +121,7 @@ if __name__ == '__main__':
         # Video prediction part - 10182019
         elif line.startswith('ds:'):
             ds_path, ds_spec_file_name = line.split(':')[1].strip().split()
-            ds_path = os.path.join(os.path.dirname(spec_file), ds_path)
+            ds_path = os.path.join(os.path.dirname(ds_spec_file_name), ds_path)
         elif line.startswith('v_layer_name:'):
             v_layer_name = line.split(':')[1].strip()
         elif line.startswith('v_box_type:'):
@@ -130,10 +130,11 @@ if __name__ == '__main__':
             window_size = int(line.split(':')[1].strip())
         elif line.startswith('v_model_param_file:'):
             v_model_param_file_path = line.split(':')[1].strip()
-            v_model_param_file_path = os.path.join(os.path.dirname(spec_file), model_param_file_path)
+            v_model_param_file_path = os.path.join(os.path.dirname(spec_file), v_model_param_file_path)
         elif line.startswith('plog_path'):
-            plog_path = line.split(':')[1].strip()
-            plog_path = os.path.join(os.path.dirname(spec_file), plog_path)
+            plog_path = line.split(':')[1].strip().split()
+            plog_path = os.path.normpath(''.join(plog_path))
+#            plog_path = os.path.join(os.path.dirname(plog_file_name), plog_path)
         elif line.startswith('v_gpu_id:'):
             v_gpu_id = int(line.split(':')[1].strip())
         # End video prediction part
