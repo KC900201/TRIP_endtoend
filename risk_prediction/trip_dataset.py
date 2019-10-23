@@ -156,7 +156,9 @@ class TripDataset(dataset.DatasetMixin):
                         output_array[0][c] = resized_f_array_c
                     f_array = output_array
                 """
+                print("Before: " + f_array.size() + ", Shape: " + f_array.shape)
                 f_array.shape = tuple(shape)
+                print("After: " + f_array.size() + ", Shape: " + f_array.shape)
                 if p == 0:
                     f_arrays = f_array
                 else:
