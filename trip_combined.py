@@ -16,6 +16,7 @@ Date          Comment
 10162019      Fix gpu and gpu_id attributes string conflict and layer name list, temporarily harcode input and output directory for dataset generation
 10182019      Amend error part (unknown object) in dataset_generator part, add in video risk prediction
 10212019      Re-amend directory input path
+10242019      Remove training part code as pre-train model is used in end-to-end architecture
 """
 
 #Import libraries
@@ -23,9 +24,9 @@ import os
 import cv2
 import argparse
 import numpy as np
-from pathlib import Path, WindowsPath #10132019
+#from pathlib import Path, WindowsPath #10132019
 #Import module 
-from risk_prediction.trip_trainer import TripTrainer
+#from risk_prediction.trip_trainer import TripTrainer #10242019
 from risk_prediction.trip_vpredictor import TripVPredictor #10182019
 from estimation.dataset_generator.dataset_generator_function import DatasetGenerator
 from estimation.dataset_generator.object_detector import ObjectDetector
@@ -72,9 +73,30 @@ if __name__ == '__main__':
         elif line.startswith('save_img'):
             parser.add_argument('--save_img', type=bool, default=bool(line.split(':')[1].strip()), help='save_img option')
         elif line.startswith('video'):
-            parser.add_argument('--video', type=bool, default=bool(line.split(':')[1].strip()), help='video option')
+            parser.add_argument('--video', type=bool, default=bool(line.split(':')[1].strip()), help='video option')        
         # End dataset generator part
-        # Risk prediction part - 10142019
+        # Video prediction part - 10182019
+        elif line.startswith('ds:'):
+            ds_path, ds_spec_file_name = line.split(':')[1].strip().split()
+            ds_path = os.path.join(os.path.dirname(ds_spec_file_name), ds_path)
+        elif line.startswith('v_layer_name:'):
+            v_layer_name = line.split(':')[1].strip()
+        elif line.startswith('v_box_type:'):
+            v_box_type = line.split(':')[1].strip()
+        elif line.startswith('window_size:'):
+            window_size = int(line.split(':')[1].strip())
+        elif line.startswith('v_model_param_file:'):
+            v_model_param_file_path = line.split(':')[1].strip()
+            v_model_param_file_path = os.path.join(os.path.dirname(spec_file), v_model_param_file_path)
+        elif line.startswith('plog_path'):
+            plog_path = line.split(':')[1].strip().split()
+            plog_path = os.path.normpath(''.join(plog_path))
+#            plog_path = os.path.join(os.path.dirname(plog_file_name), plog_path)
+        elif line.startswith('v_gpu_id:'):
+            v_gpu_id = int(line.split(':')[1].strip())
+        # End video prediction part
+        # Risk prediction part - 10142019, 10242019
+        """
         elif line.startswith('train_ds1:'):
             train_ds_path1, train_spec_file_name1, train_risk1 = line.split(':')[1].strip().split()
 #            train_ds_path1 = os.path.join(os.path.dirname(spec_file), train_ds_path1)
@@ -117,27 +139,8 @@ if __name__ == '__main__':
 #            tlog_path = os.path.join(os.path.dirname(spec_file), tlog_path)
         elif line.startswith('gpu_id:'):
             gpu_id = int(line.split(':')[1].strip())
+        """
         # End risk prediction part
-        # Video prediction part - 10182019
-        elif line.startswith('ds:'):
-            ds_path, ds_spec_file_name = line.split(':')[1].strip().split()
-            ds_path = os.path.join(os.path.dirname(ds_spec_file_name), ds_path)
-        elif line.startswith('v_layer_name:'):
-            v_layer_name = line.split(':')[1].strip()
-        elif line.startswith('v_box_type:'):
-            v_box_type = line.split(':')[1].strip()
-        elif line.startswith('window_size:'):
-            window_size = int(line.split(':')[1].strip())
-        elif line.startswith('v_model_param_file:'):
-            v_model_param_file_path = line.split(':')[1].strip()
-            v_model_param_file_path = os.path.join(os.path.dirname(spec_file), v_model_param_file_path)
-        elif line.startswith('plog_path'):
-            plog_path = line.split(':')[1].strip().split()
-            plog_path = os.path.normpath(''.join(plog_path))
-#            plog_path = os.path.join(os.path.dirname(plog_file_name), plog_path)
-        elif line.startswith('v_gpu_id:'):
-            v_gpu_id = int(line.split(':')[1].strip())
-        # End video prediction part
             
     ## 10102019
     args = parser.parse_args()
@@ -294,7 +297,8 @@ if __name__ == '__main__':
                 # specfileを保存 save specfile
                 #save_specfile(output_dir, img_features)        
     ## End estimation part -- 10102019
-    ## 10112019
+    ## 10112019, 10242019
+    """
     tripTrainer = TripTrainer(train_ds_path1, train_spec_file_name1, train_risk1,
                               train_ds_path2, train_spec_file_name2, train_risk2,
                               test_ds_path1, test_spec_file_name1, test_risk1,
@@ -306,6 +310,7 @@ if __name__ == '__main__':
         tripTrainer.learn_model()
     else:
         tripTrainer.test_model()
+    """
     ## 10112019
     ## 10182019
     trip_predictor = TripVPredictor(ds_path, ds_spec_file_name, v_layer_name, v_box_type, window_size, v_model_param_file_path, plog_path, v_gpu_id)
