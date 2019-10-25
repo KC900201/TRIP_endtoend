@@ -159,13 +159,9 @@ class TripDataset(dataset.DatasetMixin):
 #                print("Feature shape (Before upsizing): channel - %s, height - %s, width - %s" %( f_array.shape[1], f_array.shape[2], f_array.shape[3])) #remove after testing
                 f_array.shape = tuple(shape)
                 if p == 0:
-#                    print("p == 0, channel for f_array - %s, height - %s, width - %s" %( f_array.shape[1], f_array.shape[2], f_array.shape[3]))
                     f_arrays = f_array
-#                    print("p == 0, channel for f_arrays - %s, height - %s, width - %s" %( f_arrays.shape[1], f_arrays.shape[2], f_arrays.shape[3]))
                 else:
-#                    print("p != 0, channel for f_array - %s, height - %s, width - %s" %( f_array.shape[1], f_array.shape[2], f_array.shape[3]))
                     f_arrays = np.concatenate([f_arrays, f_array], axis=0)
-#                    print("p != 0, channel for f_arrays - %s, height - %s, width - %s" %( f_arrays.shape[1], f_arrays.shape[2], f_arrays.shape[3]))
 #                print("Feature shape (After upsizing): channel - %s, height - %s, width - %s" %( f_array.shape[1], f_array.shape[2], f_array.shape[3])) #remove after testing
                 
 

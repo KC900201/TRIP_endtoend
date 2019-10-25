@@ -64,7 +64,7 @@ v_gpu_id: 0
 v_model_param_file: risk_prediction/model_tbox_param5.txt
 #v_model_param_file: risk_prediction/model_tbox_param_bg_gn5.txt
 window_size: 10
-plog_path: result/yolov3/dashcam/dashcam_test0_tlog.txt
+plog_path: result/yolov3/dashcam/dashcam_test0_tlog_20191025.txt
 #plog_path: result/yolov3/dashcam/dashcam_test1_tlog.txt
 #plog_path: result/yolov3/dashcam/dashcam_bg_gn_test0_tlog.txt
 

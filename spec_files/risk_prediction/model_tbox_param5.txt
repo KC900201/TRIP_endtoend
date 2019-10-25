@@ -5,7 +5,7 @@
 #model_path: model/yolov3/accident_KitDash_8000_tbox_5_model.npz
 model_path: result/yolov3/model/pretrain/accident_KitDash_8000_tbox_5_model.npz
 #model_arch: MP-C-SPP-FC-LSTM
-model_arch: MP-C-SPP-FC-DO-LSTM
+model_arch: MP-C-SPP-FC-DO-LSTM2
 input_size: 1000
 hidden_size: 100
 # roi_bg: BG_ZERO | BG_GN std | BG_DP rate - GN:Gaussian Noise, DP:Depression

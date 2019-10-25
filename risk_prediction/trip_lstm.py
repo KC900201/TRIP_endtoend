@@ -5,6 +5,11 @@ Created on Tue Sep 10 16:22:40 2019
 @author: setsu
 @filename: trip_lstm.py
 @coding: utf-8
+========================
+Date          Comment
+========================
+09142019      First revision
+10252019      Enhancement code to improve result (>70% accuracy in risk prediction)
 """
 from chainer import Chain, cuda, Variable
 import chainer.links as L
@@ -25,6 +30,7 @@ class TripLSTM(Chain):
         with self.init_scope():
             self.input = L.Linear(None, input_size)
             self.lstm = L.LSTM(input_size, hidden_size)
+            self.lstm2 = L.LSTM(input_size, hidden_size) # 10252019
             self.ho = L.Linear(hidden_size, 1)
     #
     def __call__(self, x):

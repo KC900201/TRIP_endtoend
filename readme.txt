@@ -44,4 +44,5 @@ Updates
 2019/10/23 - Amend directory file input for video prediction part (trip_combined.py - plog_path, ds_path; trip_predictor.py)
 2019/10/24 - Finally test run 1st trial of end-to-end architecture. Omitted training (risk prediction) coding due to unnecessary code in the architecture. 
              Videos are able to be created. Future questions: Enhance the convolutional neural network layer coding in trip_lstm.py
+2019/10/25 - Enhancement to include new LSTM (input_middle_conv) and new model arch (trip_c_lstm.py, trip_lstm.py) 
 	    
