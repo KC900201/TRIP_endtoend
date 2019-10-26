@@ -17,6 +17,7 @@ Date          Comment
 10182019      Amend error part (unknown object) in dataset_generator part, add in video risk prediction
 10212019      Re-amend directory input path
 10242019      Remove training part code as pre-train model is used in end-to-end architecture
+10252019      Repeat training for multiple program files
 """
 
 #Import libraries
@@ -297,19 +298,22 @@ if __name__ == '__main__':
                 # specfileを保存 save specfile
                 #save_specfile(output_dir, img_features)        
     ## End estimation part -- 10102019
-    ## 10112019, 10242019
-    """
-    tripTrainer = TripTrainer(train_ds_path1, train_spec_file_name1, train_risk1,
-                              train_ds_path2, train_spec_file_name2, train_risk2,
-                              test_ds_path1, test_spec_file_name1, test_risk1,
-                              test_ds_path2, test_spec_file_name2, test_risk2,
-                              layer_name, box_type, 
-                              execution_mode, num_of_epoch, minibatch_size, eval_interval, save_interval,
-                              model_param_file_path, tlog_path, gpu_id)
-    if execution_mode == 'train' or execution_mode == 'retrain':
-        tripTrainer.learn_model()
-    else:
-        tripTrainer.test_model()
+    ## 10112019, 10242019, 10252019
+    """    
+    for count, model_param_file_path in enumerate(model_param_file_paths):
+        print(count+1, '/', len(model_param_file_paths))
+        repeat_tlog_path = os.path.splitext(tlog_path)[0] + '_({}).txt'.format(str(count+1))
+        tripTrainer = TripTrainer(train_ds_path1, train_spec_file_name1, train_risk1,
+                                  train_ds_path2, train_spec_file_name2, train_risk2,
+                                  test_ds_path1, test_spec_file_name1, test_risk1,
+                                  test_ds_path2, test_spec_file_name2, test_risk2,
+                                  layer_name, box_type, 
+                                  execution_mode, num_of_epoch, minibatch_size, eval_interval, save_interval,
+                                  model_param_file_path, repeat_tlog_path, gpu_id)
+        if execution_mode == 'train' or execution_mode == 'retrain':
+            tripTrainer.learn_model()
+        else:
+            tripTrainer.test_model()
     """
     ## 10112019
     ## 10182019

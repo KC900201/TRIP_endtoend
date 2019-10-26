@@ -30,7 +30,7 @@ class TripLSTM(Chain):
         with self.init_scope():
             self.input = L.Linear(None, input_size)
             self.lstm = L.LSTM(input_size, hidden_size)
-            self.lstm2 = L.LSTM(input_size, hidden_size) # 10252019
+            self.lstm2 = L.LSTM(hidden_size, hidden_size) # 10252019
             self.ho = L.Linear(hidden_size, 1)
     #
     def __call__(self, x):
