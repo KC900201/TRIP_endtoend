@@ -18,6 +18,7 @@ Date          Comment
 10212019      Re-amend directory input path
 10242019      Remove training part code as pre-train model is used in end-to-end architecture
 10252019      Repeat training for multiple program files
+10272019      Temporarily hide dataset generation part
 """
 
 #Import libraries
@@ -27,8 +28,8 @@ import argparse
 import numpy as np
 #from pathlib import Path, WindowsPath #10132019
 #Import module 
-#from risk_prediction.trip_trainer import TripTrainer #10242019
-from risk_prediction.trip_vpredictor import TripVPredictor #10182019
+from risk_prediction.trip_trainer import TripTrainer #10242019
+#from risk_prediction.trip_vpredictor import TripVPredictor #10182019
 from estimation.dataset_generator.dataset_generator_function import DatasetGenerator
 from estimation.dataset_generator.object_detector import ObjectDetector
 
@@ -36,6 +37,7 @@ from estimation.dataset_generator.object_detector import ObjectDetector
 if __name__ == '__main__':
     # Initialize parameters
     parser = argparse.ArgumentParser(description='dataset_maker')
+    model_param_file_paths = [] # 10252019
     
     spec_file = input('Input spec file (endtoend_spec.txt): ')
     video_out_path = input('Input a video output path (if no video output, enter a return): ') #video risk prediction - 10182019
@@ -94,10 +96,9 @@ if __name__ == '__main__':
             plog_path = os.path.normpath(''.join(plog_path))
 #            plog_path = os.path.join(os.path.dirname(plog_file_name), plog_path)
         elif line.startswith('v_gpu_id:'):
-            v_gpu_id = int(line.split(':')[1].strip())
+            v_gpu_id = int(line.split(':')[1].strip())        
         # End video prediction part
         # Risk prediction part - 10142019, 10242019
-        """
         elif line.startswith('train_ds1:'):
             train_ds_path1, train_spec_file_name1, train_risk1 = line.split(':')[1].strip().split()
 #            train_ds_path1 = os.path.join(os.path.dirname(spec_file), train_ds_path1)
@@ -135,15 +136,16 @@ if __name__ == '__main__':
         elif line.startswith('model_param_file:'):
             model_param_file_path = line.split(':')[1].strip()
             model_param_file_path = os.path.join(os.path.dirname(spec_file), model_param_file_path)
+            model_param_file_paths.append(model_param_file_path) # 10252019
         elif line.startswith('tlog_path:'):
             tlog_path = line.split(':')[1].strip()
 #            tlog_path = os.path.join(os.path.dirname(spec_file), tlog_path)
         elif line.startswith('gpu_id:'):
             gpu_id = int(line.split(':')[1].strip())
-        """
         # End risk prediction part
             
     ## 10102019
+    """ #10272019
     args = parser.parse_args()
 
     input_dir = args.input_dir
@@ -298,8 +300,8 @@ if __name__ == '__main__':
                 # specfileを保存 save specfile
                 #save_specfile(output_dir, img_features)        
     ## End estimation part -- 10102019
+    """
     ## 10112019, 10242019, 10252019
-    """    
     for count, model_param_file_path in enumerate(model_param_file_paths):
         print(count+1, '/', len(model_param_file_paths))
         repeat_tlog_path = os.path.splitext(tlog_path)[0] + '_({}).txt'.format(str(count+1))
@@ -314,13 +316,15 @@ if __name__ == '__main__':
             tripTrainer.learn_model()
         else:
             tripTrainer.test_model()
-    """
+    
     ## 10112019
     ## 10182019
+    """
     trip_predictor = TripVPredictor(ds_path, ds_spec_file_name, v_layer_name, v_box_type, window_size, v_model_param_file_path, plog_path, v_gpu_id)
     if video_out_path != '':
         trip_predictor.set_video_out(video_out_path)
     trip_predictor.vpredict()
+    """
     ## 10182019
         
         

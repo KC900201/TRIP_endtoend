@@ -5,6 +5,12 @@ Created on Tue Sep 10 17:17:15 2019
 @author: setsu
 @filename: trip_dataset.py
 @coding: utf-8
+========================
+Date          Comment
+========================
+09142019      First revision
+10282019      Temp solution to change directory when training, 
+              comment out when finished training feature extraction
 """
 
 from chainer import dataset
@@ -35,6 +41,7 @@ class TripDataset(dataset.DatasetMixin):
         # set dataset path (ds_path)
         self.ds_path = ds_path
         # set dataset spec (feature_type, layer_info, box_type)
+        os.chdir("C:\Users\atsumilab\Pictures\TRIP_Dataset\YOLO_KitDash") # 10282019
         with open(os.path.join(self.ds_path, spec_file), 'r', encoding='utf-8') as f:
             lines = f.readlines()
         for line in lines:
