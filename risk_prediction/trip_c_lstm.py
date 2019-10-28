@@ -11,6 +11,8 @@ Date          Comment
 09142019      First revision
 10252019      Enhancement code to improve result (>70% accuracy in risk prediction)
 10262019      Reduce ksize, stride, pad for input_middle_conv 
+10272019      Increase convolutional layer (input_sec_middle_conv)
+10282019      Increase lstm (lstm3)
 """
 
 import chainer.functions as F
@@ -32,6 +34,7 @@ class TripCLSTM(TripLSTM):
             self.input_conv = L.Convolution2D(None, 512, ksize=3, stride=1, pad=1) 
 #            self.input_middle_conv = L.Convolution2D(None, 1024, ksize=6, stride=2, pad=2) #10252019
             self.input_middle_conv = L.Convolution2D(None, 512, ksize=3, stride=1, pad=1) #10262019
+            self.input_sec_middle_conv = L.Convolution2D(None, 512, ksize=3, stride=1, pad=1) #10272019
         self.model_arch = model_arch
     #
     def __call__(self, x):
@@ -62,28 +65,32 @@ class TripCLSTM(TripLSTM):
             #z = F.spatial_pyramid_pooling_2d(z, 3, pooling_class=F.MaxPooling2D)
             z = F.spatial_pyramid_pooling_2d(z, 3, pooling="max")
             z = F.tanh(self.input(z))
-        elif self.model_arch == 'MP-C-SPP-FC-DO-LSTM2': # 10252019
+        elif self.model_arch == 'MP-C-SPP-FC-DO-LSTM2' or self.model_arch == 'MP-C-SPP-FC-DO-LSTM3': # 10252019, 10282019
             z = F.max_pooling_2d(x, 2)
             z = F.tanh(self.input_conv(z))
             #z = F.spatial_pyramid_pooling_2d(z, 3, pooling_class=F.MaxPooling2D)
             z = F.max_pooling_2d(x, 2) 
-            z = F.tanh(self.input_middle_conv(z))            
+            z = F.tanh(self.input_middle_conv(z))
+            #z = F.max_pooling_2d(x, 2)  # 10272019
+            #z = F.tanh(self.input_sec_middle_conv(z))   # 10272019            
             z = F.spatial_pyramid_pooling_2d(z, 3, pooling="max")
             z = F.tanh(self.input(z))
             z = F.dropout(z, ratio=dropout_ratio)
-            z = self.lstm2(z)
-        elif self.model_arch == 'MP-C-SPP-FC-LSTM2': # 10252019
+        elif self.model_arch == 'MP-C-SPP-FC-LSTM2' or self.model_arch == 'MP-C-SPP-FC-LSTM3': # 10252019, 10282019
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
             z = F.tanh(self.input_conv(z)) # 512, ksize=3, stride=1. pad=1
             z = F.max_pooling_2d(x, 2) 
-            z = F.tanh(self.input_middle_conv(z))            
+            z = F.tanh(self.input_middle_conv(z))
+            #z = F.max_pooling_2d(x, 2)  # 10272019
+            #z = F.tanh(self.input_sec_middle_conv(z))   # 10272019                        
             #z = F.spatial_pyramid_pooling_2d(z, 3, pooling_class=F.MaxPooling2D)
             z = F.spatial_pyramid_pooling_2d(z, 3, pooling="max")
             z = F.tanh(self.input(z))
-            z = self.lstm2(z)
         
         if self.model_arch == 'MP-C-SPP-FC-DO-LSTM2' or self.model_arch == 'MP-C-SPP-FC-LSTM2': #10252019
             return self.lstm2(self.lstm(z))
+        elif self.model_arch == 'MP-C-SPP-FC-DO-LSTM3' or self.model_arch == 'MP-C-SPP-FC-LSTM3': #10282019
+            return self.lstm3(self.lstm2(self.lstm(z)))
         else:
             return self.lstm(z)
 #        return self.lstm(z)

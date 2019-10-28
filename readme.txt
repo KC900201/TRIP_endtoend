@@ -46,3 +46,5 @@ Updates
              Videos are able to be created. Future questions: Enhance the convolutional neural network layer coding in trip_lstm.py
 2019/10/25 - Enhancement to include new LSTM (input_middle_conv) and new model arch (trip_c_lstm.py, trip_lstm.py) 
 2019/10/26 - Enhance training part to run multiple param files, refine input middle convolution layer by reducing ksize, stride, pad and kernel
+2019/10/27 - Increase one more convolutional layer (input_sec_middle_conv) in trip_c_lstm.py 
+2019/10/28 - Increase one more lstm (lstm3) in trip_lstm.py 
