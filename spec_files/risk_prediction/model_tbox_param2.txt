@@ -6,7 +6,8 @@
 model_path: result/yolov3/model/accident_KitDash_8000_tbox_2_model.npz
 #model_arch: MP-C-SPP-FC-LSTM
 #model_arch: MP-C-SPP-FC-DO-LSTM
-model_arch: MP-C-SPP-FC-DO-LSTM2
+#model_arch: MP-C-SPP-FC-DO-LSTM2
+model_arch: MP-C-SPP-FC-DO-LSTM3
 input_size: 1000
 #hidden_size: 100
 hidden_size: 1000
