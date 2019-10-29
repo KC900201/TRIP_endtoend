@@ -53,7 +53,7 @@ model_param_file: risk_prediction/model_tbox_param3.txt
 model_param_file: risk_prediction/model_tbox_param4.txt
 model_param_file: risk_prediction/model_tbox_param5.txt
 #tlog_path: result/yolov3/dashcam_tbox_tlog_conv33_adadelta_bak20190514.txt
-tlog_path: result/yolov3/dashcam_tbox_tlog_conv33_adadelta.txt
+tlog_path: result/yolov3/dashcam_tbox_tlog_conv33_adadelta_bak20191029.txt
 gpu_id: 0
 ########################
 #Risk Prediction Config

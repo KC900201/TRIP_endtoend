@@ -19,6 +19,7 @@ Date          Comment
 10242019      Remove training part code as pre-train model is used in end-to-end architecture
 10252019      Repeat training for multiple program files
 10272019      Temporarily hide dataset generation part
+10292019      Temporary hardcode path for training and testing dataset
 """
 
 #Import libraries
@@ -102,22 +103,26 @@ if __name__ == '__main__':
         elif line.startswith('train_ds1:'):
             train_ds_path1, train_spec_file_name1, train_risk1 = line.split(':')[1].strip().split()
 #            train_ds_path1 = os.path.join(os.path.dirname(spec_file), train_ds_path1)
-            train_ds_path1 = os.path.join(os.path.dirname(train_spec_file_name1), train_ds_path1) #10212019
+#            train_ds_path1 = os.path.join(os.path.dirname(train_spec_file_name1), train_ds_path1) #10212019
+            train_ds_path1 = os.path.join('C:/Users/atsumilab/Pictures/TRIP_Dataset', train_ds_path1) #10292019
             train_risk1 = int(train_risk1)
         elif line.startswith('train_ds2:'):
             train_ds_path2, train_spec_file_name2, train_risk2 = line.split(':')[1].strip().split()
 #           train_ds_path2 = os.path.join(os.path.dirname(spec_file), train_ds_path2)
-            train_ds_path2 = os.path.join(os.path.dirname(train_spec_file_name2), train_ds_path2) #10212019
+#            train_ds_path2 = os.path.join(os.path.dirname(train_spec_file_name2), train_ds_path2) #10212019
+            train_ds_path2 = os.path.join('C:/Users/atsumilab/Pictures/TRIP_Dataset', train_ds_path2) #10292019
             train_risk2 = int(train_risk2)
         elif line.startswith('test_ds1:'):
             test_ds_path1, test_spec_file_name1, test_risk1 = line.split(':')[1].strip().split()
 #            test_ds_path1 = os.path.join(os.path.dirname(spec_file), test_ds_path1) #10212019
-            test_ds_path1 = os.path.join(os.path.dirname(test_spec_file_name1), test_ds_path1)
+#            test_ds_path1 = os.path.join(os.path.dirname(test_spec_file_name1), test_ds_path1)
+            test_ds_path1 = os.path.join('C:/Users/atsumilab/Pictures/TRIP_Dataset', test_ds_path1) #10292019
             test_risk1 = int(test_risk1)
         elif line.startswith('test_ds2:'):
             test_ds_path2, test_spec_file_name2, test_risk2 = line.split(':')[1].strip().split()
 #            test_ds_path2 = os.path.join(os.path.dirname(spec_file), test_ds_path2) #10212019
-            test_ds_path2 = os.path.join(os.path.dirname(test_spec_file_name2), test_ds_path2)
+#            test_ds_path2 = os.path.join(os.path.dirname(test_spec_file_name2), test_ds_path2)
+            test_ds_path2 = os.path.join('C:/Users/atsumilab/Pictures/TRIP_Dataset', test_ds_path2) #10292019
             test_risk2 = int(test_risk2)
         elif line.startswith('layer_name:'):
             layer_name = line.split(':')[1].strip()
