@@ -2,15 +2,12 @@
 #model_path: model/accident_KitDash_8000_tbox_bg_gn_model.npz
 #model_path: model/accident_KitDash_8000_tbox_model.npz
 #model_path: model/accident_KitDash_8000.50.npz
-#model_path: model/yolov3/accident_KitDash_8000_2_tbox_model.npz
-model_path: result/yolov3/model/backup_lstm3_do_adadelta_input_middle_conv_20191101/accident_KitDash_8000_tbox_2_model.npz
+model_path: result/yolov3/lstm3/accident_KitDash_8000_tbox_4_model.npz
 #model_arch: MP-C-SPP-FC-LSTM
-#model_arch: MP-C-SPP-FC-DO-LSTM
 #model_arch: MP-C-SPP-FC-DO-LSTM2
 model_arch: MP-C-SPP-FC-DO-LSTM3
 input_size: 1000
-#hidden_size: 100
-hidden_size: 1000
+hidden_size: 100
 # roi_bg: BG_ZERO | BG_GN std | BG_DP rate - GN:Gaussian Noise, DP:Depression
 roi_bg: BG_ZERO
 comparative_loss_margin: 0.5

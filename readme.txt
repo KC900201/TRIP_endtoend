@@ -49,3 +49,4 @@ Updates
 2019/10/27 - Increase one more convolutional layer (input_sec_middle_conv) in trip_c_lstm.py 
 2019/10/28 - Increase one more lstm (lstm3) in trip_lstm.py 
 2019/10/29 - Increase one conv layer (input_third_middle_conv) in trip_lstm.py without implementation. Edit param files to run LSTM3 architecture.
+2019/11/01 - Revert batch size to 32 in training (endtoend_spec.txt). Create new param files (model_tbox_lstm3_param1 - ...param5.txt) for training without drop-out mode.

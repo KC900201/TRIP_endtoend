@@ -70,13 +70,13 @@ class TripCLSTM(TripLSTM):
         elif self.model_arch == 'MP-C-SPP-FC-DO-LSTM2' or self.model_arch == 'MP-C-SPP-FC-DO-LSTM3': # 10252019, 10282019
             z = F.max_pooling_2d(x, 2)
             z = F.tanh(self.input_conv(z))
-            #z = F.spatial_pyramid_pooling_2d(z, 3, pooling_class=F.MaxPooling2D)
             z = F.max_pooling_2d(x, 2) 
             z = F.tanh(self.input_middle_conv(z))
             #z = F.max_pooling_2d(x, 2)  # 10272019
             #z = F.tanh(self.input_sec_middle_conv(z))   # 10272019  
             #z = F.max_pooling_2d(x, 2) # 10292019
             #z = F.tanh(self.input_third_middle_conv(z)) # 10292019
+            #z = F.spatial_pyramid_pooling_2d(z, 3, pooling_class=F.MaxPooling2D)
             z = F.spatial_pyramid_pooling_2d(z, 3, pooling="max")
             z = F.tanh(self.input(z))
             z = F.dropout(z, ratio=dropout_ratio)

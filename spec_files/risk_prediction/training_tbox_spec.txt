@@ -1,8 +1,12 @@
 # training spec
-train_ds1: ds3/train0 ds_spec.txt 0
-train_ds2: ds3/train1 ds_spec.txt 1
-test_ds1: ds3/test0 ds_spec.txt 0
-test_ds2: ds3/test1 ds_spec.txt 1
+#train_ds1: ds3/train0 ds_spec.txt 0
+#train_ds2: ds3/train1 ds_spec.txt 1
+#test_ds1: ds3/test0 ds_spec.txt 0
+#test_ds2: ds3/test1 ds_spec.txt 1
+train_ds1: YOLO_KitDash/train0 ds_spec.txt 0
+train_ds2: YOLO_KitDash/train1 ds_spec.txt 1
+test_ds1: YOLO_KitDash/test0 ds_spec.txt 0
+test_ds2: YOLO_KitDash/test1 ds_spec.txt 1
 #layer_name: conv33,conv39,conv45
 layer_name: conv33
 box_type: tbox
@@ -15,10 +19,10 @@ save_interval: 10
 # tlog_path: result/dashcam_tbox_tlog.txt
 #model_param_file: model_tbox_param_no_do.txt
 #tlog_path: result/yolov3/dashcam_tbox_no_do_tlog.txt
-model_param_file: model_tbox_param1.txt
-model_param_file: model_tbox_param2.txt
-model_param_file: model_tbox_param3.txt
-model_param_file: model_tbox_param4.txt
-model_param_file: model_tbox_param5.txt
-tlog_path: result/yolov3/dashcam_tbox_tlog_conv33_adadelta_bak20190514.txt
+model_param_file: model_tbox_lstm3_param1.txt
+model_param_file: model_tbox_lstm3_param2.txt
+model_param_file: model_tbox_lstm3_param3.txt
+model_param_file: model_tbox_lstm3_param4.txt
+model_param_file: model_tbox_lstm3_param5.txt
+tlog_path: result/yolov3/lstm3/dashcam_tbox_tlog_ltsm3_no_do_conv33_adadelta_bak20191101.txt
 gpu_id: 0
