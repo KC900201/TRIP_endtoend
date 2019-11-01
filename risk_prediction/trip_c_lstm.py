@@ -14,6 +14,7 @@ Date          Comment
 10272019      Increase convolutional layer (input_sec_middle_conv)
 10282019      Increase lstm (lstm3)
 10292019      Increase convolutional layer (input_third_middle_conv)
+11012019    　Remove max_pooling at extra input middle conv layer to prevent data loss, insert dropout in between middle conv layer
 """
 
 import chainer.functions as F
@@ -68,26 +69,30 @@ class TripCLSTM(TripLSTM):
             z = F.spatial_pyramid_pooling_2d(z, 3, pooling="max")
             z = F.tanh(self.input(z))
         elif self.model_arch == 'MP-C-SPP-FC-DO-LSTM2' or self.model_arch == 'MP-C-SPP-FC-DO-LSTM3': # 10252019, 10282019
-            z = F.max_pooling_2d(x, 2)
-            z = F.tanh(self.input_conv(z))
-            z = F.max_pooling_2d(x, 2) 
+            #z = F.max_pooling_2d(x, 2) #11012019
+            z = F.tanh(self.input_conv(x))
+            z = F.dropout(z, ratio=dropout_ratio) #11012019
+            #z = F.max_pooling_2d(z, 2) #11012019
             z = F.tanh(self.input_middle_conv(z))
-            #z = F.max_pooling_2d(x, 2)  # 10272019
-            #z = F.tanh(self.input_sec_middle_conv(z))   # 10272019  
-            #z = F.max_pooling_2d(x, 2) # 10292019
+            #z = F.max_pooling_2d(z, 2)  # 10272019, 11012019
+            z = F.dropout(z, ratio=dropout_ratio) #11012019
+            z = F.tanh(self.input_sec_middle_conv(z))   # 10272019  
+            #z = F.max_pooling_2d(z, 2) # 10292019, 11012019
             #z = F.tanh(self.input_third_middle_conv(z)) # 10292019
             #z = F.spatial_pyramid_pooling_2d(z, 3, pooling_class=F.MaxPooling2D)
             z = F.spatial_pyramid_pooling_2d(z, 3, pooling="max")
             z = F.tanh(self.input(z))
             z = F.dropout(z, ratio=dropout_ratio)
         elif self.model_arch == 'MP-C-SPP-FC-LSTM2' or self.model_arch == 'MP-C-SPP-FC-LSTM3': # 10252019, 10282019
-            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
-            z = F.tanh(self.input_conv(z)) # 512, ksize=3, stride=1. pad=1
-            z = F.max_pooling_2d(x, 2) 
+            #z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.tanh(self.input_conv(x)) # 512, ksize=3, stride=1. pad=1
+            z = F.dropout(z, ratio=dropout_ratio) #11012019
+            #z = F.max_pooling_2d(x, 2) #11012019
             z = F.tanh(self.input_middle_conv(z))
-            #z = F.max_pooling_2d(x, 2)  # 10272019
-            #z = F.tanh(self.input_sec_middle_conv(z))   # 10272019                        
-            #z = F..max_pooling_2d(x, 2) # 10292019
+            #z = F.max_pooling_2d(z, 2)  # 10272019
+            z = F.dropout(z, ratio=dropout_ratio) #11012019
+            z = F.tanh(self.input_sec_middle_conv(z))   # 10272019                        
+            #z = F..max_pooling_2d(z, 2) # 10292019
             #z = F.tanh(self.input_third_middle_conv(z)) # 10292019
             #z = F.spatial_pyramid_pooling_2d(z, 3, pooling_class=F.MaxPooling2D)
             z = F.spatial_pyramid_pooling_2d(z, 3, pooling="max")

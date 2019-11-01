@@ -40,8 +40,8 @@ layer_name: conv33
 box_type: tbox
 execution_mode: train
 num_of_epoch: 50
-minibatch_size: 32
-#minibatch_size: 1
+#minibatch_size: 32
+minibatch_size: 16
 eval_interval: 5
 save_interval: 10
 # tlog_path: result/dashcam_tbox_tlog.txt
