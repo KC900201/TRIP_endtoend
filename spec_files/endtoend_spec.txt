@@ -41,7 +41,7 @@ box_type: tbox
 execution_mode: train
 num_of_epoch: 50
 #minibatch_size: 32
-minibatch_size: 16
+minibatch_size: 8
 eval_interval: 5
 save_interval: 10
 # tlog_path: result/dashcam_tbox_tlog.txt
@@ -53,7 +53,7 @@ model_param_file: risk_prediction/model_tbox_param3.txt
 model_param_file: risk_prediction/model_tbox_param4.txt
 model_param_file: risk_prediction/model_tbox_param5.txt
 #tlog_path: result/yolov3/dashcam_tbox_tlog_conv33_adadelta_bak20190514.txt
-tlog_path: result/yolov3/lstm3/dashcam_tbox_tlog_ltsm3_conv33_adadelta_bak20191101.txt
+tlog_path: result/yolov3/lstm3/dashcam_tbox_tlog_ltsm2_conv33_adadelta_bak20191104.txt
 gpu_id: 0
 ########################
 #Risk Prediction Config
