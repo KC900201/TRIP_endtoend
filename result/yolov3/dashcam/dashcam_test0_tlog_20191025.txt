@@ -1,0 +1,6 @@
+000456_0
+ risk of interval [0,9]: 0.28056473
+ risk of interval [10,19]: 0.12654915
+ risk of interval [20,29]: 0.05699612
+ risk of interval [30,39]: 0.47295797
+ risk of interval [40,49]: 0.32898223
