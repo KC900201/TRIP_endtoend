@@ -12,8 +12,8 @@ layer_name: conv33
 box_type: tbox
 execution_mode: train
 num_of_epoch: 50
-#minibatch_size: 2
-minibatch_size: 32
+minibatch_size: 8
+#minibatch_size: 32
 eval_interval: 5
 save_interval: 10
 # tlog_path: result/dashcam_tbox_tlog.txt
@@ -24,5 +24,5 @@ model_param_file: model_tbox_lstm3_param2.txt
 model_param_file: model_tbox_lstm3_param3.txt
 model_param_file: model_tbox_lstm3_param4.txt
 model_param_file: model_tbox_lstm3_param5.txt
-tlog_path: result/yolov3/lstm3/dashcam_tbox_tlog_ltsm3_no_do_conv33_adadelta_bak20191101.txt
+tlog_path: result/yolov3/lstm3/dashcam_tbox_tlog_ltsm2_no_do_conv33_adadelta_bak20191107.txt
 gpu_id: 0
