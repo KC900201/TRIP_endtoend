@@ -54,3 +54,111 @@ Epoch: 11
  loss: 25.796477 (290.40 sec)
 Epoch: 12
  loss: 25.194802 (228.14 sec)
+Epoch: 13
+ loss: 25.381834 (194.08 sec)
+Epoch: 14
+ loss: 25.047936 (218.75 sec)
+Epoch: 15
+ loss: 25.253356 (175.72 sec)
+ train data evaluation:
+  accuracy: 63.073% [275/436] (296.81 sec)
+ test data evaluation:
+  accuracy: 62.733% [101/161] (402.45 sec)
+Epoch: 16
+ loss: 25.067827 (575.33 sec)
+Epoch: 17
+ loss: 25.564186 (547.64 sec)
+Epoch: 18
+ loss: 25.201592 (1271.45 sec)
+Epoch: 19
+ loss: 25.785888 (814.52 sec)
+Epoch: 20
+ loss: 25.208256 (166.54 sec)
+ train data evaluation:
+  accuracy: 65.138% [284/436] (276.11 sec)
+ test data evaluation:
+  accuracy: 62.112% [100/161] (339.18 sec)
+Epoch: 21
+ loss: 25.468365 (174.21 sec)
+Epoch: 22
+ loss: 25.002000 (160.22 sec)
+Epoch: 23
+ loss: 26.283553 (165.30 sec)
+Epoch: 24
+ loss: 25.887027 (160.89 sec)
+Epoch: 25
+ loss: 26.261935 (166.46 sec)
+ train data evaluation:
+  accuracy: 55.734% [243/436] (254.16 sec)
+ test data evaluation:
+  accuracy: 52.174% [84/161] (352.14 sec)
+Epoch: 26
+ loss: 25.985907 (160.73 sec)
+Epoch: 27
+ loss: 26.083050 (163.67 sec)
+Epoch: 28
+ loss: 25.420380 (160.19 sec)
+Epoch: 29
+ loss: 24.647358 (164.79 sec)
+Epoch: 30
+ loss: 25.690208 (160.06 sec)
+ train data evaluation:
+  accuracy: 64.450% [281/436] (220.41 sec)
+ test data evaluation:
+  accuracy: 55.280% [89/161] (119.20 sec)
+Epoch: 31
+ loss: 26.119002 (161.06 sec)
+Epoch: 32
+ loss: 25.235749 (162.32 sec)
+Epoch: 33
+ loss: 25.412718 (164.85 sec)
+Epoch: 34
+ loss: 25.330224 (162.41 sec)
+Epoch: 35
+ loss: 25.829189 (163.62 sec)
+ train data evaluation:
+  accuracy: 63.073% [275/436] (225.86 sec)
+ test data evaluation:
+  accuracy: 55.280% [89/161] (111.88 sec)
+Epoch: 36
+ loss: 25.092400 (160.31 sec)
+Epoch: 37
+ loss: 25.423761 (164.86 sec)
+Epoch: 38
+ loss: 24.785858 (162.21 sec)
+Epoch: 39
+ loss: 25.122514 (164.52 sec)
+Epoch: 40
+ loss: 24.708738 (156.77 sec)
+ train data evaluation:
+  accuracy: 63.073% [275/436] (280.37 sec)
+ test data evaluation:
+  accuracy: 57.764% [93/161] (463.64 sec)
+Epoch: 41
+ loss: 25.141401 (286.87 sec)
+Epoch: 42
+ loss: 24.759829 (162.53 sec)
+Epoch: 43
+ loss: 26.441245 (164.71 sec)
+Epoch: 44
+ loss: 25.027548 (159.56 sec)
+Epoch: 45
+ loss: 25.183986 (164.26 sec)
+ train data evaluation:
+  accuracy: 63.761% [278/436] (213.33 sec)
+ test data evaluation:
+  accuracy: 57.764% [93/161] (206.81 sec)
+Epoch: 46
+ loss: 24.565309 (158.70 sec)
+Epoch: 47
+ loss: 24.881954 (163.31 sec)
+Epoch: 48
+ loss: 24.568308 (160.59 sec)
+Epoch: 49
+ loss: 25.075535 (165.77 sec)
+Epoch: 50
+ loss: 25.630275 (159.36 sec)
+ train data evaluation:
+  accuracy: 71.330% [311/436] (164.18 sec)
+ test data evaluation:
+  accuracy: 54.658% [88/161] (111.86 sec)
