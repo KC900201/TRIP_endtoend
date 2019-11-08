@@ -5,6 +5,11 @@ Created on Wed Sep 11 19:58:23 2019
 @author: setsu
 @filename: yolov3_feature_ext.py
 @code: utf-8
+========================
+Date          Comment
+========================
+09142019      First revision
+11082019      Enhancement on using soft-nms
 """
 
 from __future__ import division
@@ -261,7 +266,7 @@ class YOLOv3(YOLOBase):
             layer_id_l = np.array([step_list.index(step) for step in step_l])
 
             indices = utils.non_maximum_suppression(
-                bbox_l, self.nms_thresh, score_l)
+                bbox_l, self.nms_thresh, score_l) # 11082019
             bbox_l = bbox_l[indices]
             score_l = score_l[indices]
             layer_id_l = layer_id_l[cuda.to_cpu(indices)]

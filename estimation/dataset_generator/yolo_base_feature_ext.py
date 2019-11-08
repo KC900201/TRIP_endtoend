@@ -5,6 +5,11 @@ Created on Wed Sep 11 20:07:36 2019
 @author: setsu
 @filename: yolo_base_feature_ext
 @code: utf-8
+========================
+Date          Comment
+========================
+09142019      First revision
+11082019      Enhancement on using soft-nms
 """
 
 import chainer
@@ -43,10 +48,10 @@ class YOLOBase(chainer.Chain):
         """
 
         if preset == 'visualize':
-            self.nms_thresh = 0.45
+            self.nms_thresh = 0.45  #11082019
             self.score_thresh = 0.5
         elif preset == 'evaluate':
-            self.nms_thresh = 0.45
+            self.nms_thresh = 0.45  #11082019
             self.score_thresh = 0.005
         else:
             raise ValueError('preset must be visualize or evaluate')
