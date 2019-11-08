@@ -5,6 +5,12 @@ Created on Tue Sep 10 17:17:15 2019
 @author: setsu
 @filename: trip_dataset.py
 @coding: utf-8
+========================
+Date          Comment
+========================
+09142019      First revision
+10282019      Temp solution to change directory when training, 
+              comment out when finished training feature extraction
 """
 
 from chainer import dataset
@@ -35,6 +41,7 @@ class TripDataset(dataset.DatasetMixin):
         # set dataset path (ds_path)
         self.ds_path = ds_path
         # set dataset spec (feature_type, layer_info, box_type)
+        #os.chdir('C:/Users/atsumilab/Pictures/TRIP_Dataset') #10282019
         with open(os.path.join(self.ds_path, spec_file), 'r', encoding='utf-8') as f:
             lines = f.readlines()
         for line in lines:
@@ -105,7 +112,7 @@ class TripDataset(dataset.DatasetMixin):
         """
         sample = []
 
-        farray_list = []
+#        farray_list = []
         #print("before test: iteration - " + str(i) + ", length of self.dirs - " + str(len(self.dirs))) # testing - 20190211
  
         for j in range(len(self.feature_data[i])):            
@@ -156,12 +163,14 @@ class TripDataset(dataset.DatasetMixin):
                         output_array[0][c] = resized_f_array_c
                     f_array = output_array
                 """
+#                print("Feature shape (Before upsizing): channel - %s, height - %s, width - %s" %( f_array.shape[1], f_array.shape[2], f_array.shape[3])) #remove after testing
                 f_array.shape = tuple(shape)
                 if p == 0:
                     f_arrays = f_array
                 else:
                     f_arrays = np.concatenate([f_arrays, f_array], axis=0)
-                #print("Feature shape (After upsizing): channel - %s, height - %s, width - %s" %( f_array.shape[1], f_array.shape[2], f_array.shape[3])) #remove after testing
+#                print("Feature shape (After upsizing): channel - %s, height - %s, width - %s" %( f_array.shape[1], f_array.shape[2], f_array.shape[3])) #remove after testing
+                
 
             #farray_list.append(f_arrays)
     

@@ -5,18 +5,23 @@ Created on Tue Sep 10 17:24:26 2019
 @author: setsu
 @filename: trip_trainer.py
 @coding: utf-8
+========================
+Date          Comment
+========================
+09142019      First revision
+10222019      Amend directory path for model_path
 """
 
 import chainer
 from chainer import serializers, iterators, cuda, optimizers
 import chainer.functions as F
-from trip_dataset import TripDataset
-from trip_lstm import TripLSTM
+from risk_prediction.trip_dataset import TripDataset
+from risk_prediction.trip_lstm import TripLSTM
 import numpy as np
 import time
 import os
 # <ADD>
-from trip_c_lstm import TripCLSTM
+from risk_prediction.trip_c_lstm import TripCLSTM
 # </ADD>
 
 class TripTrainer(object):
@@ -139,8 +144,9 @@ class TripTrainer(object):
             if line[0] == '#':
                 continue
             param = line.split(':')
-            if param[0].strip() == 'model_path':
-                self.model_path = os.path.join(os.path.dirname(model_param_file_path), param[1].strip())
+            if param[0].strip() == 'model_path':                
+#                self.model_path = os.path.join(os.path.dirname(model_param_file_path), param[1].strip()) 
+                self.model_path = param[1].strip() #10222019
             # <ADD>
             elif param[0].strip() == 'model_arch':
                 self.model_arch = param[1].strip()

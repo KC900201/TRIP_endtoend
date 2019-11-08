@@ -1,0 +1,20 @@
+# model parameter
+#model_path: model/accident_KitDash_8000_tbox_bg_gn_model.npz
+#model_path: model/accident_KitDash_8000_tbox_model.npz
+#model_path: model/accident_KitDash_8000.50.npz
+model_path: result/yolov3/model/backup_lstm2_no_do_adadelta_input_third_middle_conv_20191107/accident_KitDash_8000_tbox_2_model.npz
+#model_arch: MP-C-SPP-FC-LSTM
+#model_arch: MP-C-SPP-FC-DO-LSTM2
+model_arch: MP-C-SPP-FC-LSTM2
+#model_arch: MP-C-SPP-FC-DO-LSTM3
+input_size: 1000
+hidden_size: 100
+# roi_bg: BG_ZERO | BG_GN std | BG_DP rate - GN:Gaussian Noise, DP:Depression
+roi_bg: BG_ZERO
+comparative_loss_margin: 0.5
+risk_type: seq_risk
+threshold_of_similar_risk = 0.1
+# adam | adadelta | adagrad [lr=0.001]  |rmsprop [lr=0.01] | momentum_sgd [lr=0.01 momentum=0.9] | 
+# nesterovag [lr=0.01 momentum=0.9] | rmspropgraves [lr=0.0001 momentum=0.9] | sgd [lr=0.01] | smorms3 [lr=0.001]
+optimizer_info: adadelta
+#optimizer_info: sgd 0.01

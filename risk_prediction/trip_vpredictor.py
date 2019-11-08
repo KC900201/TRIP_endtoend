@@ -7,7 +7,7 @@ Created on Tue Sep 10 17:35:17 2019
 @coding: utf-8
 """
 
-from trip_predictor import TripPredictor
+from risk_prediction.trip_predictor import TripPredictor
 import chainer
 from chainer import cuda
 import os

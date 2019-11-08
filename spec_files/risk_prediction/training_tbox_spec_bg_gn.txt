@@ -1,0 +1,24 @@
+# training spec
+train_ds1: ds3/train0 ds_spec.txt 0
+train_ds2: ds3/train1 ds_spec.txt 1
+test_ds1: ds3/test0 ds_spec.txt 0
+test_ds2: ds3/test1 ds_spec.txt 1
+#layer_name: conv33,conv39,conv45
+layer_name: conv33
+box_type: tbox
+execution_mode: train
+num_of_epoch: 50
+#minibatch_size: 2
+minibatch_size: 32
+eval_interval: 5
+save_interval: 10
+# tlog_path: result/dashcam_tbox_tlog.txt
+#model_param_file: model_tbox_param_no_do.txt
+#tlog_path: result/yolov3/dashcam_tbox_no_do_tlog.txt
+model_param_file: model_tbox_param_bg_gn1.txt
+model_param_file: model_tbox_param_bg_gn2.txt
+model_param_file: model_tbox_param_bg_gn3.txt
+model_param_file: model_tbox_param_bg_gn4.txt
+model_param_file: model_tbox_param_bg_gn5.txt
+tlog_path: result/yolov3/dashcam_tbox_tlog_conv33_bg_gn_adadelta_bak20190514.txt
+gpu_id: 0

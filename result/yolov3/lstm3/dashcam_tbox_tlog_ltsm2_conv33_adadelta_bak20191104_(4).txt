@@ -1,0 +1,164 @@
+[Head]
+Train DS 1: train0, 0
+Train DS 2: train1, 1
+Test DS 1: test0, 0
+Test DS 2: test1, 1
+Train DS length: 436
+Test DS length: 161
+Layer: conv33 (13,13,512)
+Box type: tbox
+Model: accident_KitDash_8000_tbox_4_model.npz
+Model arch: MP-C-SPP-FC-DO-LSTM2
+Input size: 1000
+Hidden size: 100
+ROI BG: (BG_ZERO)
+Risk type: seq_risk
+Comparative loss margin: 0.5
+Optimizer info: adadelta
+Minibatch size: 8
+Threshold of similar risk: 0.1
+[Body]
+Epoch: 1
+ loss: 26.874977 (220.58 sec)
+ train data evaluation:
+  accuracy: 52.523% [229/436] (165.34 sec)
+ test data evaluation:
+  accuracy: 57.143% [92/161] (118.56 sec)
+Epoch: 2
+ loss: 26.204398 (154.80 sec)
+Epoch: 3
+ loss: 26.477668 (158.32 sec)
+Epoch: 4
+ loss: 25.811009 (155.44 sec)
+Epoch: 5
+ loss: 26.304155 (158.03 sec)
+ train data evaluation:
+  accuracy: 61.697% [269/436] (308.25 sec)
+ test data evaluation:
+  accuracy: 56.522% [91/161] (227.67 sec)
+Epoch: 6
+ loss: 25.813863 (154.35 sec)
+Epoch: 7
+ loss: 26.721706 (157.36 sec)
+Epoch: 8
+ loss: 26.097873 (154.36 sec)
+Epoch: 9
+ loss: 26.009044 (157.95 sec)
+Epoch: 10
+ loss: 25.443333 (155.24 sec)
+ train data evaluation:
+  accuracy: 66.972% [292/436] (165.35 sec)
+ test data evaluation:
+  accuracy: 59.627% [96/161] (60.99 sec)
+Epoch: 11
+ loss: 25.809832 (157.39 sec)
+Epoch: 12
+ loss: 25.211780 (154.24 sec)
+Epoch: 13
+ loss: 26.501432 (918.57 sec)
+Epoch: 14
+ loss: 24.972292 (154.64 sec)
+Epoch: 15
+ loss: 25.371132 (157.26 sec)
+ train data evaluation:
+  accuracy: 58.945% [257/436] (164.71 sec)
+ test data evaluation:
+  accuracy: 57.764% [93/161] (251.13 sec)
+Epoch: 16
+ loss: 27.125542 (153.72 sec)
+Epoch: 17
+ loss: 27.513484 (157.74 sec)
+Epoch: 18
+ loss: 27.000499 (154.14 sec)
+Epoch: 19
+ loss: 27.529959 (157.46 sec)
+Epoch: 20
+ loss: 26.996108 (154.54 sec)
+ train data evaluation:
+  accuracy: 56.881% [248/436] (164.94 sec)
+ test data evaluation:
+  accuracy: 48.447% [78/161] (60.01 sec)
+Epoch: 21
+ loss: 27.496356 (386.04 sec)
+Epoch: 22
+ loss: 27.019912 (155.83 sec)
+Epoch: 23
+ loss: 27.504751 (157.76 sec)
+Epoch: 24
+ loss: 27.003996 (155.17 sec)
+Epoch: 25
+ loss: 27.486976 (158.22 sec)
+ train data evaluation:
+  accuracy: 59.633% [260/436] (163.85 sec)
+ test data evaluation:
+  accuracy: 55.901% [90/161] (60.46 sec)
+Epoch: 26
+ loss: 26.984447 (154.37 sec)
+Epoch: 27
+ loss: 27.469210 (157.48 sec)
+Epoch: 28
+ loss: 27.000960 (154.28 sec)
+Epoch: 29
+ loss: 27.384966 (157.67 sec)
+Epoch: 30
+ loss: 26.969778 (1859.96 sec)
+ train data evaluation:
+  accuracy: 52.523% [229/436] (162.97 sec)
+ test data evaluation:
+  accuracy: 57.143% [92/161] (214.89 sec)
+Epoch: 31
+ loss: 27.484368 (157.10 sec)
+Epoch: 32
+ loss: 27.008857 (155.23 sec)
+Epoch: 33
+ loss: 27.525486 (4205.51 sec)
+Epoch: 34
+ loss: 27.014017 (154.28 sec)
+Epoch: 35
+ loss: 27.505474 (158.43 sec)
+ train data evaluation:
+  accuracy: 54.128% [236/436] (162.96 sec)
+ test data evaluation:
+  accuracy: 55.901% [90/161] (60.25 sec)
+Epoch: 36
+ loss: 27.021294 (154.85 sec)
+Epoch: 37
+ loss: 27.501848 (157.96 sec)
+Epoch: 38
+ loss: 27.007388 (154.65 sec)
+Epoch: 39
+ loss: 27.499043 (157.66 sec)
+Epoch: 40
+ loss: 27.005985 (155.26 sec)
+ train data evaluation:
+  accuracy: 53.440% [233/436] (163.91 sec)
+ test data evaluation:
+  accuracy: 52.795% [85/161] (60.39 sec)
+Epoch: 41
+ loss: 27.505189 (157.71 sec)
+Epoch: 42
+ loss: 27.001739 (154.98 sec)
+Epoch: 43
+ loss: 27.502825 (157.98 sec)
+Epoch: 44
+ loss: 27.000507 (155.09 sec)
+Epoch: 45
+ loss: 27.502273 (157.86 sec)
+ train data evaluation:
+  accuracy: 52.752% [230/436] (163.61 sec)
+ test data evaluation:
+  accuracy: 54.037% [87/161] (60.24 sec)
+Epoch: 46
+ loss: 27.000725 (154.87 sec)
+Epoch: 47
+ loss: 27.498264 (2763.47 sec)
+Epoch: 48
+ loss: 27.003517 (153.48 sec)
+Epoch: 49
+ loss: 27.503212 (157.40 sec)
+Epoch: 50
+ loss: 26.998356 (154.64 sec)
+ train data evaluation:
+  accuracy: 52.523% [229/436] (3526.39 sec)
+ test data evaluation:
+  accuracy: 52.174% [84/161] (60.56 sec)

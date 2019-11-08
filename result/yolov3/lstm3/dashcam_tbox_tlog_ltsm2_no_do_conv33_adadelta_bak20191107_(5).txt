@@ -1,0 +1,56 @@
+[Head]
+Train DS 1: train0, 0
+Train DS 2: train1, 1
+Test DS 1: test0, 0
+Test DS 2: test1, 1
+Train DS length: 436
+Test DS length: 161
+Layer: conv33 (13,13,512)
+Box type: tbox
+Model: accident_KitDash_8000_tbox_5_model.npz
+Model arch: MP-C-SPP-FC-LSTM2
+Input size: 1000
+Hidden size: 100
+ROI BG: (BG_ZERO)
+Risk type: seq_risk
+Comparative loss margin: 0.5
+Optimizer info: adadelta
+Minibatch size: 8
+Threshold of similar risk: 0.1
+[Body]
+Epoch: 1
+ loss: 27.072224 (165.10 sec)
+ train data evaluation:
+  accuracy: 57.569% [251/436] (270.53 sec)
+ test data evaluation:
+  accuracy: 54.037% [87/161] (114.83 sec)
+Epoch: 2
+ loss: 26.094670 (158.75 sec)
+Epoch: 3
+ loss: 26.444001 (160.68 sec)
+Epoch: 4
+ loss: 25.891139 (159.23 sec)
+Epoch: 5
+ loss: 26.255611 (217.33 sec)
+ train data evaluation:
+  accuracy: 58.716% [256/436] (265.69 sec)
+ test data evaluation:
+  accuracy: 50.311% [81/161] (282.17 sec)
+Epoch: 6
+ loss: 25.869662 (178.39 sec)
+Epoch: 7
+ loss: 26.105052 (161.77 sec)
+Epoch: 8
+ loss: 25.798699 (162.37 sec)
+Epoch: 9
+ loss: 25.908222 (162.51 sec)
+Epoch: 10
+ loss: 25.787820 (159.51 sec)
+ train data evaluation:
+  accuracy: 66.055% [288/436] (271.40 sec)
+ test data evaluation:
+  accuracy: 55.901% [90/161] (1391.30 sec)
+Epoch: 11
+ loss: 25.796477 (290.40 sec)
+Epoch: 12
+ loss: 25.194802 (228.14 sec)

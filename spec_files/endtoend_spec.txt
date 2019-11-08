@@ -1,0 +1,74 @@
+﻿###########################
+#Dataset Generation Config
+###########################
+#object_model_type: yolo_v2
+object_model_type: yolo_v3
+object_model_path: estimation/model_v3/accident_KitDash_8000.npz
+object_label_path: estimation/model_v3/obj.names
+object_cfg_path: estimation/model_v3/yolo-obj.cfg
+object_detection_threshold: 0.1
+gpu: 0
+#input_dir: C:/Users/atsumilab/Pictures/TRIP_Dataset/YOLO_KitDash/images
+#input_dir: C:/Users/atsumilab/Pictures/TRIP_Dataset/YOLO_KitDash/test0/000456_0/orig_img
+#output_dir: C:/Users/atsumilab/Pictures/TRIP_Dataset/YOLO_KitDash/output
+input_dir: dataset/test0/000456_0/orig_img
+output_dir: result/yolov3/test0
+#input_dir: dataset/train1/000001_1/orig_img
+#output_dir: dataset/train1/000001_1
+layer_name_list: conv33,conv39,conv45
+#layer_name_list: conv33
+save_img: True
+video: True
+########################
+#Risk Prediction Config
+########################
+# training spec
+#train_ds1: ds3/train0 ds_spec.txt 0
+#train_ds2: ds3/train1 ds_spec.txt 1
+#test_ds1: ds3/test0 ds_spec.txt 0
+#test_ds2: ds3/test1 ds_spec.txt 1
+#train_ds1: dataset/train0 ds_spec.txt 0
+#train_ds2: dataset/train1 ds_spec.txt 1
+#test_ds1: dataset/test0 ds_spec.txt 0
+#test_ds2: dataset/test1 ds_spec.txt 1
+train_ds1: YOLO_KitDash/train0 ds_spec.txt 0
+train_ds2: YOLO_KitDash/train1 ds_spec.txt 1
+test_ds1: YOLO_KitDash/test0 ds_spec.txt 0
+test_ds2: YOLO_KitDash/test1 ds_spec.txt 1
+#layer_name: conv33,conv39,conv45
+layer_name: conv33
+box_type: tbox
+execution_mode: train
+num_of_epoch: 50
+#minibatch_size: 32
+minibatch_size: 8
+eval_interval: 5
+save_interval: 10
+# tlog_path: result/dashcam_tbox_tlog.txt
+#model_param_file: model_tbox_param_no_do.txt
+#tlog_path: result/yolov3/dashcam_tbox_no_do_tlog.txt
+model_param_file: risk_prediction/model_tbox_param1.txt
+model_param_file: risk_prediction/model_tbox_param2.txt
+model_param_file: risk_prediction/model_tbox_param3.txt
+model_param_file: risk_prediction/model_tbox_param4.txt
+model_param_file: risk_prediction/model_tbox_param5.txt
+#tlog_path: result/yolov3/dashcam_tbox_tlog_conv33_adadelta_bak20190514.txt
+tlog_path: result/yolov3/lstm3/dashcam_tbox_tlog_ltsm2_conv33_adadelta_bak20191104.txt
+gpu_id: 0
+########################
+#Risk Prediction Config
+########################
+#ds: dataset/train0 ds_spec.txt
+ds: dataset/test0 ds_spec.txt
+#ds: dataset/test1 ds_spec.txt
+#v_layer_name: conv33,conv39,conv45
+v_layer_name: conv33
+v_box_type: tbox
+v_gpu_id: 0
+v_model_param_file: risk_prediction/model_tbox_param2.txt
+#v_model_param_file: risk_prediction/model_tbox_param_bg_gn5.txt
+window_size: 10
+plog_path: result/yolov3/dashcam/dashcam_test0_tlog_20191027.txt
+#plog_path: result/yolov3/dashcam/dashcam_test1_tlog.txt
+#plog_path: result/yolov3/dashcam/dashcam_bg_gn_test0_tlog.txt
+

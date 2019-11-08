@@ -9,7 +9,7 @@ Created on Sat Sep 14 13:10:51 2019
 
 import chainer
 #from chainercv.links import YOLOv2
-from yolov3_feature_ext import YOLOv3
+from estimation.dataset_generator.yolov3_feature_ext import YOLOv3
 from chainer import cuda
 import numpy as np
 import cv2
