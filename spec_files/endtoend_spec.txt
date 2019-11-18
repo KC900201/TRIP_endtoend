@@ -20,7 +20,7 @@ layer_name_list: conv33,conv39,conv45
 save_img: True
 video: True
 ########################
-#Risk Prediction Config
+#Risk Prediction Training Config
 ########################
 # training spec
 #train_ds1: ds3/train0 ds_spec.txt 0

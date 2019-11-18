@@ -52,3 +52,4 @@ Updates
 2019/11/01 - Revert batch size to 32 in training (endtoend_spec.txt). 
 	     Create new param files (model_tbox_lstm3_param1 - ...param5.txt) for training without drop-out mode.
 	     Remove max_pooling at extra input middle conv layer to prevent data loss, insert dropout in between middle conv layer
+2019/11/18 - Create new files for csv to txt conversion and file copying. Renamed training config
