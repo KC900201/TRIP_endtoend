@@ -54,3 +54,4 @@ Updates
 	     Remove max_pooling at extra input middle conv layer to prevent data loss, insert dropout in between middle conv layer
 2019/11/18 - Create new files for csv to txt conversion and file copying. Renamed training config
 2019/11/19 - New file to convert GTAV dataset annotation files (csv) to yolo bbox annotation
+2019/11/20 - Modifications for gta2yolo.py
