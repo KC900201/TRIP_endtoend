@@ -55,3 +55,4 @@ Updates
 2019/11/18 - Create new files for csv to txt conversion and file copying. Renamed training config
 2019/11/19 - New file to convert GTAV dataset annotation files (csv) to yolo bbox annotation
 2019/11/20 - Modifications for gta2yolo.py
+2019/11/29 - Modifications for copyfiles.py. Update new cfg file for yolo-obj.cfg using updated anchors

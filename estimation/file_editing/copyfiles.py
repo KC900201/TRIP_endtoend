@@ -8,13 +8,14 @@ Created on Sat Sep 14 13:05:58 2019
 Date          Comment
 ========================
 11182019      First revision
-
+11292019      Modifications to use glob library
 """
 
 import shutil
 import errno 
 import os
 import stat
+import glob
 
 def copyDirectory(src, dest):
     try:
@@ -36,6 +37,8 @@ def ignore_function(ignore):
 
 def copy(src, dest):
     try:
+        if not os.path.exists(dest):
+            os.makedirs(dest)
         shutil.copytree(src, dest, ignore=shutil.ignore_patterns('*.py', '*.sh'))
     except OSError as e:
         # If the error was caused because the source wasn't a directory
@@ -66,15 +69,62 @@ def copyTree(src, dst, symlinks = False, ignore = None):
       except:
         pass # lchmod not available
     elif os.path.isdir(s):
-      copytree(s, d, symlinks, ignore)
+      copyTree(s, d, symlinks, ignore)
     else:
       shutil.copy2(s, d)
 
 if __name__ == '__main__':
+    #11292019
+    testdir = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3\test0\*')
+    testdir1 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3\test1\*')
+    traindir = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3\train0\*')
+    traindir1 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3\train1\*')
+    
+    for dir in testdir:
+        if os.path.isdir(dir):
+            print("Test folder 0: " + str(dir))
+            input_dir = dir + "\\orig_img"
+            output_dir = input_dir.replace('ds3', 'ds4')
+            input_dir_tbox = dir + "\\tbox"
+            output_dir_tbox = input_dir_tbox.replace('ds3', 'ds4')
+            copyTree(input_dir, output_dir)
+            copyTree(input_dir_tbox, output_dir_tbox)
+
+    for dir in traindir:
+        if os.path.isdir(dir):
+            print("Train folder 0: " + str(dir))
+            input_dir = dir + "\\orig_img"
+            output_dir = input_dir.replace('ds3', 'ds4')
+            input_dir_tbox = dir + "\\tbox"
+            output_dir_tbox = input_dir_tbox.replace('ds3', 'ds4')
+            copyTree(input_dir, output_dir)
+            copyTree(input_dir_tbox, output_dir_tbox)
+
+    for dir in testdir1:
+        if os.path.isdir(dir):
+            print("Test folder 1: " + str(dir))
+            input_dir = dir + "\\orig_img"
+            output_dir = input_dir.replace('ds3', 'ds4')
+            input_dir_tbox = dir + "\\tbox"
+            output_dir_tbox = input_dir_tbox.replace('ds3', 'ds4')
+            copyTree(input_dir, output_dir)
+            copyTree(input_dir_tbox, output_dir_tbox)
+
+    for dir in traindir1:
+        if os.path.isdir(dir):
+            print("Train folder 1: " + str(dir))
+            input_dir = dir + "\\orig_img"
+            output_dir = input_dir.replace('ds3', 'ds4')
+            input_dir_tbox = dir + "\\tbox"
+            output_dir_tbox = input_dir_tbox.replace('ds3', 'ds4')
+            copyTree(input_dir, output_dir)
+            copyTree(input_dir_tbox, output_dir_tbox)
+    
     #for i in range (456, 621):
         #print("Test folfer: " + str(i))
         #copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\test1\\h000" + str(i) + "_1\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\test1\\000" + str(i) + "_1\\tbox")
-
+    
+    '''
     for j in range (10, 78):
         print("Train folder: " + str(j))
         if j < 10:
@@ -83,12 +133,13 @@ if __name__ == '__main__':
         else:
             copyTree("D:\\darknet_project\\Dataset\\GTAV\\images\\bb\\0" + str(j), "D:\\darknet_project\\Dataset\\GTAV\\images")
             copyTree("D:\\darknet_project\\Dataset\\GTAV\\images\\img\\0" + str(j), "D:\\darknet_project\\Dataset\\GTAV\\images")
-#        if j < 10:
-#            copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\train0\\h00000" + str(j) + "_0\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\train0\\00000" + str(j) + "_0\\tbox")
-#            copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\train1\\h00000" + str(j) + "_1\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\train1\\00000" + str(j) + "_1\\tbox")
-#        elif (j >= 10 and j < 100):
-#            copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\train0\\h0000" + str(j) + "_0\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\train0\\0000" + str(j) + "_0\\tbox")
-#            copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\train1\\h0000" + str(j) + "_1\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\train1\\0000" + str(j) + "_1\\tbox")
-#        else:
-#            copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\train0\\h000" + str(j) + "_0\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\train0\\000" + str(j) + "_0\\tbox")
-#            copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\train1\\h000" + str(j) + "_1\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\train1\\000" + str(j) + "_1\\tbox")
+        if j < 10:
+            copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\train0\\h00000" + str(j) + "_0\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\train0\\00000" + str(j) + "_0\\tbox")
+            copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\train1\\h00000" + str(j) + "_1\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\train1\\00000" + str(j) + "_1\\tbox")
+        elif (j >= 10 and j < 100):
+            copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\train0\\h0000" + str(j) + "_0\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\train0\\0000" + str(j) + "_0\\tbox")
+            copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\train1\\h0000" + str(j) + "_1\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\train1\\0000" + str(j) + "_1\\tbox")
+        else:
+            copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\train0\\h000" + str(j) + "_0\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\train0\\000" + str(j) + "_0\\tbox")
+            copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\train1\\h000" + str(j) + "_1\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\train1\\000" + str(j) + "_1\\tbox")
+    '''
