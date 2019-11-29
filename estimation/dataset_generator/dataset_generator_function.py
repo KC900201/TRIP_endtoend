@@ -10,6 +10,7 @@ Date          Comment
 ========================
 10102019      First revision
 10112019      Amend directory
+11292019      Modification for bbox assignment 
 """
 
 import os
@@ -26,10 +27,12 @@ class DatasetGenerator(object): #Create class (10102019)
             # 指定した物体が存在したら…/ If there is a specified object
             #if name in object_list:
             # 画像からその物体の領域を切り取って保存
-            top = int(bbox[0])
-            bottom = int(bbox[2])
-            left = int(bbox[1])
-            right = int(bbox[3])
+            #11292019
+            top = int(bbox[0]) if (int(bbox[0]) >= 0) else 0 
+            bottom = int(bbox[2]) if (int(bbox[2]) <= orig_img.shape[0]) else orig_img.shape[0] 
+            left = int(bbox[1]) if (int(bbox[1]) >= 0) else 0 
+            right = int(bbox[3]) if (int(bbox[3]) <= orig_img.shape[1]) else orig_img.shape[1] 
+            #End 11292019
             #left, top = result['box'].int_left_top()
             #right, bottom = result['box'].int_right_bottom()
             filename = os.path.join(output_dir,'img',file+'_'+str(counter)+'.jpg')
