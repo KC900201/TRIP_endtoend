@@ -20,6 +20,7 @@ Date          Comment
 10252019      Repeat training for multiple program files
 10272019      Temporarily hide dataset generation part
 10292019      Temporary hardcode path for training and testing dataset
+11302019      Enhance risk prediction training to have one more parameter for virtual data input
 """
 
 #Import libraries
@@ -124,6 +125,24 @@ if __name__ == '__main__':
             test_ds_path2 = os.path.join(os.path.dirname(test_spec_file_name2), test_ds_path2)
 #            test_ds_path2 = os.path.join('C:/Users/atsumilab/Pictures/TRIP_Dataset', test_ds_path2) #10292019
             test_risk2 = int(test_risk2)
+        #11302019
+        elif line.startswith('vtrain_ds1:'):
+            vtrain_ds_path1, vtrain_spec_file_name1, vtrain_risk1 = line.split(':')[1].strip().split()
+            vtrain_ds_path1 = os.path.join(os.path.dirname(vtrain_spec_file_name1), vtrain_ds_path1) #10212019
+            vtrain_risk1 = int(vtrain_risk1)
+        elif line.startswith('vtrain_ds2:'):
+            vtrain_ds_path2, vtrain_spec_file_name2, vtrain_risk2 = line.split(':')[1].strip().split()
+            vtrain_ds_path2 = os.path.join(os.path.dirname(vtrain_spec_file_name2), vtrain_ds_path2) #10212019
+            vtrain_risk2 = int(vtrain_risk2)
+        elif line.startswith('vtest_ds1:'):
+            vtest_ds_path1, vtest_spec_file_name1, vtest_risk1 = line.split(':')[1].strip().split()
+            vtest_ds_path1 = os.path.join(os.path.dirname(vtest_spec_file_name1), vtest_ds_path1) #10212019
+            vtest_risk1 = int(vtest_risk1)
+        elif line.startswith('vtest_ds2:'):
+            vtest_ds_path2, vtest_spec_file_name2, vtest_risk2 = line.split(':')[1].strip().split()
+            vtest_ds_path2 = os.path.join(os.path.dirname(vtest_spec_file_name2), vtest_ds_path2) #10212019
+            vtest_risk2 = int(vtest_risk2)
+        #End 11302019
         elif line.startswith('layer_name:'):
             layer_name = line.split(':')[1].strip()
         elif line.startswith('box_type:'):
@@ -148,9 +167,8 @@ if __name__ == '__main__':
         elif line.startswith('gpu_id:'):
             gpu_id = int(line.split(':')[1].strip())
         # End risk prediction part
-            
     ## 10102019
-    """ #10272019
+    #10272019
     args = parser.parse_args()
 
     input_dir = args.input_dir
@@ -305,7 +323,6 @@ if __name__ == '__main__':
                 # specfileを保存 save specfile
                 #save_specfile(output_dir, img_features)        
     ## End estimation part -- 10102019
-    """
     ## 10112019, 10242019, 10252019
     for count, model_param_file_path in enumerate(model_param_file_paths):
         print(count+1, '/', len(model_param_file_paths))
@@ -314,6 +331,11 @@ if __name__ == '__main__':
                                   train_ds_path2, train_spec_file_name2, train_risk2,
                                   test_ds_path1, test_spec_file_name1, test_risk1,
                                   test_ds_path2, test_spec_file_name2, test_risk2,
+                                  # 11302019
+                                  vtrain_ds_path1, vtrain_spec_file_name1, vtrain_risk1,
+                                  vtrain_ds_path2, vtrain_spec_file_name2, vtrain_risk2,
+                                  vtest_ds_path1, vtest_spec_file_name1, vtest_risk1,
+                                  vtest_ds_path2, vtest_spec_file_name2, vtest_risk2,
                                   layer_name, box_type, 
                                   execution_mode, num_of_epoch, minibatch_size, eval_interval, save_interval,
                                   model_param_file_path, repeat_tlog_path, gpu_id)
