@@ -34,8 +34,8 @@ class TripTrainer(object):
                        test_ds_path2, test_spec_file_name2, test_risk2,
                        vtrain_ds_path1, vtrain_spec_file_name1, vtrain_risk1, #11302019
                        vtrain_ds_path2, vtrain_spec_file_name2, vtrain_risk2, #11302019
-                       vtest_ds_path1, vtest_spec_file_name1, vtest_risk1,    #11302019
-                       vtest_ds_path2, vtest_spec_file_name2, vtest_risk2,    #11302019
+#                       vtest_ds_path1, vtest_spec_file_name1, vtest_risk1,    #11302019
+#                       vtest_ds_path2, vtest_spec_file_name2, vtest_risk2,    #11302019
                        layer_name, box_type, execution_mode, num_of_epoch, minibatch_size, 
                        eval_interval, save_interval, model_param_file_path, tlog_path, gpu_id):
         """ Constructor
@@ -89,10 +89,10 @@ class TripTrainer(object):
         self.vtrain_ds2 = TripDataset(vtrain_ds_path2, vtrain_spec_file_name2, layer_name, box_type)
         self.vtrain_risk1 = vtrain_risk1
         self.vtrain_risk2 = vtrain_risk2
-        self.vtest_ds1 = TripDataset(vtest_ds_path1, vtest_spec_file_name1, layer_name, box_type)
-        self.vtest_ds2 = TripDataset(vtest_ds_path2, vtest_spec_file_name2, layer_name, box_type)
-        self.vtest_risk1 = vtest_risk1
-        self.vtest_risk2 = vtest_risk2
+#        self.vtest_ds1 = TripDataset(vtest_ds_path1, vtest_spec_file_name1, layer_name, box_type)
+#        self.vtest_ds2 = TripDataset(vtest_ds_path2, vtest_spec_file_name2, layer_name, box_type)
+#        self.vtest_risk1 = vtest_risk1
+#        self.vtest_risk2 = vtest_risk2
         # check dataset
         train_ds_length1 = self.train_ds1.get_length()
         train_ds_length2 = self.train_ds2.get_length()
@@ -145,9 +145,9 @@ class TripTrainer(object):
         # 11302019
         vtrain_layer_info1 = self.vtrain_ds1.get_layer_info()
         vtrain_layer_info2 = self.vtrain_ds2.get_layer_info()
-        vtest_layer_info1 = self.vtest_ds1.get_layer_info()
-        vtest_layer_info2 = self.vtest_ds2.get_layer_info()
-        if (vtrain_layer_info1 != vtrain_layer_info2) or (vtest_layer_info1 != vtest_layer_info2) or (vtrain_layer_info1 != vtest_layer_info1):
+#        vtest_layer_info1 = self.vtest_ds1.get_layer_info()
+#        vtest_layer_info2 = self.vtest_ds2.get_layer_info()
+        if (vtrain_layer_info1 != vtrain_layer_info2):
             raise ValueError('Mismatch of layer infos')
         vtrain_feature_type1 = self.vtrain_ds1.get_feature_type()
         vtrain_feature_type2 = self.vtrain_ds2.get_feature_type()
@@ -157,14 +157,14 @@ class TripTrainer(object):
         vtrain_box_type2 = self.vtrain_ds2.get_box_type()
         if vtrain_box_type1 != vtrain_box_type2:
             raise ValueError('Mismatch of virtual training box types')
-        vtest_feature_type1 = self.vtest_ds1.get_feature_type()
-        vtest_feature_type2 = self.vtest_ds2.get_feature_type()
-        if vtest_feature_type1 != vtest_feature_type2:
-            raise ValueError('Mismatch of virtual test feature types')
-        vtest_box_type1 = self.vtest_ds1.get_box_type()
-        vtest_box_type2 = self.vtest_ds2.get_box_type()
-        if vtest_box_type1 != vtest_box_type2:
-            raise ValueError('Mismatch of virtual test box types')
+#        vtest_feature_type1 = self.vtest_ds1.get_feature_type()
+#        vtest_feature_type2 = self.vtest_ds2.get_feature_type()
+#        if vtest_feature_type1 != vtest_feature_type2:
+#            raise ValueError('Mismatch of virtual test feature types')
+#        vtest_box_type1 = self.vtest_ds1.get_box_type()
+#        vtest_box_type2 = self.vtest_ds2.get_box_type()
+#        if vtest_box_type1 != vtest_box_type2:
+#            raise ValueError('Mismatch of virtual test box types')
         # set gpu
         self.gpu_id = gpu_id
         if self.gpu_id >= 0:
@@ -359,10 +359,10 @@ class TripTrainer(object):
         # 11302019
         self.tlogf.write('Virtual Train DS 1: {0}, {1}\n'.format(os.path.basename(self.vtrain_ds1.ds_path), self.vtrain_risk1))
         self.tlogf.write('Virtual Train DS 2: {0}, {1}\n'.format(os.path.basename(self.vtrain_ds2.ds_path), self.vtrain_risk2))
-        self.tlogf.write('Virtual Test DS 1: {0}, {1}\n'.format(os.path.basename(self.vtest_ds1.ds_path), self.vtest_risk1))
-        self.tlogf.write('Virtual Test DS 2: {0}, {1}\n'.format(os.path.basename(self.vtest_ds2.ds_path), self.vtest_risk2))
+#        self.tlogf.write('Virtual Test DS 1: {0}, {1}\n'.format(os.path.basename(self.vtest_ds1.ds_path), self.vtest_risk1))
+#        self.tlogf.write('Virtual Test DS 2: {0}, {1}\n'.format(os.path.basename(self.vtest_ds2.ds_path), self.vtest_risk2))
         self.tlogf.write('Virtual Train DS length: {}\n'.format(self.vtrain_ds_length))
-        self.tlogf.write('Virtual Test DS length: {}\n'.format(self.vtest_ds_length))
+#        self.tlogf.write('Virtual Test DS length: {}\n'.format(self.vtest_ds_length))
         layer_info = self.train_ds1.get_layer_info()
         self.tlogf.write('Layer: {0} ({1},{2},{3})\n'.format(layer_info[0], layer_info[1], layer_info[2], layer_info[3]))
         self.tlogf.write('Box type: {}\n'.format(self.train_ds1.get_box_type()))
@@ -677,11 +677,11 @@ class TripTrainer(object):
             risk2 = self.train_risk2 + self.vtrain_risk2
             ds_length = self.train_ds_length + self.vtrain_ds_length
         elif stage == 'test':
-            ds1 = self.test_ds1 + self.vtest_ds1
-            ds2 = self.test_ds2 + self.vtest_ds2
-            risk1 = self.test_risk1 + self.vtest_risk1
-            risk2 = self.test_risk2 + self.vtest_risk2
-            ds_length = self.test_ds_length + self.vtest_ds_length
+            ds1 = self.test_ds1 
+            ds2 = self.test_ds2 
+            risk1 = self.test_risk1 
+            risk2 = self.test_risk2 
+            ds_length = self.test_ds_length 
         if ds1.ds_path != ds2.ds_path:
             different_ds = True
         else:
