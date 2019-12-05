@@ -11,6 +11,7 @@ Date          Comment
 09142019      First revision
 10222019      Amend directory path for model_path
 11302019      Enhance risk prediction training to have one more parameter for virtual data input
+12042019      New function to train with virtual data (real, virtual, real + virtual)
 """
 
 import chainer
@@ -472,7 +473,7 @@ class TripTrainer(object):
         # close a log file
         self.close_log_file()
     # 11302019
-    def learn_model_mix(self):
+    def learn_model_mix(self): # 12042019
         """ Learning (without trainer)
         """
         # open a log file
@@ -552,7 +553,7 @@ class TripTrainer(object):
         # close a log file
         self.close_log_file() 
     
-    def learn_model_virtual(self):
+    def learn_model_virtual(self): 
         """ Learning (without trainer)
         """
         # open a log file
@@ -680,6 +681,7 @@ class TripTrainer(object):
         self.evaluate('test')
         # 11302019 - evaluation with virtual
         self.evaluate_virtual('test')
+        self.evaluate_mix('test')
     #
     def evaluate(self, stage):
         """ Evaluation
@@ -743,8 +745,9 @@ class TripTrainer(object):
             self.tlogf.write(' {0} data evaluation:\n'.format(stage))
             self.tlogf.write('  accuracy: {0:.3f}% [{1:,d}/{2:,d}] ({3:.2f} sec)\n'.format(accuracy, accurate_prediction, ds_length, end_time-start_time))
             self.tlogf.flush()
-    # 11302019
-    def evaluate_virtual(self, stage):
+
+    # 12042019
+    def evaluate_mix(self, stage):
         """ Evaluation
             Args:
              stage (str): a stage 'train' or 'test'
@@ -753,9 +756,73 @@ class TripTrainer(object):
         if stage == 'train':
             ds1 = self.train_ds1 + self.vtrain_ds1
             ds2 = self.train_ds2 + self.vtrain_ds2
-            risk1 = self.train_risk1 + self.vtrain_risk1
-            risk2 = self.train_risk2 + self.vtrain_risk2
+            risk1 = self.vtrain_risk1 + self.vtrain_risk1
+            risk2 = self.vtrain_risk2 + self.vtrain_risk2
             ds_length = self.train_ds_length + self.vtrain_ds_length
+        elif stage == 'test':
+            ds1 = self.test_ds1 
+            ds2 = self.test_ds2 
+            risk1 = self.test_risk1 
+            risk2 = self.test_risk2 
+            ds_length = self.test_ds_length 
+        if ds1.ds_path != ds2.ds_path:
+            different_ds = True
+        else:
+            different_ds = False
+        # evaluate model(forward recurrent propagation and risk prediction) and count accurate prediction
+        start_time = time.time()
+        accurate_prediction = 0
+        with chainer.using_config('train', False), chainer.no_backprop_mode():
+            for i in range(ds_length):
+                if different_ds:
+                    sid1 = i
+                    sid2 = i
+                else:
+                    sid1 = i
+                    sid2 = i+1
+                    if sid2 == ds_length:
+                        sid2 = 0
+                sample1 = [ds1.get_example(sid1)]
+                sample2 = [ds2.get_example(sid2)]
+                input_feature_seq1 = ds1.prepare_input_sequence(sample1, self.roi_bg) # <ADD self.roi_bg/>
+                input_feature_seq2 = ds2.prepare_input_sequence(sample2, self.roi_bg) # <ADD self.roi_bg/> 
+                if self.risk_type == 'seq_risk':
+                    r1 = self.model.predict_risk(input_feature_seq1)
+                    r2 = self.model.predict_risk(input_feature_seq2)
+                elif self.risk_type == 'seq_mean_risk':
+                    r1 = self.model.predict_mean_risk(input_feature_seq1)
+                    r2 = self.model.predict_mean_risk(input_feature_seq2)
+                rel = self.compare_risk_level(sample1, sample2, risk1, risk2) # a numpy array each element of which is one of {[1], [-1], [0]}
+                rd1 = cuda.to_cpu(r1.data)
+                rd2 = cuda.to_cpu(r2.data)
+                # count up the number of rel == 1 and r1 > r2
+                accurate_prediction += len(np.where(np.logical_and(rel.flatten() == 1, rd1.flatten() > rd2.flatten()))[0])
+                # count up the number of rel == -1 and r1 < r2
+                accurate_prediction += len(np.where(np.logical_and(rel.flatten() == -1, rd1.flatten() < rd2.flatten()))[0])
+                # count up the number of rel == 0 and abs(r1-r2) < self.threshold_of_similar_risk
+                accurate_prediction += len(np.where(np.logical_and(rel.flatten() == 0, np.abs(rd1-rd2).flatten() < self.threshold_of_similar_risk))[0])
+        end_time = time.time()
+        # calculation of accuracy
+        accuracy = 100.0 * accurate_prediction / ds_length
+        print('  accuracy: {0:.3f}% [{1:,d}/{2:,d}] ({3:.2f} sec)'.format(accuracy, accurate_prediction, ds_length, end_time-start_time))
+        if self.tlogf is not None:
+            self.tlogf.write(' {0} data evaluation:\n'.format(stage))
+            self.tlogf.write('  accuracy: {0:.3f}% [{1:,d}/{2:,d}] ({3:.2f} sec)\n'.format(accuracy, accurate_prediction, ds_length, end_time-start_time))
+            self.tlogf.flush()    
+
+    # 11302019
+    def evaluate_virtual(self, stage):
+        """ Evaluation
+            Args:
+             stage (str): a stage 'train' or 'test'
+        """
+        #print("stage: " + str(stage) + ", ds_length: " + str(self.train_ds_length) + ", ds_length (test): " + str(self.test_ds_length)) #testing - 20190213
+        if stage == 'train':
+            ds1 = self.vtrain_ds1
+            ds2 = self.vtrain_ds2
+            risk1 = self.vtrain_risk1
+            risk2 = self.vtrain_risk2
+            ds_length = self.vtrain_ds_length
         elif stage == 'test':
             ds1 = self.test_ds1 
             ds2 = self.test_ds2 

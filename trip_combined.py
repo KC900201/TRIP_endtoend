@@ -169,6 +169,7 @@ if __name__ == '__main__':
         # End risk prediction part
     ## 10102019
     #10272019
+    '''
     args = parser.parse_args()
 
     input_dir = args.input_dir
@@ -321,7 +322,8 @@ if __name__ == '__main__':
 #                    DatasetGenerator.save_ebox(results, object_list, img_h, img_w, output_dir, 'e'+file+'.txt')
                     DatasetGenerator.save_ebox(bboxes, labels, layer_ids, img_h, img_w, output_dir, 'e'+file+'.txt') #10182019
                 # specfileを保存 save specfile
-                #save_specfile(output_dir, img_features)        
+                #save_specfile(output_dir, img_features)   
+    '''     
     ## End estimation part -- 10102019
     ## 10112019, 10242019, 10252019
     for count, model_param_file_path in enumerate(model_param_file_paths):
@@ -341,6 +343,8 @@ if __name__ == '__main__':
                                   model_param_file_path, repeat_tlog_path, gpu_id)
         if execution_mode == 'train' or execution_mode == 'retrain':
             tripTrainer.learn_model()
+#            tripTrainer.learn_model_virtual()
+#            tripTrainer.learn_model_mix()
         else:
             tripTrainer.test_model()
     
