@@ -109,12 +109,12 @@ def moveTree(src, dst, symlinks = False, ignore = None):
     else:         # move specific files
         filename = str(os.path.splitext(os.path.basename(item))[0])
         if "e" not in filename and "_" not in filename: # found no special characters in file name
-            fileno = int(filename)
+            fileno = int(filename.lstrip().rstrip())
             if fileno > 50:
-                new_fileno = fileno - 50
+                new_fileno = int(fileno) - 50
                 new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or new_fileno == 50) else filename.replace(str(fileno), str(new_fileno))
                 s = os.path.join(src, item)
-                d = os.path.join(dst, item).replace(filename, new_filename) 
+                d = os.path.join(dst, item.replace(filename, new_filename))
                 if symlinks and os.path.islink(s):
                   if os.path.lexists(d):
                     os.remove(d)
@@ -138,7 +138,7 @@ def moveTree(src, dst, symlinks = False, ignore = None):
                 new_fileno = int(fileno) - 50
                 new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or new_fileno == 50) else filename.replace(str(fileno), str(new_fileno))
                 s = os.path.join(src, item)
-                d = os.path.join(dst, item).replace(filename, new_filename)
+                d = os.path.join(dst, item.replace(filename, new_filename))
                 if symlinks and os.path.islink(s):
                   if os.path.lexists(d):
                     os.remove(d)
@@ -154,7 +154,6 @@ def moveTree(src, dst, symlinks = False, ignore = None):
                 else:
                   shutil.move(s, d)
 
-# 12042019
 def moveTreeVirtual(src, dst, symlinks = False, ignore = None):
   if not os.path.exists(dst):
     os.makedirs(dst)
@@ -187,9 +186,9 @@ def moveTreeVirtual(src, dst, symlinks = False, ignore = None):
             fileno = int(filename)
             if fileno > 75:
                 new_fileno = fileno - 75
-                new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or new_fileno == 75) else filename.replace(str(fileno), str(new_fileno))
+                new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or new_fileno > 24) else filename.replace(str(fileno), str(new_fileno))
                 s = os.path.join(src, item)
-                d = os.path.join(dst, item).replace(filename, new_filename) 
+                d = os.path.join(dst, item.replace(filename, new_filename)) 
                 if symlinks and os.path.islink(s):
                   if os.path.lexists(d):
                     os.remove(d)
@@ -211,9 +210,9 @@ def moveTreeVirtual(src, dst, symlinks = False, ignore = None):
                 fileno = int(filename.split("_")[0])
             if fileno > 75:
                 new_fileno = int(fileno) - 75
-                new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or new_fileno == 75) else filename.replace(str(fileno), str(new_fileno))
+                new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or new_fileno > 24) else filename.replace(str(fileno), str(new_fileno))
                 s = os.path.join(src, item)
-                d = os.path.join(dst, item).replace(filename, new_filename)
+                d = os.path.join(dst, item.replace(filename, new_filename))
                 if symlinks and os.path.islink(s):
                   if os.path.lexists(d):
                     os.remove(d)
@@ -237,9 +236,10 @@ def copyTreeFormat(src, dst, list, oname):
             if file_name in list:
                 for odir in dst:
                     if os.path.isdir(odir):
-                        if odir.endswith(oname):
-#                            new_odir = odir + "\\" + file_name + "_0" # for dashcam data
-                            new_odir = odir + "\\" + file_name  # for virtual data
+#                        if odir.endswith(oname):
+                        if str(os.path.basename(odir)) == oname:
+                            new_odir = odir + "\\" + file_name + "_0" # for dashcam data
+#                            new_odir = odir + "\\" + file_name  # for virtual data
                             copyTree(dir, new_odir)
 
 def moveTreeFormat(src, dst, list, oname):
@@ -251,11 +251,11 @@ def moveTreeFormat(src, dst, list, oname):
             if file_name_ori in list:
                 for odir in dst:
                     if os.path.isdir(odir):
-                        if odir.endswith(oname):
+#                        if odir.endswith(oname):
+                        if str(os.path.basename(odir)) == oname:
                             new_odir = odir + "\\" + file_name.replace("_0", "_1")
                             moveTree(dir, new_odir)
 
-# 12042019
 def moveTreeFormatVirtual(src, dst, list, oname):
     for dir in src:
         if os.path.isdir(dir):
@@ -287,14 +287,14 @@ if __name__ == '__main__':
 
     #copyTreeFormat(traindir_dashcam, output_dir, Folder.dashcam_train, "train0")
     #copyTreeFormat(testdir_dashcam, output_dir, Folder.dashcam_test, "test0")
-    #moveTreeFormat(traindir_0, output_dir, Folder.dashcam_train, "train1")
-    #moveTreeFormat(testdir_0, output_dir, Folder.dashcam_test, "test1") 
-    copyTreeFormat(accident_car_dir, output_dir, Folder.accident_car, "vtrain0")
-    copyTreeFormat(accident_asset_dir, output_dir, Folder.accident_asset, "vtrain0")
-    copyTreeFormat(accident_pedestrian_dir, output_dir, Folder.accident_pedes, "vtrain0")
-    moveTreeFormatVirtual(vtraindir_0, output_dir, Folder.accident_asset, "vtrain1")
-    moveTreeFormatVirtual(vtraindir_0, output_dir, Folder.accident_car, "vtrain1")
-    moveTreeFormatVirtual(vtraindir_0, output_dir, Folder.accident_pedes, "vtrain1")
+    #moveTreeFormat(traindir_0, output_dir, Folder.dashcam_train, "train1")    
+    moveTreeFormat(testdir_0, output_dir, Folder.dashcam_test, "test1") 
+    #copyTreeFormat(accident_car_dir, output_dir, Folder.accident_car, "vtrain0")
+    #copyTreeFormat(accident_asset_dir, output_dir, Folder.accident_asset, "vtrain0")
+    #copyTreeFormat(accident_pedestrian_dir, output_dir, Folder.accident_pedes, "vtrain0")
+    #moveTreeFormatVirtual(vtraindir_0, output_dir, Folder.accident_asset, "vtrain1")
+    #moveTreeFormatVirtual(vtraindir_0, output_dir, Folder.accident_car, "vtrain1")
+    #moveTreeFormatVirtual(vtraindir_0, output_dir, Folder.accident_pedes, "vtrain1")
 
     '''
     for dir in no_accident_dir:
