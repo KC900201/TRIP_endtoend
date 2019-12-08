@@ -57,3 +57,8 @@ Updates
 2019/11/20 - Modifications for gta2yolo.py
 2019/11/29 - Modifications for copyfiles.py. Update new cfg file for yolo-obj.cfg using updated anchors
 2019/11/30 - Enhance risk prediction training to have one more parameter for virtual data input
+2019/12/04 - Remove virtual data set test directory (trip_trainer.py). Add new function to move and separate files from train0 folder (copyfiles.py)
+             New python file to store folders name for training
+2019/12/05 - Add new functions (learn_virtual, learn_mix) to train risk prediction with virtual data (trip_trainer.py). 
+	     Comment dataset generation part and append new functions (trip_combined.py)
+2019/12/08 - Add new function to count number of files (copyfiles.py)
