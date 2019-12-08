@@ -11,6 +11,7 @@ Date          Comment
 11292019      Modifications to use glob library
 12032019      New function to move files
 12042019      Function to move file for virtual dataset allocation
+12062019      New function to count no. of files in directory, for checking whether data transferred successfully
 """
 
 import shutil
@@ -23,6 +24,7 @@ import math
 from folder import Folder
 
 folder_name = ['conv33', 'conv39', 'conv45', 'ebox', 'img', 'orig_img']
+folder_name_2 = ['conv33', 'conv39', 'conv45', 'ebox', 'orig_img']
 
 def copyDirectory(src, dest):
     try:
@@ -267,6 +269,29 @@ def moveTreeFormatVirtual(src, dst, list, oname):
                         if odir.endswith(oname):
                             new_odir = odir + "\\" + file_name
                             moveTreeVirtual(dir, new_odir)
+
+# 12062019
+def countFilesFolders(dir, list):
+    files = 0
+    #folders = 0
+    
+    if len(list) == 0:
+        for _, dirnames, filenames in os.walk(dir):
+            if os.path.basename(_) in folder_name_2:                
+                files += len(filenames)
+            #folders += len(dirnames)
+    else:
+        for _, dirnames, filenames in os.walk(dir):
+            selected = os.path.basename(_)
+            if selected in list:
+                files += len(filenames)
+                #folders += len(dirnames)
+                for _, dirnames2, filenames2 in os.walk(_):
+                    if os.path.basename(_) in folder_name_2: 
+                        files += len(filenames2)
+                    #folders += len(dirnames2)
+    print('' + str(files) + ' files in '  + dir)
+    #print('' + str(files) + ' files, ' + str(folders) + ' folders found ' + dir)
         
 if __name__ == '__main__':
     testdir = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3\test0\*')
@@ -282,13 +307,36 @@ if __name__ == '__main__':
     traindir_dashcam = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2019Q2\Dashcam_dataset\training\positive\*')
     testdir_dashcam = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2019Q2\Dashcam_dataset\testing\positive\*')
     traindir_0 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\train0\*')
+    traindir_1 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\train1\*')
     testdir_0 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test0\*')
+    testdir_1 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test1\*')
     vtraindir_0 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\vtrain0\*')
+    traindir_dashcam0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\train0'
+    traindir_dashcam1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\train1'
+    testdir_dashcam0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test0'
+    testdir_dashcam1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test1'
+    traindir_viena0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\vtrain0'
+    traindir_viena1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\vtrain1'
+    viena_dir = r'E:\AtsumiLabMDS-2\TRIP\Dataset\VIENA2\image\Scenario2'
+    dashcam_train = r'E:\AtsumiLabMDS-2\TRIP\Trip2019Q2\Dashcam_dataset\training\positive'
+    dashcam_test = r'E:\AtsumiLabMDS-2\TRIP\Trip2019Q2\Dashcam_dataset\testing\positive'
 
     #copyTreeFormat(traindir_dashcam, output_dir, Folder.dashcam_train, "train0")
-    #copyTreeFormat(testdir_dashcam, output_dir, Folder.dashcam_test, "test0")
     #moveTreeFormat(traindir_0, output_dir, Folder.dashcam_train, "train1")    
-    moveTreeFormat(testdir_0, output_dir, Folder.dashcam_test, "test1") 
+    countFilesFolders(dashcam_train, Folder.dashcam_train)
+    countFilesFolders(traindir_dashcam0, [])
+    countFilesFolders(traindir_dashcam1, [])
+    countFilesFolders(dashcam_test, Folder.dashcam_test)
+    countFilesFolders(testdir_dashcam0, [])
+    countFilesFolders(testdir_dashcam1, [])
+    countFilesFolders(viena_dir, Folder.accident_asset)
+    countFilesFolders(viena_dir, Folder.accident_car)
+    countFilesFolders(viena_dir, Folder.accident_pedes)
+    countFilesFolders(traindir_viena0, [])
+    countFilesFolders(traindir_viena1, [])
+
+    #copyTreeFormat(testdir_dashcam, output_dir, Folder.dashcam_test, "test0")
+    #moveTreeFormat(testdir_0, output_dir, Folder.dashcam_test, "test1") 
     #copyTreeFormat(accident_car_dir, output_dir, Folder.accident_car, "vtrain0")
     #copyTreeFormat(accident_asset_dir, output_dir, Folder.accident_asset, "vtrain0")
     #copyTreeFormat(accident_pedestrian_dir, output_dir, Folder.accident_pedes, "vtrain0")
@@ -296,101 +344,6 @@ if __name__ == '__main__':
     #moveTreeFormatVirtual(vtraindir_0, output_dir, Folder.accident_car, "vtrain1")
     #moveTreeFormatVirtual(vtraindir_0, output_dir, Folder.accident_pedes, "vtrain1")
 
-    '''
-    for dir in no_accident_dir:
-        if os.path.isdir(dir):
-            print("No accident folder: " + str(dir))
-        for odir in output_dir:
-            if os.path.isdir(odir):
-                if odir.endswith("vtrain0"):
-                    file_name = os.path.basename(dir)
-                    if file_name in Folder.non_accident:
-                        new_odir = odir + "\\" + file_name
-                        copyTree(dir, new_odir)        
-
-    for dir in accident_car_dir:
-        if os.path.isdir(dir):
-            print("Accident car folder: " + str(dir))
-        for odir in output_dir:
-            if os.path.isdir(odir):
-                if odir.endswith("vtrain1"):
-                    file_name = os.path.basename(dir)
-                    if file_name in Folder.accident_car:
-                        new_odir = odir + "\\" + file_name
-                        copyTree(dir, new_odir)  
-
-    for dir in accident_asset_dir:
-        if os.path.isdir(dir):
-            print("Accident asset folder: " + str(dir))
-        for odir in output_dir:
-            if os.path.isdir(odir):
-                if odir.endswith("vtrain1"):
-                   file_name = os.path.basename(dir)
-                   if file_name in Folder.accident_asset:
-                      new_odir = odir + "\\" + file_name
-                      copyTree(dir, new_odir)  
-    
-    for dir in accident_pedestrian_dir:
-        if os.path.isdir(dir):
-            print("Accident pedestrian folder: " + str(dir))
-        for odir in output_dir:
-            if os.path.isdir(odir):
-                if odir.endswith("vtrain1"):
-                   file_name = os.path.basename(dir)
-                   if file_name in Folder.accident_pedes:
-                    new_odir = odir + "\\" + file_name
-                    copyTree(dir, new_odir)  
-    
-    for dir in accident_b_dir:
-        if os.path.isdir(dir):
-            print("Accident b folder: " + str(dir))
-        for odir in output_dir:
-            if os.path.isdir(odir):
-                if odir.endswith("vtrain1"):
-                    file_name = os.path.basename(dir)
-                    new_odir = odir + "\\" + file_name
-                    copyTree(dir, new_odir)  
-    
-    for dir in testdir:
-        if os.path.isdir(dir):
-            print("Test folder 0: " + str(dir))
-            input_dir = dir + "\\orig_img"
-            output_dir = input_dir.replace('ds3', 'ds4')
-            input_dir_tbox = dir + "\\tbox"
-            output_dir_tbox = input_dir_tbox.replace('ds3', 'ds4')
-            copyTree(input_dir, output_dir)
-            copyTree(input_dir_tbox, output_dir_tbox)
-
-    for dir in traindir:
-        if os.path.isdir(dir):
-            print("Train folder 0: " + str(dir))
-            input_dir = dir + "\\orig_img"
-            output_dir = input_dir.replace('ds3', 'ds4')
-            input_dir_tbox = dir + "\\tbox"
-            output_dir_tbox = input_dir_tbox.replace('ds3', 'ds4')
-            copyTree(input_dir, output_dir)
-            copyTree(input_dir_tbox, output_dir_tbox)
-
-    for dir in testdir1:
-        if os.path.isdir(dir):
-            print("Test folder 1: " + str(dir))
-            input_dir = dir + "\\orig_img"
-            output_dir = input_dir.replace('ds3', 'ds4')
-            input_dir_tbox = dir + "\\tbox"
-            output_dir_tbox = input_dir_tbox.replace('ds3', 'ds4')
-            copyTree(input_dir, output_dir)
-            copyTree(input_dir_tbox, output_dir_tbox)
-
-    for dir in traindir1:
-        if os.path.isdir(dir):
-            print("Train folder 1: " + str(dir))
-            input_dir = dir + "\\orig_img"
-            output_dir = input_dir.replace('ds3', 'ds4')
-            input_dir_tbox = dir + "\\tbox"
-            output_dir_tbox = input_dir_tbox.replace('ds3', 'ds4')
-            copyTree(input_dir, output_dir)
-            copyTree(input_dir_tbox, output_dir_tbox)
-     '''
 #    for i in range (0, 621):
 #        print("Test folfer: " + str(i))
 #        copy("E:\\AtsumiLabMDS-2\TRIP\\Trip2018Q1\Dashcam\\ds2\\test1\\h000" + str(i) + "_1\\tbox", "E:\\AtsumiLabMDS-2\\TRIP\\Trip2018Q1\\Dashcam\\ds3\\test1\\000" + str(i) + "_1\\tbox")
