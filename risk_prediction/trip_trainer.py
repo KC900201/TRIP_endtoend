@@ -16,7 +16,7 @@ Date          Comment
 """
 
 import chainer
-from chainer import serializers, iterators, cuda, optimizers
+from chainer import serializers, iterators, cuda, optimizers, datasets
 import chainer.functions as F
 from risk_prediction.trip_dataset import TripDataset
 from risk_prediction.trip_lstm import TripLSTM
@@ -488,8 +488,8 @@ class TripTrainer(object):
                                             # cf. optimizer.t: the number of iterations
         num_of_epoch = self.num_of_epoch - start_epoch
         # set iterators (real + virtual)
-        train_iterator1 = iterators.MultithreadIterator(self.train_ds1 + self.vtrain_ds1, self.minibatch_size)
-        train_iterator2 = iterators.MultithreadIterator(self.train_ds2 + self.vtrain_ds2, self.minibatch_size)
+        train_iterator1 = iterators.MultithreadIterator(datasets.ConcatenatedDataset(self.train_ds1, self.vtrain_ds1), self.minibatch_size)
+        train_iterator2 = iterators.MultithreadIterator(datasets.ConcatenatedDataset(self.train_ds2, self.vtrain_ds2), self.minibatch_size)
         # training loop
         epoch = 0
         while train_iterator1.epoch < num_of_epoch:
@@ -509,16 +509,22 @@ class TripTrainer(object):
             # prepare input sequences
             input_feature_seq1 = self.train_ds1.prepare_input_sequence(train_batch1, self.roi_bg) # <ADD self.roi_bg/>
             input_feature_seq2 = self.train_ds2.prepare_input_sequence(train_batch2, self.roi_bg) # <ADD self.roi_bg/>
+            input_feature_vseq1 = self.vtrain_ds1.prepare_input_sequence(train_batch1, self.roi_bg) # <ADD self.roi_bg/>
+            input_feature_vseq2 = self.vtrain_ds2.prepare_input_sequence(train_batch2, self.roi_bg) # <ADD self.roi_bg/>
             # forward recurrent propagation and risk prediction
             if self.risk_type == 'seq_risk':
                 r1 = self.model.predict_risk(input_feature_seq1)
                 r2 = self.model.predict_risk(input_feature_seq2)
+                vr1 = self.model.predict_risk(input_feature_vseq1)
+                vr2 = self.model.predict_risk(input_feature_vseq2)
             elif self.risk_type == 'seq_mean_risk':
                 r1 = self.model.predict_mean_risk(input_feature_seq1)
                 r2 = self.model.predict_mean_risk(input_feature_seq2)
+                vr1 = self.model.predict_mean_risk(input_feature_vseq1)
+                vr2 = self.model.predict_mean_risk(input_feature_vseq2)
             # compute comparative loss
             rel = self.compare_risk_level(train_batch1, train_batch2, self.train_risk1 + self.vtrain_risk1, self.train_risk2 + self.vtrain_risk2)
-            batch_loss = self.model.comparative_loss(r1, r2, rel, self.comparative_loss_margin)
+            batch_loss = self.model.comparative_loss(r1 + vr1, r2 + vr2, rel, self.comparative_loss_margin)
             epoch_loss += float(cuda.to_cpu(batch_loss.data))
             # backward propagation and update parameters
             self.model.cleargrads()
@@ -587,8 +593,8 @@ class TripTrainer(object):
             train_batch1 = train_iterator1.next() # a list of minibatch elements of train dataset 1
             train_batch2 = train_iterator2.next() # a list of minibatch elements of train dataset 2
             # prepare input sequences
-            input_feature_seq1 = self.train_ds1.prepare_input_sequence(train_batch1, self.roi_bg) # <ADD self.roi_bg/>
-            input_feature_seq2 = self.train_ds2.prepare_input_sequence(train_batch2, self.roi_bg) # <ADD self.roi_bg/>
+            input_feature_seq1 = self.vtrain_ds1.prepare_input_sequence(train_batch1, self.roi_bg) # <ADD self.roi_bg/>
+            input_feature_seq2 = self.vtrain_ds2.prepare_input_sequence(train_batch2, self.roi_bg) # <ADD self.roi_bg/>
             # forward recurrent propagation and risk prediction
             if self.risk_type == 'seq_risk':
                 r1 = self.model.predict_risk(input_feature_seq1)
@@ -597,7 +603,7 @@ class TripTrainer(object):
                 r1 = self.model.predict_mean_risk(input_feature_seq1)
                 r2 = self.model.predict_mean_risk(input_feature_seq2)
             # compute comparative loss
-            rel = self.compare_risk_level(train_batch1, train_batch2, self.train_risk1 + self.vtrain_risk1, self.train_risk2 + self.vtrain_risk2)
+            rel = self.compare_risk_level(train_batch1, train_batch2, self.vtrain_risk1, self.vtrain_risk2)
             batch_loss = self.model.comparative_loss(r1, r2, rel, self.comparative_loss_margin)
             epoch_loss += float(cuda.to_cpu(batch_loss.data))
             # backward propagation and update parameters
@@ -770,8 +776,8 @@ class TripTrainer(object):
         """
         #print("stage: " + str(stage) + ", ds_length: " + str(self.train_ds_length) + ", ds_length (test): " + str(self.test_ds_length)) #testing - 20190213
         if stage == 'train':
-            ds1 = self.train_ds1 + self.vtrain_ds1
-            ds2 = self.train_ds2 + self.vtrain_ds2
+            ds1 = datasets.ConcatenatedDataset(self.train_ds1, self.vtrain_ds1)
+            ds2 = datasets.ConcatenatedDataset(self.train_ds2, self.vtrain_ds2)
             risk1 = self.vtrain_risk1 + self.vtrain_risk1
             risk2 = self.vtrain_risk2 + self.vtrain_risk2
             ds_length = self.train_ds_length + self.vtrain_ds_length

@@ -330,39 +330,42 @@ if __name__ == '__main__':
     '''     
     ## End estimation part -- 10102019
     ## 10112019, 10242019, 10252019
-    for count, model_param_file_path in enumerate(model_param_file_paths):
-        print(count+1, '/', len(model_param_file_paths))
-        repeat_tlog_path = os.path.splitext(tlog_path)[0] + '_({}).txt'.format(str(count+1))
-        tripTrainer = TripTrainer(train_ds_path1, train_spec_file_name1, train_risk1,
-                                  train_ds_path2, train_spec_file_name2, train_risk2,
-                                  test_ds_path1, test_spec_file_name1, test_risk1,
-                                  test_ds_path2, test_spec_file_name2, test_risk2,
-                                  # 11302019
-                                  vtrain_ds_path1, vtrain_spec_file_name1, vtrain_risk1,
-                                  vtrain_ds_path2, vtrain_spec_file_name2, vtrain_risk2,
-#                                  vtest_ds_path1, vtest_spec_file_name1, vtest_risk1,
-#                                  vtest_ds_path2, vtest_spec_file_name2, vtest_risk2,
-                                  layer_name, box_type, 
-                                  execution_mode, num_of_epoch, minibatch_size, eval_interval, save_interval,
-                                  model_param_file_path, repeat_tlog_path, gpu_id)
-        if execution_mode == 'train' or execution_mode == 'retrain':
-            # 12102019
-            if str(train_data).upper() in train_data_group:
-                if str(train_data).upper() == train_data_group[0]:
-                    tripTrainer.learn_model()
-                elif str(train_data).upper() == train_data_group[1]:                   
-                    tripTrainer.learn_model_virtual()
+    if (train_data).upper() not in train_data_group:
+        print("Wrong data input!")
+    else: 
+        for count, model_param_file_path in enumerate(model_param_file_paths):
+            print(count+1, '/', len(model_param_file_paths))
+            repeat_tlog_path = os.path.splitext(tlog_path)[0] + '_({}).txt'.format(str(count+1))
+            tripTrainer = TripTrainer(train_ds_path1, train_spec_file_name1, train_risk1,
+                                      train_ds_path2, train_spec_file_name2, train_risk2,
+                                      test_ds_path1, test_spec_file_name1, test_risk1,
+                                      test_ds_path2, test_spec_file_name2, test_risk2,
+                                      # 11302019
+                                      vtrain_ds_path1, vtrain_spec_file_name1, vtrain_risk1,
+                                      vtrain_ds_path2, vtrain_spec_file_name2, vtrain_risk2,
+#                                      vtest_ds_path1, vtest_spec_file_name1, vtest_risk1,
+#                                      vtest_ds_path2, vtest_spec_file_name2, vtest_risk2,
+                                      layer_name, box_type, 
+                                      execution_mode, num_of_epoch, minibatch_size, eval_interval, save_interval,
+                                      model_param_file_path, repeat_tlog_path, gpu_id)
+            if execution_mode == 'train' or execution_mode == 'retrain':
+                # 12102019
+                if str(train_data).upper() in train_data_group:
+                    if str(train_data).upper() == train_data_group[0]:
+                        tripTrainer.learn_model()
+                    elif str(train_data).upper() == train_data_group[1]:                   
+                        tripTrainer.learn_model_virtual()
+                    else:
+                        tripTrainer.learn_model_mix()
                 else:
-                    tripTrainer.learn_model_mix()
+                    print("Wrong data input!")
             else:
-                print("Wrong data input!")
-        else:
-#            tripTrainer.test_model()
-            # 12102019
-            if str(train_data).upper() in train_data_group:
-                tripTrainer.test_model_select(train_data)
-            else:
-                print("Wrong data input!")    
+#                tripTrainer.test_model()
+                # 12102019
+                if str(train_data).upper() in train_data_group:
+                    tripTrainer.test_model_select(train_data)
+                else:
+                    print("Wrong data input!")    
     ## 10112019
     ## 10182019
     """
