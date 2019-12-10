@@ -42,7 +42,7 @@ class TripDataset(dataset.DatasetMixin):
         self.ds_path = ds_path
         # set dataset spec (feature_type, layer_info, box_type)
         #os.chdir('C:/Users/atsumilab/Pictures/TRIP_Dataset') #10282019
-        os.chdir('E:/AtsumiLabMDS-2/TRIP/Trip2018Q1/Dashcam') #12052019
+        os.chdir('C:/Users/atsumilab/Pictures') #12052019
         with open(os.path.join(self.ds_path, spec_file), 'r', encoding='utf-8') as f:
             lines = f.readlines()
         for line in lines:

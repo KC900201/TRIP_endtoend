@@ -21,6 +21,7 @@ Date          Comment
 10272019      Temporarily hide dataset generation part
 10292019      Temporary hardcode path for training and testing dataset
 11302019      Enhance risk prediction training to have one more parameter for virtual data input
+12102019      Comment out input for video prediction path, include one input for choosing training data
 """
 
 #Import libraries
@@ -35,6 +36,8 @@ from risk_prediction.trip_trainer import TripTrainer #10242019
 from estimation.dataset_generator.dataset_generator_function import DatasetGenerator
 from estimation.dataset_generator.object_detector import ObjectDetector
 
+train_data_group = ['R', 'V', 'M']
+
 #Main function
 if __name__ == '__main__':
     # Initialize parameters
@@ -42,7 +45,8 @@ if __name__ == '__main__':
     model_param_file_paths = [] # 10252019
     
     spec_file = input('Input spec file (endtoend_spec.txt): ')
-    video_out_path = input('Input a video output path (if no video output, enter a return): ') #video risk prediction - 10182019
+    #video_out_path = input('Input a video output path (if no video output, enter a return): ') #video risk prediction - 10182019, 12102910
+    train_data = input('Input training data choice (R, V, M): ')
     with open(spec_file, "r", encoding='utf-8') as f: 
         lines = f.readlines()
     for line in lines:
@@ -342,12 +346,23 @@ if __name__ == '__main__':
                                   execution_mode, num_of_epoch, minibatch_size, eval_interval, save_interval,
                                   model_param_file_path, repeat_tlog_path, gpu_id)
         if execution_mode == 'train' or execution_mode == 'retrain':
-            tripTrainer.learn_model()
-#            tripTrainer.learn_model_virtual()
-#            tripTrainer.learn_model_mix()
+            # 12102019
+            if str(train_data).upper() in train_data_group:
+                if str(train_data).upper() == train_data_group[0]:
+                    tripTrainer.learn_model()
+                elif str(train_data).upper() == train_data_group[1]:                   
+                    tripTrainer.learn_model_virtual()
+                else:
+                    tripTrainer.learn_model_mix()
+            else:
+                print("Wrong data input!")
         else:
-            tripTrainer.test_model()
-    
+#            tripTrainer.test_model()
+            # 12102019
+            if str(train_data).upper() in train_data_group:
+                tripTrainer.test_model_select(train_data)
+            else:
+                print("Wrong data input!")    
     ## 10112019
     ## 10182019
     """

@@ -12,6 +12,7 @@ Date          Comment
 10222019      Amend directory path for model_path
 11302019      Enhance risk prediction training to have one more parameter for virtual data input
 12042019      New function to train with virtual data (real, virtual, real + virtual)
+12102019      Include one input for choosing testing data
 """
 
 import chainer
@@ -25,6 +26,9 @@ import os
 # <ADD>
 from risk_prediction.trip_c_lstm import TripCLSTM
 # </ADD>
+
+# 12102019
+train_data_group = ['R', 'V', 'M']
 
 class TripTrainer(object):
     """A class of TRIP(Traffic Risk Prediction) trainer
@@ -679,9 +683,21 @@ class TripTrainer(object):
         """
         # evaluation
         self.evaluate('test')
-        # 11302019 - evaluation with virtual
-        self.evaluate_virtual('test')
-        self.evaluate_mix('test')
+    # 12102019
+    def test_model_select(self, sel_data):
+        """ Test
+        """
+        # evaluation
+        if str(sel_data).upper() in train_data_group:
+            if str(sel_data).upper() == train_data_group[0]:
+                self.evaluate('test')
+            elif str(sel_data).upper() == train_data_group[1]:
+                # 11302019 - evaluation with virtual
+                self.evaluate_virtual('test')
+            else:
+                self.evaluate_mix('test')
+        else:
+            print("Wrong data input")
     #
     def evaluate(self, stage):
         """ Evaluation
