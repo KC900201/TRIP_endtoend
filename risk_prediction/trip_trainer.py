@@ -542,9 +542,9 @@ class TripTrainer(object):
                 # evaluation
                 if (cur_epoch == 1) or (epoch % self.eval_interval == 0) or (epoch == num_of_epoch):
                     print(' train data evaluation:')
-                    self.evaluate('train')
+                    self.evaluate_mix('train')
                     print(' test data evaluation:')
-                    self.evaluate('test')
+                    self.evaluate_mix('test')
                     print()
                 # save interim model and optimizer
                 if self.save_interval is not None and ((epoch % self.save_interval == 0) or (epoch == num_of_epoch)):
@@ -622,9 +622,9 @@ class TripTrainer(object):
                 # evaluation
                 if (cur_epoch == 1) or (epoch % self.eval_interval == 0) or (epoch == num_of_epoch):
                     print(' train data evaluation:')
-                    self.evaluate('train')
+                    self.evaluate_virtual('train')
                     print(' test data evaluation:')
-                    self.evaluate('test')
+                    self.evaluate_virtual('test')
                     print()
                 # save interim model and optimizer
                 if self.save_interval is not None and ((epoch % self.save_interval == 0) or (epoch == num_of_epoch)):
