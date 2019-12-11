@@ -13,6 +13,7 @@ Date          Comment
 11302019      Enhance risk prediction training to have one more parameter for virtual data input
 12042019      New function to train with virtual data (real, virtual, real + virtual)
 12102019      Include one input for choosing testing data
+12112019      Enhance risk prediction training to include one more parameter for mix data input (real + virtual)
 """
 
 import chainer
@@ -39,6 +40,8 @@ class TripTrainer(object):
                        test_ds_path2, test_spec_file_name2, test_risk2,
                        vtrain_ds_path1, vtrain_spec_file_name1, vtrain_risk1, #11302019
                        vtrain_ds_path2, vtrain_spec_file_name2, vtrain_risk2, #11302019
+                       mtrain_ds_path1, mtrain_spec_file_name1, mtrain_risk1, #12112019
+                       mtrain_ds_path2, mtrain_spec_file_name2, mtrain_risk2, #12112019
 #                       vtest_ds_path1, vtest_spec_file_name1, vtest_risk1,    #11302019
 #                       vtest_ds_path2, vtest_spec_file_name2, vtest_risk2,    #11302019
                        layer_name, box_type, execution_mode, num_of_epoch, minibatch_size, 
@@ -94,6 +97,11 @@ class TripTrainer(object):
         self.vtrain_ds2 = TripDataset(vtrain_ds_path2, vtrain_spec_file_name2, layer_name, box_type)
         self.vtrain_risk1 = vtrain_risk1
         self.vtrain_risk2 = vtrain_risk2
+        # 12112019
+        self.mtrain_ds1 = TripDataset(mtrain_ds_path1, mtrain_spec_file_name1, layer_name, box_type)
+        self.mtrain_ds2 = TripDataset(mtrain_ds_path2, mtrain_spec_file_name2, layer_name, box_type)
+        self.mtrain_risk1 = mtrain_risk1
+        self.mtrain_risk2 = mtrain_risk2
 #        self.vtest_ds1 = TripDataset(vtest_ds_path1, vtest_spec_file_name1, layer_name, box_type)
 #        self.vtest_ds2 = TripDataset(vtest_ds_path2, vtest_spec_file_name2, layer_name, box_type)
 #        self.vtest_risk1 = vtest_risk1
@@ -106,6 +114,9 @@ class TripTrainer(object):
         # 11302019
         vtrain_ds_length1 = self.vtrain_ds1.get_length()
         vtrain_ds_length2 = self.vtrain_ds2.get_length()
+        # 12112019
+        mtrain_ds_length1 = self.mtrain_ds1.get_length()
+        mtrain_ds_length2 = self.mtrain_ds2.get_length()
 #        vtest_ds_length1 = self.vtest_ds1.get_length()
 #        vtest_ds_length2 = self.vtest_ds2.get_length()
         if train_ds_length1 == train_ds_length2:
@@ -121,6 +132,11 @@ class TripTrainer(object):
             self.vtrain_ds_length = vtrain_ds_length1
         else:
             raise ValueError('Mismatch of virtual training dataset length')
+        # 12112019
+        if mtrain_ds_length1 == mtrain_ds_length2:
+            self.mtrain_ds_length = mtrain_ds_length1
+        else:
+            raise ValueError('Mismatch of mixed training dataset length')
 #        if vtest_ds_length1 == vtest_ds_length2:
 #            self.vtest_ds_length = vtest_ds_length1
 #        else:
@@ -162,6 +178,19 @@ class TripTrainer(object):
         vtrain_box_type2 = self.vtrain_ds2.get_box_type()
         if vtrain_box_type1 != vtrain_box_type2:
             raise ValueError('Mismatch of virtual training box types')
+        # 12112019
+        mtrain_layer_info1 = self.mtrain_ds1.get_layer_info()
+        mtrain_layer_info2 = self.mtrain_ds2.get_layer_info()
+        if (mtrain_layer_info1 != mtrain_layer_info2):
+            raise ValueError('Mismatch of layer infos')
+        mtrain_feature_type1 = self.mtrain_ds1.get_feature_type()
+        mtrain_feature_type2 = self.mtrain_ds2.get_feature_type()
+        if mtrain_feature_type1 != mtrain_feature_type2:
+            raise ValueError('Mismatch of mixed training feature types')
+        mtrain_box_type1 = self.mtrain_ds1.get_box_type()
+        mtrain_box_type2 = self.mtrain_ds2.get_box_type()
+        if mtrain_box_type1 != mtrain_box_type2:
+            raise ValueError('Mismatch of mixed training box types')
 #        vtest_feature_type1 = self.vtest_ds1.get_feature_type()
 #        vtest_feature_type2 = self.vtest_ds2.get_feature_type()
 #        if vtest_feature_type1 != vtest_feature_type2:
@@ -368,6 +397,11 @@ class TripTrainer(object):
 #        self.tlogf.write('Virtual Test DS 2: {0}, {1}\n'.format(os.path.basename(self.vtest_ds2.ds_path), self.vtest_risk2))
         self.tlogf.write('Virtual Train DS length: {}\n'.format(self.vtrain_ds_length))
 #        self.tlogf.write('Virtual Test DS length: {}\n'.format(self.vtest_ds_length))
+        # 12112019
+        self.tlogf.write('Mixed Train DS 1: {0}, {1}\n'.format(os.path.basename(self.mtrain_ds1.ds_path), self.mtrain_risk1))
+        self.tlogf.write('Mixed Train DS 2: {0}, {1}\n'.format(os.path.basename(self.mtrain_ds2.ds_path), self.mtrain_risk2))
+        self.tlogf.write('Mixed Train DS length: {}\n'.format(self.mtrain_ds_length))
+        #
         layer_info = self.train_ds1.get_layer_info()
         self.tlogf.write('Layer: {0} ({1},{2},{3})\n'.format(layer_info[0], layer_info[1], layer_info[2], layer_info[3]))
         self.tlogf.write('Box type: {}\n'.format(self.train_ds1.get_box_type()))
@@ -375,6 +409,11 @@ class TripTrainer(object):
         vlayer_info = self.vtrain_ds1.get_layer_info()
         self.tlogf.write('Layer (Virtual data): {0} ({1},{2},{3})\n'.format(vlayer_info[0], vlayer_info[1], vlayer_info[2], vlayer_info[3]))
         self.tlogf.write('Box type (Virtual data): {}\n'.format(self.vtrain_ds1.get_box_type()))
+        self.tlogf.write('Model: {}\n'.format(os.path.basename(self.model_path)))
+        # 11302019
+        mlayer_info = self.mtrain_ds1.get_layer_info()
+        self.tlogf.write('Layer (Mixed data): {0} ({1},{2},{3})\n'.format(mlayer_info[0], mlayer_info[1], mlayer_info[2], mlayer_info[3]))
+        self.tlogf.write('Box type (Mixed data): {}\n'.format(self.mtrain_ds1.get_box_type()))
         self.tlogf.write('Model: {}\n'.format(os.path.basename(self.model_path)))
  
         # <ADD>
@@ -488,8 +527,8 @@ class TripTrainer(object):
                                             # cf. optimizer.t: the number of iterations
         num_of_epoch = self.num_of_epoch - start_epoch
         # set iterators (real + virtual)
-        train_iterator1 = iterators.MultithreadIterator(datasets.ConcatenatedDataset(self.train_ds1, self.vtrain_ds1), self.minibatch_size)
-        train_iterator2 = iterators.MultithreadIterator(datasets.ConcatenatedDataset(self.train_ds2, self.vtrain_ds2), self.minibatch_size)
+        train_iterator1 = iterators.MultithreadIterator(self.mtrain_ds1, self.minibatch_size)
+        train_iterator2 = iterators.MultithreadIterator(self.mtrain_ds1, self.minibatch_size)
         # training loop
         epoch = 0
         while train_iterator1.epoch < num_of_epoch:
@@ -507,24 +546,18 @@ class TripTrainer(object):
             train_batch1 = train_iterator1.next() # a list of minibatch elements of train dataset 1
             train_batch2 = train_iterator2.next() # a list of minibatch elements of train dataset 2
             # prepare input sequences
-            input_feature_seq1 = self.train_ds1.prepare_input_sequence(train_batch1, self.roi_bg) # <ADD self.roi_bg/>
-            input_feature_seq2 = self.train_ds2.prepare_input_sequence(train_batch2, self.roi_bg) # <ADD self.roi_bg/>
-            input_feature_vseq1 = self.vtrain_ds1.prepare_input_sequence(train_batch1, self.roi_bg) # <ADD self.roi_bg/>
-            input_feature_vseq2 = self.vtrain_ds2.prepare_input_sequence(train_batch2, self.roi_bg) # <ADD self.roi_bg/>
+            input_feature_seq1 = self.mtrain_ds1.prepare_input_sequence(train_batch1, self.roi_bg) # <ADD self.roi_bg/>
+            input_feature_seq2 = self.mtrain_ds1.prepare_input_sequence(train_batch2, self.roi_bg) # <ADD self.roi_bg/>
             # forward recurrent propagation and risk prediction
             if self.risk_type == 'seq_risk':
                 r1 = self.model.predict_risk(input_feature_seq1)
                 r2 = self.model.predict_risk(input_feature_seq2)
-                vr1 = self.model.predict_risk(input_feature_vseq1)
-                vr2 = self.model.predict_risk(input_feature_vseq2)
             elif self.risk_type == 'seq_mean_risk':
                 r1 = self.model.predict_mean_risk(input_feature_seq1)
                 r2 = self.model.predict_mean_risk(input_feature_seq2)
-                vr1 = self.model.predict_mean_risk(input_feature_vseq1)
-                vr2 = self.model.predict_mean_risk(input_feature_vseq2)
             # compute comparative loss
-            rel = self.compare_risk_level(train_batch1, train_batch2, self.train_risk1 + self.vtrain_risk1, self.train_risk2 + self.vtrain_risk2)
-            batch_loss = self.model.comparative_loss(r1 + vr1, r2 + vr2, rel, self.comparative_loss_margin)
+            rel = self.compare_risk_level(train_batch1, train_batch2, self.mtrain_risk1, self.mtrain_risk2)
+            batch_loss = self.model.comparative_loss(r1, r2, rel, self.comparative_loss_margin)
             epoch_loss += float(cuda.to_cpu(batch_loss.data))
             # backward propagation and update parameters
             self.model.cleargrads()
@@ -776,11 +809,11 @@ class TripTrainer(object):
         """
         #print("stage: " + str(stage) + ", ds_length: " + str(self.train_ds_length) + ", ds_length (test): " + str(self.test_ds_length)) #testing - 20190213
         if stage == 'train':
-            ds1 = datasets.ConcatenatedDataset(self.train_ds1, self.vtrain_ds1)
-            ds2 = datasets.ConcatenatedDataset(self.train_ds2, self.vtrain_ds2)
-            risk1 = self.vtrain_risk1 + self.vtrain_risk1
-            risk2 = self.vtrain_risk2 + self.vtrain_risk2
-            ds_length = self.train_ds_length + self.vtrain_ds_length
+            ds1 = self.mtrain_ds1
+            ds2 = self.mtrain_ds2
+            risk1 = self.mtrain_risk1 
+            risk2 = self.mtrain_risk2 
+            ds_length = self.mtrain_ds_length
         elif stage == 'test':
             ds1 = self.test_ds1 
             ds2 = self.test_ds2 

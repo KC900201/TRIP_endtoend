@@ -22,6 +22,7 @@ Date          Comment
 10292019      Temporary hardcode path for training and testing dataset
 11302019      Enhance risk prediction training to have one more parameter for virtual data input
 12102019      Comment out input for video prediction path, include one input for choosing training data
+12112019      Enhance risk prediction training to have one more parameter for mix data input (real + virtual)
 """
 
 #Import libraries
@@ -129,7 +130,7 @@ if __name__ == '__main__':
             test_ds_path2 = os.path.join(os.path.dirname(test_spec_file_name2), test_ds_path2)
 #            test_ds_path2 = os.path.join('C:/Users/atsumilab/Pictures/TRIP_Dataset', test_ds_path2) #10292019
             test_risk2 = int(test_risk2)
-        #11302019
+        # 11302019
 #        elif line.startswith('vtest_ds1:'):
 #            vtest_ds_path1, vtest_spec_file_name1, vtest_risk1 = line.split(':')[1].strip().split()
 #            vtest_ds_path1 = os.path.join(os.path.dirname(vtest_spec_file_name1), vtest_ds_path1) #10212019
@@ -147,6 +148,16 @@ if __name__ == '__main__':
             vtrain_ds_path2 = os.path.join(os.path.dirname(vtrain_spec_file_name2), vtrain_ds_path2) #10212019
             vtrain_risk2 = int(vtrain_risk2)
         #End 11302019
+        # 12112019
+        elif line.startswith('mtrain_ds1:'):
+            mtrain_ds_path1, mtrain_spec_file_name1, mtrain_risk1 = line.split(':')[1].strip().split()
+            mtrain_ds_path1 = os.path.join(os.path.dirname(mtrain_spec_file_name1), mtrain_ds_path1) #10212019
+            mtrain_risk1 = int(mtrain_risk1)
+        elif line.startswith('mtrain_ds2:'):
+            mtrain_ds_path2, mtrain_spec_file_name2, mtrain_risk2 = line.split(':')[1].strip().split()
+            mtrain_ds_path2 = os.path.join(os.path.dirname(mtrain_spec_file_name2), mtrain_ds_path2) #10212019
+            mtrain_risk2 = int(mtrain_risk2)
+        #End 12112019
         elif line.startswith('layer_name:'):
             layer_name = line.split(':')[1].strip()
         elif line.startswith('box_type:'):
@@ -343,6 +354,9 @@ if __name__ == '__main__':
                                       # 11302019
                                       vtrain_ds_path1, vtrain_spec_file_name1, vtrain_risk1,
                                       vtrain_ds_path2, vtrain_spec_file_name2, vtrain_risk2,
+                                      # 12112019
+                                      mtrain_ds_path1, mtrain_spec_file_name1, mtrain_risk1,
+                                      mtrain_ds_path2, mtrain_spec_file_name2, mtrain_risk2,
 #                                      vtest_ds_path1, vtest_spec_file_name1, vtest_risk1,
 #                                      vtest_ds_path2, vtest_spec_file_name2, vtest_risk2,
                                       layer_name, box_type, 

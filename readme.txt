@@ -62,3 +62,5 @@ Updates
 2019/12/05 - Add new functions (learn_virtual, learn_mix) to train risk prediction with virtual data (trip_trainer.py). 
 	     Comment dataset generation part and append new functions (trip_combined.py)
 2019/12/08 - Add new function to count number of files (copyfiles.py)
+2019/12/10 - Comment out input for video prediction path, include one input for choosing training data (trip_combined.py; trip_trainer.py)
+2019/12/11 - Enhance risk prediction training to have one more parameter for mix data input (real + virtual) - trip_combined.py; trip_trainer.py
