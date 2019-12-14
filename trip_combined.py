@@ -23,6 +23,7 @@ Date          Comment
 11302019      Enhance risk prediction training to have one more parameter for virtual data input
 12102019      Comment out input for video prediction path, include one input for choosing training data
 12112019      Enhance risk prediction training to have one more parameter for mix data input (real + virtual)
+12142019      Train mixed data using new function
 """
 
 #Import libraries
@@ -370,7 +371,8 @@ if __name__ == '__main__':
                     elif str(train_data).upper() == train_data_group[1]:                   
                         tripTrainer.learn_model_virtual()
                     else:
-                        tripTrainer.learn_model_mix()
+#                        tripTrainer.learn_model_mix()
+                        tripTrainer.learn_model_mix_2() # 12142019
                 else:
                     print("Wrong data input!")
             else:

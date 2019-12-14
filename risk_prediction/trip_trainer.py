@@ -14,6 +14,7 @@ Date          Comment
 12042019      New function to train with virtual data (real, virtual, real + virtual)
 12102019      Include one input for choosing testing data
 12112019      Enhance risk prediction training to include one more parameter for mix data input (real + virtual)
+12142019      New (trial) function to train mixed data but separately
 """
 
 import chainer
@@ -595,7 +596,148 @@ class TripTrainer(object):
         print(' done')
         # close a log file
         self.close_log_file() 
-    
+    # 12142019
+    def learn_model_mix_2(self):
+        """ Learning (without trainer)
+        """
+        # open a log file
+        self.open_log_file()
+        self.write_log_header()
+        # redefine the number of epochs (for retrain)
+        start_epoch = self.optimizer.epoch  # optimizer.epoch: the number of epochs (epoch value is 0 when optimizer is generated)
+                                            # cf. optimizer.t: the number of iterations
+        num_of_epoch = self.num_of_epoch - start_epoch
+        # set iterators (real + virtual)
+        train_iterator1 = iterators.MultithreadIterator(self.train_ds1, self.minibatch_size)
+        train_iterator2 = iterators.MultithreadIterator(self.train_ds2, self.minibatch_size)
+        vtrain_iterator1 = iterators.MultithreadIterator(self.vtrain_ds1, self.minibatch_size)
+        vtrain_iterator2 = iterators.MultithreadIterator(self.vtrain_ds2, self.minibatch_size)
+        # training loop
+        epoch = 0
+        # Real data training
+        while train_iterator1.epoch < num_of_epoch:
+            # preprocessing
+            if epoch == 0 or train_iterator1.is_new_epoch:
+                self.optimizer.new_epoch() # increment the optimizer.epoch by calling new_epock() for retrain
+                epoch = train_iterator1.epoch + 1
+                cur_epoch = start_epoch + epoch
+                print('Epoch: {0:d}'.format(cur_epoch))
+                if self.tlogf is not None:
+                    self.tlogf.write('Epoch: {0:d}\n'.format(cur_epoch))
+                epoch_loss = 0.0
+                start_time = time.time()
+            # get a minibatch of each dataset (a list of examples)
+            train_batch1 = train_iterator1.next() # a list of minibatch elements of train dataset 1
+            train_batch2 = train_iterator2.next() # a list of minibatch elements of train dataset 2
+            # prepare input sequences
+            input_feature_seq1 = self.train_ds1.prepare_input_sequence(train_batch1, self.roi_bg) # <ADD self.roi_bg/>
+            input_feature_seq2 = self.train_ds2.prepare_input_sequence(train_batch2, self.roi_bg) # <ADD self.roi_bg/>
+            # forward recurrent propagation and risk prediction
+            if self.risk_type == 'seq_risk':
+                r1 = self.model.predict_risk(input_feature_seq1)
+                r2 = self.model.predict_risk(input_feature_seq2)
+            elif self.risk_type == 'seq_mean_risk':
+                r1 = self.model.predict_mean_risk(input_feature_seq1)
+                r2 = self.model.predict_mean_risk(input_feature_seq2)
+            # compute comparative loss
+            rel = self.compare_risk_level(train_batch1, train_batch2, self.train_risk1, self.train_risk2)
+            batch_loss = self.model.comparative_loss(r1, r2, rel, self.comparative_loss_margin)
+            epoch_loss += float(cuda.to_cpu(batch_loss.data))
+            # backward propagation and update parameters
+            self.model.cleargrads()
+            batch_loss.backward()
+            batch_loss.unchain_backward() # unchain backward for each video clip
+            self.optimizer.update()
+            # post processing
+            if train_iterator1.is_new_epoch:
+                # result
+                end_time = time.time()
+                print(' loss: {0:.6f} ({1:.2f} sec)'.format(epoch_loss, end_time-start_time))
+                if self.tlogf is not None:
+                    self.tlogf.write(' loss: {0:.6f} ({1:.2f} sec)\n'.format(epoch_loss, end_time-start_time))
+                    self.tlogf.flush()
+                # evaluation
+                if (cur_epoch == 1) or (epoch % self.eval_interval == 0) or (epoch == num_of_epoch):
+                    print(' train data evaluation (Real data):')
+                    self.evaluate('train')
+                    print(' test data evaluation (Real data):')
+                    self.evaluate('test')
+                    print()
+                # save interim model and optimizer
+                if self.save_interval is not None and ((epoch % self.save_interval == 0) or (epoch == num_of_epoch)):
+                    interim_model_path = self.model_path[:-4] + '.' + str(cur_epoch) + self.model_path[-4:]
+                    interim_optimizer_path = self.model_path.replace('model.npz','optimizer.npz')
+                    interim_optimizer_path = interim_optimizer_path[:-4] + '.' + str(cur_epoch) + interim_optimizer_path[-4:]
+                    print('Saving an interim model: {}'.format(interim_model_path))
+                    serializers.save_npz(interim_model_path, self.model)
+                    serializers.save_npz(interim_optimizer_path, self.optimizer)
+                    print(' done')
+        # Virtual data training
+        while vtrain_iterator1.epoch < num_of_epoch:
+            # preprocessing
+            if epoch == 0 or vtrain_iterator1.is_new_epoch:
+                self.optimizer.new_epoch() # increment the optimizer.epoch by calling new_epock() for retrain
+                epoch = vtrain_iterator1.epoch + 1
+                cur_epoch = start_epoch + epoch
+                print('Epoch: {0:d}'.format(cur_epoch))
+                if self.tlogf is not None:
+                    self.tlogf.write('Epoch: {0:d}\n'.format(cur_epoch))
+                epoch_loss = 0.0
+                start_time = time.time()
+            # get a minibatch of each dataset (a list of examples)
+            train_batch1 = vtrain_iterator1.next() # a list of minibatch elements of train dataset 1
+            train_batch2 = vtrain_iterator2.next() # a list of minibatch elements of train dataset 2
+            # prepare input sequences
+            input_feature_seq1 = self.vtrain_ds1.prepare_input_sequence(train_batch1, self.roi_bg) # <ADD self.roi_bg/>
+            input_feature_seq2 = self.vtrain_ds2.prepare_input_sequence(train_batch2, self.roi_bg) # <ADD self.roi_bg/>
+            # forward recurrent propagation and risk prediction
+            if self.risk_type == 'seq_risk':
+                r1 = self.model.predict_risk(input_feature_seq1)
+                r2 = self.model.predict_risk(input_feature_seq2)
+            elif self.risk_type == 'seq_mean_risk':
+                r1 = self.model.predict_mean_risk(input_feature_seq1)
+                r2 = self.model.predict_mean_risk(input_feature_seq2)
+            # compute comparative loss
+            rel = self.compare_risk_level(train_batch1, train_batch2, self.vtrain_risk1, self.vtrain_risk2)
+            batch_loss = self.model.comparative_loss(r1, r2, rel, self.comparative_loss_margin)
+            epoch_loss += float(cuda.to_cpu(batch_loss.data))
+            # backward propagation and update parameters
+            self.model.cleargrads()
+            batch_loss.backward()
+            batch_loss.unchain_backward() # unchain backward for each video clip
+            self.optimizer.update()
+            # post processing
+            if vtrain_iterator1.is_new_epoch:
+                # result
+                end_time = time.time()
+                print(' loss: {0:.6f} ({1:.2f} sec)'.format(epoch_loss, end_time-start_time))
+                if self.tlogf is not None:
+                    self.tlogf.write(' loss: {0:.6f} ({1:.2f} sec)\n'.format(epoch_loss, end_time-start_time))
+                    self.tlogf.flush()
+                # evaluation
+                if (cur_epoch == 1) or (epoch % self.eval_interval == 0) or (epoch == num_of_epoch):
+                    print(' train data evaluation (Virtual data):')
+                    self.evaluate_virtual('train')
+                    print(' test data evaluation (Virtual data):')
+                    self.evaluate_virtual('test')
+                    print()
+                # save interim model and optimizer
+                if self.save_interval is not None and ((epoch % self.save_interval == 0) or (epoch == num_of_epoch)):
+                    interim_model_path = self.model_path[:-4] + '.' + str(cur_epoch) + self.model_path[-4:]
+                    interim_optimizer_path = self.model_path.replace('model.npz','optimizer.npz')
+                    interim_optimizer_path = interim_optimizer_path[:-4] + '.' + str(cur_epoch) + interim_optimizer_path[-4:]
+                    print('Saving an interim model: {}'.format(interim_model_path))
+                    serializers.save_npz(interim_model_path, self.model)
+                    serializers.save_npz(interim_optimizer_path, self.optimizer)
+                    print(' done')
+        # save final model and optimizer
+        print('Saving a final model: {}'.format(self.model_path))
+        serializers.save_npz(self.model_path, self.model)
+        serializers.save_npz(self.model_path.replace('model.npz','optimizer.npz'), self.optimizer)
+        print(' done')
+        # close a log file
+        self.close_log_file() 
+
     def learn_model_virtual(self): 
         """ Learning (without trainer)
         """
