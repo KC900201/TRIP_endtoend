@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{b57b2640-9936-4bd4-b586-92cd2040eaae}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>trip_combined.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId />
+    <InterpreterVersion />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="estimation\Readme.txt" />
+    <Content Include="readme.txt" />
+    <Content Include="result\yolov3\dashcam\dashcam_test0_tlog.txt" />
+    <Content Include="result\yolov3\dashcam\dashcam_test0_tlog_20191025.txt" />
+    <Content Include="result\yolov3\dashcam\dashcam_test1_tlog.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm2_conv33_adadelta_bak20191104_%281%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm2_conv33_adadelta_bak20191104_%282%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm2_conv33_adadelta_bak20191104_%283%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm2_conv33_adadelta_bak20191104_%284%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm2_conv33_adadelta_bak20191104_%285%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm2_no_do_conv33_adadelta_bak20191107_%281%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm2_no_do_conv33_adadelta_bak20191107_%282%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm2_no_do_conv33_adadelta_bak20191107_%283%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm2_no_do_conv33_adadelta_bak20191107_%284%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm2_no_do_conv33_adadelta_bak20191107_%285%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm3_conv33_adadelta_bak20191101_%281%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm3_conv33_adadelta_bak20191101_%282%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm3_conv33_adadelta_bak20191101_%283%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm3_conv33_adadelta_bak20191101_%284%29.txt" />
+    <Content Include="result\yolov3\lstm3\dashcam_tbox_tlog_ltsm3_conv33_adadelta_bak20191101_%285%29.txt" />
+    <Content Include="spec_files\endtoend_spec.txt" />
+    <Content Include="spec_files\endtoend_spec2.txt" />
+    <Content Include="spec_files\estimation\dataset_spec.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_lstm3_param1.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_lstm3_param2.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_lstm3_param3.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_lstm3_param4.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_lstm3_param5.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_param1.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_param2.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_param3.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_param4.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_param5.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_param_bg_gn.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_param_bg_gn1.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_param_bg_gn2.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_param_bg_gn3.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_param_bg_gn4.txt" />
+    <Content Include="spec_files\risk_prediction\model_tbox_param_bg_gn5.txt" />
+    <Content Include="spec_files\risk_prediction\training_tbox_spec.txt" />
+    <Content Include="spec_files\risk_prediction\training_tbox_spec_bg_gn.txt" />
+    <Content Include="spec_files\video_prediction\prediction_v3_0_ebox_spec.txt" />
+    <Content Include="spec_files\video_prediction\prediction_v3_0_tbox_spec.txt" />
+    <Content Include="spec_files\video_prediction\prediction_v3_1_ebox_spec.txt" />
+    <Content Include="spec_files\video_prediction\prediction_v3_1_tbox_spec.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="estimation\dataset_generator\dataset_generator_function.py" />
+    <Compile Include="estimation\dataset_generator\dataset_generator_img.py" />
+    <Compile Include="estimation\dataset_generator\dataset_generator_two.py" />
+    <Compile Include="estimation\dataset_generator\lib\functions\reorg.py" />
+    <Compile Include="estimation\dataset_generator\lib\functions\sum_of_squared_error.py" />
+    <Compile Include="estimation\dataset_generator\lib\functions\test_reorg.py" />
+    <Compile Include="estimation\dataset_generator\lib\functions\test_sum_of_squared_error.py" />
+    <Compile Include="estimation\dataset_generator\lib\functions\__init__.py" />
+    <Compile Include="estimation\dataset_generator\lib\image_generator.py" />
+    <Compile Include="estimation\dataset_generator\lib\preprocess.py" />
+    <Compile Include="estimation\dataset_generator\lib\utils.py" />
+    <Compile Include="estimation\dataset_generator\object_detector.py" />
+    <Compile Include="estimation\dataset_generator\yolov3_feature_ext.py" />
+    <Compile Include="estimation\dataset_generator\yolo_base_feature_ext.py" />
+    <Compile Include="estimation\file_editing\copyfiles.py" />
+    <Compile Include="estimation\file_editing\csvtotxt.py" />
+    <Compile Include="estimation\file_editing\folder.py" />
+    <Compile Include="estimation\file_editing\gta2yolo.py" />
+    <Compile Include="estimation\file_editing\weighttonpz.py" />
+    <Compile Include="risk_prediction\main_trip_prediction.py" />
+    <Compile Include="risk_prediction\main_trip_repeat_training.py" />
+    <Compile Include="risk_prediction\main_trip_training.py" />
+    <Compile Include="risk_prediction\main_trip_vpredictor.py" />
+    <Compile Include="risk_prediction\trip_c_lstm.py" />
+    <Compile Include="risk_prediction\trip_dataset.py" />
+    <Compile Include="risk_prediction\trip_dataset_v.py" />
+    <Compile Include="risk_prediction\trip_lstm.py" />
+    <Compile Include="risk_prediction\trip_predictor.py" />
+    <Compile Include="risk_prediction\trip_trainer.py" />
+    <Compile Include="risk_prediction\trip_vpredictor.py" />
+    <Compile Include="trip_combined.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="estimation" />
+    <Folder Include="estimation\dataset_generator" />
+    <Folder Include="estimation\dataset_generator\lib" />
+    <Folder Include="estimation\dataset_generator\lib\functions" />
+    <Folder Include="estimation\file_editing" />
+    <Folder Include="result\" />
+    <Folder Include="result\yolov3\" />
+    <Folder Include="result\yolov3\dashcam" />
+    <Folder Include="result\yolov3\lstm3" />
+    <Folder Include="risk_prediction" />
+    <Folder Include="spec_files" />
+    <Folder Include="spec_files\estimation" />
+    <Folder Include="spec_files\risk_prediction" />
+    <Folder Include="spec_files\video_prediction" />
+  </ItemGroup>
+  <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
+</Project>

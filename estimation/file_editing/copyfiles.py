@@ -320,20 +320,24 @@ if __name__ == '__main__':
     viena_dir = r'E:\AtsumiLabMDS-2\TRIP\Dataset\VIENA2\image\Scenario2'
     dashcam_train = r'E:\AtsumiLabMDS-2\TRIP\Trip2019Q2\Dashcam_dataset\training\positive'
     dashcam_test = r'E:\AtsumiLabMDS-2\TRIP\Trip2019Q2\Dashcam_dataset\testing\positive'
+    traindir_mixed0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain0'
+    traindir_mixed1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain1'
 
     #copyTreeFormat(traindir_dashcam, output_dir, Folder.dashcam_train, "train0")
     #moveTreeFormat(traindir_0, output_dir, Folder.dashcam_train, "train1")    
     countFilesFolders(dashcam_train, Folder.dashcam_train)
     countFilesFolders(traindir_dashcam0, [])
     countFilesFolders(traindir_dashcam1, [])
-    countFilesFolders(dashcam_test, Folder.dashcam_test)
-    countFilesFolders(testdir_dashcam0, [])
-    countFilesFolders(testdir_dashcam1, [])
-    countFilesFolders(viena_dir, Folder.accident_asset)
-    countFilesFolders(viena_dir, Folder.accident_car)
-    countFilesFolders(viena_dir, Folder.accident_pedes)
+    #countFilesFolders(dashcam_test, Folder.dashcam_test)
+    #countFilesFolders(testdir_dashcam0, [])
+    #countFilesFolders(testdir_dashcam1, [])
+    #countFilesFolders(viena_dir, Folder.accident_asset)
+    #countFilesFolders(viena_dir, Folder.accident_car)
+    #countFilesFolders(viena_dir, Folder.accident_pedes)
     countFilesFolders(traindir_viena0, [])
     countFilesFolders(traindir_viena1, [])
+    countFilesFolders(traindir_mixed0, [])
+    countFilesFolders(traindir_mixed1, [])
 
     #copyTreeFormat(testdir_dashcam, output_dir, Folder.dashcam_test, "test0")
     #moveTreeFormat(testdir_0, output_dir, Folder.dashcam_test, "test1") 

@@ -528,7 +528,7 @@ class TripTrainer(object):
         num_of_epoch = self.num_of_epoch - start_epoch
         # set iterators (real + virtual)
         train_iterator1 = iterators.MultithreadIterator(self.mtrain_ds1, self.minibatch_size)
-        train_iterator2 = iterators.MultithreadIterator(self.mtrain_ds1, self.minibatch_size)
+        train_iterator2 = iterators.MultithreadIterator(self.mtrain_ds2, self.minibatch_size)
         # training loop
         epoch = 0
         while train_iterator1.epoch < num_of_epoch:
