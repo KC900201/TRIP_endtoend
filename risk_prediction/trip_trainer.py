@@ -547,7 +547,7 @@ class TripTrainer(object):
             train_batch2 = train_iterator2.next() # a list of minibatch elements of train dataset 2
             # prepare input sequences
             input_feature_seq1 = self.mtrain_ds1.prepare_input_sequence(train_batch1, self.roi_bg) # <ADD self.roi_bg/>
-            input_feature_seq2 = self.mtrain_ds1.prepare_input_sequence(train_batch2, self.roi_bg) # <ADD self.roi_bg/>
+            input_feature_seq2 = self.mtrain_ds2.prepare_input_sequence(train_batch2, self.roi_bg) # <ADD self.roi_bg/>
             # forward recurrent propagation and risk prediction
             if self.risk_type == 'seq_risk':
                 r1 = self.model.predict_risk(input_feature_seq1)
