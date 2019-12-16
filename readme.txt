@@ -64,3 +64,4 @@ Updates
 2019/12/08 - Add new function to count number of files (copyfiles.py)
 2019/12/10 - Comment out input for video prediction path, include one input for choosing training data (trip_combined.py; trip_trainer.py)
 2019/12/11 - Enhance risk prediction training to have one more parameter for mix data input (real + virtual) - trip_combined.py; trip_trainer.py
+2019/12/16 - New function to remove extra files in virtual data directory (file no. 51 - 75, copyfiles.py)

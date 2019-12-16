@@ -12,6 +12,7 @@ Date          Comment
 12032019      New function to move files
 12042019      Function to move file for virtual dataset allocation
 12062019      New function to count no. of files in directory, for checking whether data transferred successfully
+12162019      New function to remove extra files in virtual data directory (file no. 51 - 75)
 """
 
 import shutil
@@ -230,6 +231,35 @@ def moveTreeVirtual(src, dst, symlinks = False, ignore = None):
                 else:
                   shutil.move(s, d)
 
+# 12162019
+def delTreeVirtual(src, symlinks = False, ignore = None):
+    lst = os.listdir(src)
+    if ignore:
+        excl = ignore(src, lst)
+        lst = [x for x in lst if x not in excl]
+    for item in lst:
+      if item in folder_name: # copy directory
+        s = os.path.join(src, item)
+        if os.path.isdir(s):            
+            delTreeVirtual(s, symlinks, ignore)
+        else:
+            continue
+      else:
+        filename = str(os.path.splitext(os.path.basename(item))[0])
+        if "e" not in filename and "_" not in filename: # found no special characters in file name
+            fileno = int(filename)
+            if fileno > 50 and fileno <= 75:
+                s = os.path.join(src, item)
+                os.remove(s)
+        else: # found special characters in file name
+            if 'e' in filename:
+                fileno = int(filename.strip('e').lstrip().rstrip())
+            else:
+                fileno = int(filename.split("_")[0])
+            if fileno > 50 and fileno <= 75:
+                s = os.path.join(src, item)
+                os.remove(s)
+
 def copyTreeFormat(src, dst, list, oname):
     for dir in src:
         if os.path.isdir(dir):
@@ -269,6 +299,14 @@ def moveTreeFormatVirtual(src, dst, list, oname):
                         if odir.endswith(oname):
                             new_odir = odir + "\\" + file_name
                             moveTreeVirtual(dir, new_odir)
+
+def delTreeFormatVirtual(src, list):
+    for dir in src:
+        if os.path.isdir(dir):
+            file_name = os.path.basename(dir)
+            print("Folder: " + str(dir))
+            if file_name in list:
+                    delTreeVirtual(dir)
 
 # 12062019
 def countFilesFolders(dir, list):
@@ -322,22 +360,30 @@ if __name__ == '__main__':
     dashcam_test = r'E:\AtsumiLabMDS-2\TRIP\Trip2019Q2\Dashcam_dataset\testing\positive'
     traindir_mixed0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain0'
     traindir_mixed1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain1'
+    mtraindir_0 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain0\*')
+    mtraindir_1 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain1\*')
 
+    #delTreeFormatVirtual(mtraindir_0, Folder.accident_car)
+    #delTreeFormatVirtual(mtraindir_0, Folder.accident_asset)
+    #delTreeFormatVirtual(mtraindir_0, Folder.accident_pedes)
+    delTreeFormatVirtual(mtraindir_1, Folder.accident_asset)
+    delTreeFormatVirtual(mtraindir_1, Folder.accident_car)
+    delTreeFormatVirtual(mtraindir_1, Folder.accident_pedes)
     #copyTreeFormat(traindir_dashcam, output_dir, Folder.dashcam_train, "train0")
     #moveTreeFormat(traindir_0, output_dir, Folder.dashcam_train, "train1")    
-    countFilesFolders(dashcam_train, Folder.dashcam_train)
-    countFilesFolders(traindir_dashcam0, [])
-    countFilesFolders(traindir_dashcam1, [])
+    #countFilesFolders(dashcam_train, Folder.dashcam_train)
+    #countFilesFolders(traindir_dashcam0, [])
+    #countFilesFolders(traindir_dashcam1, [])
     #countFilesFolders(dashcam_test, Folder.dashcam_test)
     #countFilesFolders(testdir_dashcam0, [])
     #countFilesFolders(testdir_dashcam1, [])
     #countFilesFolders(viena_dir, Folder.accident_asset)
     #countFilesFolders(viena_dir, Folder.accident_car)
     #countFilesFolders(viena_dir, Folder.accident_pedes)
-    countFilesFolders(traindir_viena0, [])
-    countFilesFolders(traindir_viena1, [])
-    countFilesFolders(traindir_mixed0, [])
-    countFilesFolders(traindir_mixed1, [])
+    #countFilesFolders(traindir_viena0, [])
+    #countFilesFolders(traindir_viena1, [])
+    #countFilesFolders(traindir_mixed0, [])
+    #countFilesFolders(traindir_mixed1, [])
 
     #copyTreeFormat(testdir_dashcam, output_dir, Folder.dashcam_test, "test0")
     #moveTreeFormat(testdir_0, output_dir, Folder.dashcam_test, "test1") 
