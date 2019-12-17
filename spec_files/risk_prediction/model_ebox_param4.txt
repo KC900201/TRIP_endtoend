@@ -3,9 +3,9 @@
 #model_path: model/accident_KitDash_8000_tbox_model.npz
 #model_path: model/accident_KitDash_8000.50.npz
 #model_path: model/yolov3/backup_tbox_lstm3_third_middle_conv_bg_zero_20191104/accident_KitDash_8000_tbox_4_model.npz
-model_path: model/yolov3/backup_ebox_accident_KitDashV_do_20191209/accident_KitDashV_6000_ebox_4_model.npz
-#model_arch: MP-C-SPP-FC-LSTM
-model_arch: MP-C-SPP-FC-DO-LSTM
+model_path: result/yolov3/model/yolov3/backup_ebox_accident_KitDashV_do_20191215/accident_KitDashV_6000_ebox_4_model.npz
+model_arch: MP-C-SPP-FC-LSTM
+#model_arch: MP-C-SPP-FC-DO-LSTM
 #model_arch: MP-C-SPP-FC-DO-LSTM2
 #model_arch: MP-C-SPP-FC-DO-LSTM3
 input_size: 1000

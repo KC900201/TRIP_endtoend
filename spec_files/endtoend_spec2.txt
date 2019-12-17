@@ -40,13 +40,15 @@ test_ds1: ds4/test0 ds_spec.txt 0
 test_ds2: ds4/test1 ds_spec.txt 1
 vtrain_ds1: ds4/vtrain0 ds_spec.txt 0
 vtrain_ds2: ds4/vtrain1 ds_spec.txt 1
+mtrain_ds1: ds4/train0 ds_spec.txt 0
+mtrain_ds2: ds4/train1 ds_spec.txt 1
 #layer_name: conv33,conv39,conv45
 layer_name: conv33
 box_type: ebox
 execution_mode: train
-num_of_epoch: 50
-minibatch_size: 32
-#minibatch_size: 8
+num_of_epoch: 25
+#minibatch_size: 32
+minibatch_size: 16
 eval_interval: 5
 save_interval: 10
 # tlog_path: result/dashcam_tbox_tlog.txt
@@ -58,7 +60,7 @@ model_param_file: risk_prediction/model_tbox_param3.txt
 model_param_file: risk_prediction/model_tbox_param4.txt
 model_param_file: risk_prediction/model_tbox_param5.txt
 #tlog_path: result/yolov3/dashcam_tbox_tlog_conv33_adadelta_bak20190514.txt
-tlog_path: result/yolov3/lstm3/dashcam_ebox_tlog_conv33_adadelta_bak20191210.txt
+tlog_path: result/yolov3/lstm3/dashcam_ebox_tlog_conv33_adadelta_bak20191215.txt
 gpu_id: 0
 ########################
 #Risk Prediction Config

@@ -13,6 +13,7 @@ Date          Comment
 12042019      Function to move file for virtual dataset allocation
 12062019      New function to count no. of files in directory, for checking whether data transferred successfully
 12162019      New function to remove extra files in virtual data directory (file no. 51 - 75)
+12172019      Modify new function to delete "img" folder in virtual data directory
 """
 
 import shutil
@@ -240,10 +241,13 @@ def delTreeVirtual(src, symlinks = False, ignore = None):
     for item in lst:
       if item in folder_name: # copy directory
         s = os.path.join(src, item)
-        if os.path.isdir(s):            
-            delTreeVirtual(s, symlinks, ignore)
+        if item == folder_name[4]: # 12172019
+            shutil.rmtree(s)
         else:
-            continue
+            if os.path.isdir(s):            
+                delTreeVirtual(s, symlinks, ignore)
+            else:
+                continue
       else:
         filename = str(os.path.splitext(os.path.basename(item))[0])
         if "e" not in filename and "_" not in filename: # found no special characters in file name
@@ -349,12 +353,18 @@ if __name__ == '__main__':
     testdir_0 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test0\*')
     testdir_1 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test1\*')
     vtraindir_0 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\vtrain0\*')
-    traindir_dashcam0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\train0'
-    traindir_dashcam1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\train1'
-    testdir_dashcam0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test0'
-    testdir_dashcam1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test1'
-    traindir_viena0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\vtrain0'
-    traindir_viena1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\vtrain1'
+#    traindir_dashcam0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\train0'
+#   traindir_dashcam1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\train1'
+    traindir_dashcam0 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\train0'
+    traindir_dashcam1 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\train1'
+#    testdir_dashcam0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test0'
+#    testdir_dashcam1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test1'
+    testdir_dashcam0 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\test0'
+    testdir_dashcam1 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\test1'
+#    traindir_viena0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\vtrain0'
+#    traindir_viena1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\vtrain1'
+    traindir_viena0 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\vtrain0'
+    traindir_viena1 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\vtrain1'
     viena_dir = r'E:\AtsumiLabMDS-2\TRIP\Dataset\VIENA2\image\Scenario2'
     dashcam_train = r'E:\AtsumiLabMDS-2\TRIP\Trip2019Q2\Dashcam_dataset\training\positive'
     dashcam_test = r'E:\AtsumiLabMDS-2\TRIP\Trip2019Q2\Dashcam_dataset\testing\positive'
@@ -366,9 +376,9 @@ if __name__ == '__main__':
     #delTreeFormatVirtual(mtraindir_0, Folder.accident_car)
     #delTreeFormatVirtual(mtraindir_0, Folder.accident_asset)
     #delTreeFormatVirtual(mtraindir_0, Folder.accident_pedes)
-    delTreeFormatVirtual(mtraindir_1, Folder.accident_asset)
-    delTreeFormatVirtual(mtraindir_1, Folder.accident_car)
-    delTreeFormatVirtual(mtraindir_1, Folder.accident_pedes)
+    #delTreeFormatVirtual(mtraindir_1, Folder.accident_asset)
+    #delTreeFormatVirtual(mtraindir_1, Folder.accident_car)
+    #delTreeFormatVirtual(mtraindir_1, Folder.accident_pedes)
     #copyTreeFormat(traindir_dashcam, output_dir, Folder.dashcam_train, "train0")
     #moveTreeFormat(traindir_0, output_dir, Folder.dashcam_train, "train1")    
     #countFilesFolders(dashcam_train, Folder.dashcam_train)
