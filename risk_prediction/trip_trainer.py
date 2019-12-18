@@ -15,6 +15,7 @@ Date          Comment
 12102019      Include one input for choosing testing data
 12112019      Enhance risk prediction training to include one more parameter for mix data input (real + virtual)
 12142019      New (trial) function to train mixed data but separately
+12182019      Modify function to evaluate accuracy increase at 25th epoch
 """
 
 import chainer
@@ -213,6 +214,7 @@ class TripTrainer(object):
         self.save_interval = save_interval
         self.tlog_path = tlog_path
         self.tlogf = None
+        self.previous_acc = 0 # 12182019
     #
     def set_model(self, execution_mode, model_param_file_path):
         """ Set a model and its parameters
@@ -458,6 +460,11 @@ class TripTrainer(object):
                 self.optimizer.new_epoch() # increment the optimizer.epoch by calling new_epock() for retrain
                 epoch = train_iterator1.epoch + 1
                 cur_epoch = start_epoch + epoch
+                # 12182019
+                if cur_epoch == 26: #current epoch == 26,
+                    if self.previous_acc < 70: # if accuracy at epoch 25 does not reach 70
+                        break                  # break loop, skip training and jump to next trial
+                # end 12182019
                 print('Epoch: {0:d}'.format(cur_epoch))
                 if self.tlogf is not None:
                     self.tlogf.write('Epoch: {0:d}\n'.format(cur_epoch))
@@ -538,6 +545,11 @@ class TripTrainer(object):
                 self.optimizer.new_epoch() # increment the optimizer.epoch by calling new_epock() for retrain
                 epoch = train_iterator1.epoch + 1
                 cur_epoch = start_epoch + epoch
+                # 12182019
+                if cur_epoch == 26: #current epoch == 26,
+                    if self.previous_acc < 70: # if accuracy at epoch 25 does not reach 70
+                        break                  # break loop, skip training and jump to next trial
+                # end 12182019
                 print('Epoch: {0:d}'.format(cur_epoch))
                 if self.tlogf is not None:
                     self.tlogf.write('Epoch: {0:d}\n'.format(cur_epoch))
@@ -621,6 +633,11 @@ class TripTrainer(object):
                 self.optimizer.new_epoch() # increment the optimizer.epoch by calling new_epock() for retrain
                 epoch = train_iterator1.epoch + 1
                 cur_epoch = start_epoch + epoch
+                # 12182019
+                if cur_epoch == 26: #current epoch == 26,
+                    if self.previous_acc < 70: # if accuracy at epoch 25 does not reach 70
+                        break                  # break loop, skip training and jump to next trial
+                # end 12182019
                 print('Epoch: {0:d}'.format(cur_epoch))
                 if self.tlogf is not None:
                     self.tlogf.write('Epoch: {0:d}\n'.format(cur_epoch))
@@ -679,6 +696,9 @@ class TripTrainer(object):
                 self.optimizer.new_epoch() # increment the optimizer.epoch by calling new_epock() for retrain
                 epoch = vtrain_iterator1.epoch + 1
                 cur_epoch = start_epoch + epoch
+                if cur_epoch == 26: #current epoch == 26,
+                    if self.previous_acc < 70: # if accuracy at epoch 25 does not reach 70
+                        break                  # break loop, skip training and jump to next trial
                 print('Epoch: {0:d}'.format(cur_epoch))
                 if self.tlogf is not None:
                     self.tlogf.write('Epoch: {0:d}\n'.format(cur_epoch))
@@ -759,6 +779,11 @@ class TripTrainer(object):
                 self.optimizer.new_epoch() # increment the optimizer.epoch by calling new_epock() for retrain
                 epoch = train_iterator1.epoch + 1
                 cur_epoch = start_epoch + epoch
+                # 12182019
+                if cur_epoch == 26: #current epoch == 26,
+                    if self.previous_acc < 70: # if accuracy at epoch 25 does not reach 70
+                        break                  # break loop, skip training and jump to next trial
+                # end 12182019
                 print('Epoch: {0:d}'.format(cur_epoch))
                 if self.tlogf is not None:
                     self.tlogf.write('Epoch: {0:d}\n'.format(cur_epoch))
@@ -937,6 +962,9 @@ class TripTrainer(object):
         end_time = time.time()
         # calculation of accuracy
         accuracy = 100.0 * accurate_prediction / ds_length
+        # 12182019
+        if stage == 'test':
+            self.previous_acc = accuracy # Store accuracy value of previous epoch
         print('  accuracy: {0:.3f}% [{1:,d}/{2:,d}] ({3:.2f} sec)'.format(accuracy, accurate_prediction, ds_length, end_time-start_time))
         if self.tlogf is not None:
             self.tlogf.write(' {0} data evaluation:\n'.format(stage))
@@ -1001,6 +1029,9 @@ class TripTrainer(object):
         end_time = time.time()
         # calculation of accuracy
         accuracy = 100.0 * accurate_prediction / ds_length
+        # 12182019
+        if stage == 'test':
+            self.previous_acc = accuracy # Store accuracy value of previous epoch
         print('  accuracy: {0:.3f}% [{1:,d}/{2:,d}] ({3:.2f} sec)'.format(accuracy, accurate_prediction, ds_length, end_time-start_time))
         if self.tlogf is not None:
             self.tlogf.write(' {0} data evaluation:\n'.format(stage))
@@ -1065,6 +1096,9 @@ class TripTrainer(object):
         end_time = time.time()
         # calculation of accuracy
         accuracy = 100.0 * accurate_prediction / ds_length
+        # 12182019
+        if stage == 'test':
+            self.previous_acc = accuracy # Store accuracy value of previous epoch
         print('  accuracy: {0:.3f}% [{1:,d}/{2:,d}] ({3:.2f} sec)'.format(accuracy, accurate_prediction, ds_length, end_time-start_time))
         if self.tlogf is not None:
             self.tlogf.write(' {0} data evaluation:\n'.format(stage))

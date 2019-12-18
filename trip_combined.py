@@ -371,8 +371,8 @@ if __name__ == '__main__':
                     elif str(train_data).upper() == train_data_group[1]:                   
                         tripTrainer.learn_model_virtual()
                     else:
-#                        tripTrainer.learn_model_mix()
-                        tripTrainer.learn_model_mix_2() # 12142019
+                        tripTrainer.learn_model_mix()
+#                        tripTrainer.learn_model_mix_2() # 12142019
                 else:
                     print("Wrong data input!")
             else:
