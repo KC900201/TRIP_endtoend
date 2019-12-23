@@ -16,6 +16,7 @@ Date          Comment
 12112019      Enhance risk prediction training to include one more parameter for mix data input (real + virtual)
 12142019      New (trial) function to train mixed data but separately
 12182019      Modify function to evaluate accuracy increase at 25th epoch
+12232019      Remodify function to reduce accuracy value
 """
 
 import chainer
@@ -215,6 +216,7 @@ class TripTrainer(object):
         self.tlog_path = tlog_path
         self.tlogf = None
         self.previous_acc = 0 # 12182019
+        self.previous_train_acc = 0 # 12232019
     #
     def set_model(self, execution_mode, model_param_file_path):
         """ Set a model and its parameters
@@ -462,8 +464,11 @@ class TripTrainer(object):
                 cur_epoch = start_epoch + epoch
                 # 12182019
                 if cur_epoch == 26: #current epoch == 26,
-                    if self.previous_acc < 70: # if accuracy at epoch 25 does not reach 70
-                        break                  # break loop, skip training and jump to next trial
+                    if self.previous_train_acc < 90:
+                        break
+                    else:                        
+                        if self.previous_acc < 65: # if accuracy at epoch 25 does not reach 70
+                            break                  # break loop, skip training and jump to next trial
                 # end 12182019
                 print('Epoch: {0:d}'.format(cur_epoch))
                 if self.tlogf is not None:
@@ -965,6 +970,8 @@ class TripTrainer(object):
         # 12182019
         if stage == 'test':
             self.previous_acc = accuracy # Store accuracy value of previous epoch
+        else:
+            self.previous_train_acc = accuracy # 12232019
         print('  accuracy: {0:.3f}% [{1:,d}/{2:,d}] ({3:.2f} sec)'.format(accuracy, accurate_prediction, ds_length, end_time-start_time))
         if self.tlogf is not None:
             self.tlogf.write(' {0} data evaluation:\n'.format(stage))
@@ -1032,6 +1039,8 @@ class TripTrainer(object):
         # 12182019
         if stage == 'test':
             self.previous_acc = accuracy # Store accuracy value of previous epoch
+        else:
+            self.previous_train_acc = accuracy # 12232019
         print('  accuracy: {0:.3f}% [{1:,d}/{2:,d}] ({3:.2f} sec)'.format(accuracy, accurate_prediction, ds_length, end_time-start_time))
         if self.tlogf is not None:
             self.tlogf.write(' {0} data evaluation:\n'.format(stage))
@@ -1099,6 +1108,8 @@ class TripTrainer(object):
         # 12182019
         if stage == 'test':
             self.previous_acc = accuracy # Store accuracy value of previous epoch
+        else:
+            self.previous_train_acc = accuracy # 12232019
         print('  accuracy: {0:.3f}% [{1:,d}/{2:,d}] ({3:.2f} sec)'.format(accuracy, accurate_prediction, ds_length, end_time-start_time))
         if self.tlogf is not None:
             self.tlogf.write(' {0} data evaluation:\n'.format(stage))

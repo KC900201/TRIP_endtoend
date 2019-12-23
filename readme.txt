@@ -67,3 +67,4 @@ Updates
 2019/12/16 - New function to remove extra files in virtual data directory (file no. 51 - 75, copyfiles.py)
 2019/12/17 - Modify new function to delete "img" folder in virtual data directory (copyfiles.py)
 2019/12/18 - new model architecture function to test increasing accuracy (trip_c_lstm.py), modify RP training to evaluate accuracy increase at 25th epoch (trip_dataset.py)
+2019/12/23 - remodify function to reduce accuracy value (trip_trainer.py)
