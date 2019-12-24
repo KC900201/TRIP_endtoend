@@ -68,3 +68,4 @@ Updates
 2019/12/17 - Modify new function to delete "img" folder in virtual data directory (copyfiles.py)
 2019/12/18 - new model architecture function to test increasing accuracy (trip_c_lstm.py), modify RP training to evaluate accuracy increase at 25th epoch (trip_dataset.py)
 2019/12/23 - remodify function to reduce accuracy value (trip_trainer.py)
+2019/12/24 - New model architecture that reverts ReLu and Tanh activation (trip_c_lstm.py)
