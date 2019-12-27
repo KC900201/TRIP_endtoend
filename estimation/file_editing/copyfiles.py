@@ -14,6 +14,7 @@ Date          Comment
 12062019      New function to count no. of files in directory, for checking whether data transferred successfully
 12162019      New function to remove extra files in virtual data directory (file no. 51 - 75)
 12172019      Modify new function to delete "img" folder in virtual data directory
+12262019      New function to separate A3D datasets (< 100 img and >= 100 img)
 """
 
 import shutil
@@ -27,6 +28,7 @@ from folder import Folder
 
 folder_name = ['conv33', 'conv39', 'conv45', 'ebox', 'img', 'orig_img']
 folder_name_2 = ['conv33', 'conv39', 'conv45', 'ebox', 'orig_img']
+folder_name_a3d = ['100_SELECTED', 'images']
 
 def copyDirectory(src, dest):
     try:
@@ -232,6 +234,31 @@ def moveTreeVirtual(src, dst, symlinks = False, ignore = None):
                 else:
                   shutil.move(s, d)
 
+# 12262019
+def moveTreeA3D(src, dst, symlinks = False, ignore = None):
+  lst = os.listdir(src)
+  if ignore:
+    excl = ignore(src, lst)
+    lst = [x for x in lst if x not in excl]
+  for item in lst:
+    if item == folder_name_a3d[1]: # copy directory
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if symlinks and os.path.islink(s):
+          if os.path.lexists(d):
+            os.remove(d)
+          os.symlink(os.readlink(s), d)
+          try:
+            st = os.lstat(s)
+            mode = stat.S_IMODE(st.st_mode)
+            os.lchmod(d, mode)
+          except:
+            pass # lchmod not available
+        elif os.path.isdir(s):
+          for _, dirnames, filenames in os.walk(s):
+            if len(filenames) >= 100:
+                shutil.move(src, dst)
+
 # 12162019
 def delTreeVirtual(src, symlinks = False, ignore = None):
     lst = os.listdir(src)
@@ -292,6 +319,19 @@ def moveTreeFormat(src, dst, list, oname):
                             new_odir = odir + "\\" + file_name.replace("_0", "_1")
                             moveTree(dir, new_odir)
 
+# 12262019
+def moveTreeFormatA3D(src, dst, oname):
+    for dir in src:
+        if os.path.isdir(dir):
+            file_name = os.path.basename(dir)
+            print("Folder: " + str(dir))            
+            for odir in dst:
+                if os.path.isdir(odir):
+                    if odir.endswith(oname):
+                        new_odir = odir + "\\" + file_name
+                        moveTreeA3D(dir, new_odir)
+
+                        
 def moveTreeFormatVirtual(src, dst, list, oname):
     for dir in src:
         if os.path.isdir(dir):
@@ -368,10 +408,19 @@ if __name__ == '__main__':
     viena_dir = r'E:\AtsumiLabMDS-2\TRIP\Dataset\VIENA2\image\Scenario2'
     dashcam_train = r'E:\AtsumiLabMDS-2\TRIP\Trip2019Q2\Dashcam_dataset\training\positive'
     dashcam_test = r'E:\AtsumiLabMDS-2\TRIP\Trip2019Q2\Dashcam_dataset\testing\positive'
-    traindir_mixed0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain0'
-    traindir_mixed1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain1'
-    mtraindir_0 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain0\*')
-    mtraindir_1 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain1\*')
+#    traindir_mixed0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain0'
+#    traindir_mixed1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain1' 
+    traindir_mixed0 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\mtrain0'
+    traindir_mixed1 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\mtrain1' 
+#    mtraindir_0 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain0\*')
+#    mtraindir_1 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain1\*') 
+    mtraindir_0 = glob.glob(r'C:\Users\atsumilab\Pictures\ds4\mtrain0\*')
+    mtraindir_1 = glob.glob(r'C:\Users\atsumilab\Pictures\ds4\mtrain1\*')
+    a3d_dir = glob.glob(r'D:\TRIP\Datasets\A3D\frames\*')
+    a3d_sel_dir = glob.glob(r'D:\TRIP\Datasets\A3D\frames\*')
+
+    
+    moveTreeFormatA3D(a3d_dir, a3d_sel_dir, folder_name_a3d[0])
 
     #delTreeFormatVirtual(mtraindir_0, Folder.accident_car)
     #delTreeFormatVirtual(mtraindir_0, Folder.accident_asset)
