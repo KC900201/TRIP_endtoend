@@ -28,7 +28,7 @@ from folder import Folder
 
 folder_name = ['conv33', 'conv39', 'conv45', 'ebox', 'img', 'orig_img']
 folder_name_2 = ['conv33', 'conv39', 'conv45', 'ebox', 'orig_img']
-folder_name_a3d = ['100_SELECTED', 'images']
+folder_name_a3d = ['conv33', 'conv39', 'conv45', 'ebox', 'img', 'orig_img', 'images']
 
 def copyDirectory(src, dest):
     try:
@@ -241,7 +241,7 @@ def moveTreeA3D(src, dst, symlinks = False, ignore = None):
     excl = ignore(src, lst)
     lst = [x for x in lst if x not in excl]
   for item in lst:
-    if item == folder_name_a3d[1]: # copy directory
+    if item == folder_name_a3d[6]: # copy directory
         s = os.path.join(src, item)
         d = os.path.join(dst, item)
         if symlinks and os.path.islink(s):
@@ -291,6 +291,46 @@ def delTreeVirtual(src, symlinks = False, ignore = None):
                 s = os.path.join(src, item)
                 os.remove(s)
 
+def delTreeA3D(src, symlinks = False, ignore = None):
+    lst = os.listdir(src)
+    count = 1
+    if ignore:
+        excl = ignore(src, lst)
+        lst = [x for x in lst if x not in excl]
+    for item in lst:
+      new_fileno = count 
+      if item in folder_name_a3d: # copy directory
+        s = os.path.join(src, item)
+        if item == folder_name_a3d[6]: # 12172019
+#            shutil.rmtree(s)
+            os.rename(s, os.path.join(src, "orig_img"))
+        else:
+            if os.path.isdir(s):            
+                delTreeA3D(s, symlinks, ignore)
+            else:
+                continue
+      else:
+        filename = str(os.path.splitext(os.path.basename(item))[0])
+        if "e" not in filename and "_" not in filename: # found no special characters in file name
+            fileno = int(filename)
+            if fileno > 100:
+             s = os.path.join(src, item)
+#            new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or fileno >= 100) else filename.replace(str(fileno), str(new_fileno))
+#            os.rename(s, os.path.join(src, item.replace(filename, new_filename)))
+#            count = count + 1
+             os.remove(s)
+        else: # found special characters in file name
+            if 'e' in filename:
+                fileno = int(filename.strip('e').lstrip().rstrip())
+            else:
+                fileno = int(filename.split("_")[0])
+            if fileno > 100:            
+             s = os.path.join(src, item)
+#            new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or fileno >= 100) else filename.replace(str(fileno), str(new_fileno))
+#            os.rename(s, os.path.join(src, item.replace(filename, new_filename)))
+#            count = count + 1
+             os.remove(s)
+
 def copyTreeFormat(src, dst, list, oname):
     for dir in src:
         if os.path.isdir(dir):
@@ -329,7 +369,8 @@ def moveTreeFormatA3D(src, dst, oname):
                 if os.path.isdir(odir):
                     if odir.endswith(oname):
                         new_odir = odir + "\\" + file_name
-                        moveTreeA3D(dir, new_odir)
+#                        moveTreeA3D(dir, new_odir)
+                        moveTree(dir, new_odir)
 
                         
 def moveTreeFormatVirtual(src, dst, list, oname):
@@ -351,6 +392,13 @@ def delTreeFormatVirtual(src, list):
             print("Folder: " + str(dir))
             if file_name in list:
                     delTreeVirtual(dir)
+
+def delTreeFormatA3D(src):
+    for dir in src:
+        if os.path.isdir(dir):
+            file_name = os.path.basename(dir)
+            print("Folder: " + str(dir))
+            delTreeA3D(dir)
 
 # 12062019
 def countFilesFolders(dir, list):
@@ -417,10 +465,16 @@ if __name__ == '__main__':
     mtraindir_0 = glob.glob(r'C:\Users\atsumilab\Pictures\ds4\mtrain0\*')
     mtraindir_1 = glob.glob(r'C:\Users\atsumilab\Pictures\ds4\mtrain1\*')
     a3d_dir = glob.glob(r'D:\TRIP\Datasets\A3D\frames\*')
-    a3d_sel_dir = glob.glob(r'D:\TRIP\Datasets\A3D\frames\*')
-
+#    a3d_sel_dir = glob.glob(r'D:\TRIP\Datasets\A3D\frames\*')
+    a3d_sel_dir = glob.glob(r'D:\TRIP\Datasets\A3D\selected\*')
+    a3d_test_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\test\*")
+    a3d_use_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\non_accident\*")
+    a3d_after_100_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\others\after_100\*")
     
-    moveTreeFormatA3D(a3d_dir, a3d_sel_dir, folder_name_a3d[0])
+    delTreeFormatA3D(a3d_test_dir)
+    
+    #moveTreeFormatA3D(a3d_use_dir, a3d_sel_dir, "accident")
+    #moveTreeFormatA3D(a3d_dir, a3d_sel_dir, folder_name_a3d[0])
 
     #delTreeFormatVirtual(mtraindir_0, Folder.accident_car)
     #delTreeFormatVirtual(mtraindir_0, Folder.accident_asset)
