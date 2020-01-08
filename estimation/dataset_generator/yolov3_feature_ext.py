@@ -21,6 +21,7 @@ from chainercv.links import Conv2DBNActiv
 from chainercv import utils
 
 from estimation.dataset_generator.yolo_base_feature_ext import YOLOBase
+#from yolo_base_feature_ext import YOLOBase
 
 
 def _leaky_relu(x):

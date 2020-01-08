@@ -52,3 +52,22 @@ Updates
 2019/11/01 - Revert batch size to 32 in training (endtoend_spec.txt). 
 	     Create new param files (model_tbox_lstm3_param1 - ...param5.txt) for training without drop-out mode.
 	     Remove max_pooling at extra input middle conv layer to prevent data loss, insert dropout in between middle conv layer
+2019/11/18 - Create new files for csv to txt conversion and file copying. Renamed training config
+2019/11/19 - New file to convert GTAV dataset annotation files (csv) to yolo bbox annotation
+2019/11/20 - Modifications for gta2yolo.py
+2019/11/29 - Modifications for copyfiles.py. Update new cfg file for yolo-obj.cfg using updated anchors
+2019/11/30 - Enhance risk prediction training to have one more parameter for virtual data input
+2019/12/04 - Remove virtual data set test directory (trip_trainer.py). Add new function to move and separate files from train0 folder (copyfiles.py)
+             New python file to store folders name for training
+2019/12/05 - Add new functions (learn_virtual, learn_mix) to train risk prediction with virtual data (trip_trainer.py). 
+	     Comment dataset generation part and append new functions (trip_combined.py)
+2019/12/08 - Add new function to count number of files (copyfiles.py)
+2019/12/10 - Comment out input for video prediction path, include one input for choosing training data (trip_combined.py; trip_trainer.py)
+2019/12/11 - Enhance risk prediction training to have one more parameter for mix data input (real + virtual) - trip_combined.py; trip_trainer.py
+2019/12/14 - New function to train virtual and real data separately (trip_trainer.py, trip_combined.py) 
+2019/12/16 - New function to remove extra files in virtual data directory (file no. 51 - 75, copyfiles.py)
+2019/12/17 - Modify new function to delete "img" folder in virtual data directory (copyfiles.py)
+2019/12/18 - new model architecture function to test increasing accuracy (trip_c_lstm.py), modify RP training to evaluate accuracy increase at 25th epoch (trip_dataset.py)
+2019/12/23 - remodify function to reduce accuracy value (trip_trainer.py)
+2019/12/24 - New model architecture that reverts ReLu and Tanh activation (trip_c_lstm.py)
+2019/12/26 - New function to separate A3D datasets

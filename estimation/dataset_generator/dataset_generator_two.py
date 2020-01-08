@@ -4,6 +4,12 @@ Created on Sat Sep 14 13:05:58 2019
 
 @author: atsumilab
 @code: utf-8
+========================
+Date          Comment
+========================
+10102019      First revision
+10112019      Amend directory
+11292019      Modification for bbox assignment 
 """
 
 import os
@@ -21,10 +27,16 @@ def save_images(orig_img, bboxes, output_dir, file):
         # 指定した物体が存在したら…/ If there is a specified object
         #if name in object_list:
         # 画像からその物体の領域を切り取って保存
-        top = int(bbox[0])
-        bottom = int(bbox[2])
-        left = int(bbox[1])
-        right = int(bbox[3])
+        #top = int(bbox[0])
+        #bottom = int(bbox[2])
+        #left = int(bbox[1])
+        #right = int(bbox[3])
+        #11292019
+        top = int(bbox[0]) if (int(bbox[0]) >= 0) else 0 
+        bottom = int(bbox[2]) if (int(bbox[2]) <= orig_img.shape[0]) else orig_img.shape[0] 
+        left = int(bbox[1]) if (int(bbox[1]) >= 0) else 0 
+        right = int(bbox[3]) if (int(bbox[3]) <= orig_img.shape[1]) else orig_img.shape[1] 
+        #End 11292019
         #left, top = result['box'].int_left_top()
         #right, bottom = result['box'].int_right_bottom()
         filename = os.path.join(output_dir,'img',file+'_'+str(counter)+'.jpg')
@@ -91,22 +103,28 @@ def copy_file(outpath):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='dataset_maker')
     parser.add_argument('--object_model_type', choices=('yolo_v2', 'yolo_v3'), default='yolo_v3')
-    parser.add_argument('--object_model_path', default='../model_v3/accident_KitDash_8000.npz')
-    parser.add_argument('--object_label_path', default='../model_v3/obj.names') # must be specified other than 'coco' and 'voc'    
-    parser.add_argument('--object_cfg_path', default='../model_v3/yolo-obj.cfg')
+    #parser.add_argument('--object_model_path', default='../model_v3/accident_KitDashV_6000.npz')
+    #parser.add_argument('--object_label_path', default='../model_v3/obj.names') # must be specified other than 'coco' and 'voc'    
+    #parser.add_argument('--object_cfg_path', default='../model_v3/yolo-obj.cfg')
+    parser.add_argument('--object_model_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\accident_KitDashV_6000.npz')
+    parser.add_argument('--object_label_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\obj.names') # must be specified other than 'coco' and 'voc'    
+    parser.add_argument('--object_cfg_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\yolo-obj.cfg')
     parser.add_argument('--object_detection_threshold', type=float, default=0.1)
     parser.add_argument('--gpu', type=int, default=0)
 
     #parser.add_argument('--input_dir', default=r'E:\AtsumiLabMDS-2\TRIP\Dataset\DashcamAccidentDataset\videos\training\positive', help='input directory')
     #parser.add_argument('--output_dir', default=r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\dataset_generator3.0\dataset_generator\test', help='directory where the dataset will be created')
-    #change directory to E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3
-    parser.add_argument('--input_dir', default=r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3', help='input directory')
-    parser.add_argument('--output_dir', default=r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3', help='directory where the dataset will be created')
+    #change directory to E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3 
+    #parser.add_argument('--input_dir', default=r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3', help='input directory') 
+    #parser.add_argument('--output_dir', default=r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3', help='directory where the dataset will be created')
+    parser.add_argument('--input_dir', default=r'D:\TRIP\Datasets\A3D\selected\others\after_100', help='input directory')
+    parser.add_argument('--output_dir', default=r'D:\TRIP\Datasets\A3D\selected\others\after_100', help='directory where the dataset will be created')
 
     parser.add_argument('--layer_name_list', default='conv33,conv39,conv45', help='list of hidden layers name to extract features')
     #parser.add_argument('--object_list', default='car,truck,person,tram,bicycle,motorbike,bus', help='list of object to get box coords')
     parser.add_argument('--save_img', type=bool, default=True, help='save_img option')
-    parser.add_argument('--video', type=bool, default=True, help='video option')
+    #parser.add_argument('--video', type=bool, default=True, help='video option')
+    parser.add_argument('--video', type=bool, default=False, help='video option')
     args = parser.parse_args()
 
     input_dir = args.input_dir
@@ -217,12 +235,13 @@ if __name__ == '__main__':
             if video_file[-5:-2]>='0':
                 print(video_file)
                 print('save %s feature...' % video_file)
-                input_dir = orig_input_dir + '/' + video_file + '/orig_img'
+                #input_dir = orig_input_dir + '/' + video_file + '/orig_img'
+                input_dir = orig_input_dir + '/' + video_file + '/images'
                 output_dir = orig_output_dir + '/' + video_file
                 # フォルダが無ければ新規作成 / Create a new folder if there is none previously
                 if not os.path.isdir(output_dir):
                     os.makedirs(output_dir)
-                for layer in layer_list:
+                for layer in layer_name_list:
                     if not os.path.isdir(os.path.join(output_dir, layer)):
                         os.mkdir(os.path.join(output_dir, layer))
                 if save_img and not os.path.isdir(os.path.join(output_dir, 'img')):
@@ -252,14 +271,19 @@ if __name__ == '__main__':
                         orig_img = cv2.resize(orig_img, (img_w, img_h))
 #
                     # 検出結果と特徴を取得 / retrieve detection results and features
-                    results, img_features = predictor(orig_img, thresh, layer_list)
+                    #results, img_features = predictor(orig_img, thresh, layer_list) 
+                    #results, img_features = predictor(orig_img, thresh, layer_name_list)
+                    bboxes, labels, scores, layer_ids, features = predictor(orig_img)
 
                     # 検出結果を利用し、画像を切り取って保存 / Use the detection results to cut and save images
-                    if save_img: save_images(orig_img, results, object_list, output_dir, file)
+                    #if save_img: save_images(orig_img, results, object_list, output_dir, file)
+                    if save_img: save_images(orig_img, bboxes, output_dir, file)
                     # 特徴ファイルを保存 / save feature file
-                    save_feature(img_features, output_dir, file+'.npz')
+                    #save_feature(img_features, output_dir, file+'.npz')
+                    save_feature(features, layer_name_list, output_dir, file+'.npz')
                     # 指定した物体の座標を保存 / save specified object's coordinates
-                    save_ebox(results, object_list, img_h, img_w, output_dir, 'e'+file+'.txt')
+                    #save_ebox(results, object_list, img_h, img_w, output_dir, 'e'+file+'.txt')
+                    save_ebox(bboxes, labels, layer_ids, img_h, img_w, output_dir, 'e'+file+'.txt')
                 # specfileを保存 save specfile
                 #save_specfile(output_dir, img_features)
 

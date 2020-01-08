@@ -20,6 +20,10 @@ Date          Comment
 10252019      Repeat training for multiple program files
 10272019      Temporarily hide dataset generation part
 10292019      Temporary hardcode path for training and testing dataset
+11302019      Enhance risk prediction training to have one more parameter for virtual data input
+12102019      Comment out input for video prediction path, include one input for choosing training data
+12112019      Enhance risk prediction training to have one more parameter for mix data input (real + virtual)
+12142019      Train mixed data using new function
 """
 
 #Import libraries
@@ -34,6 +38,8 @@ from risk_prediction.trip_trainer import TripTrainer #10242019
 from estimation.dataset_generator.dataset_generator_function import DatasetGenerator
 from estimation.dataset_generator.object_detector import ObjectDetector
 
+train_data_group = ['R', 'V', 'M']
+
 #Main function
 if __name__ == '__main__':
     # Initialize parameters
@@ -41,7 +47,8 @@ if __name__ == '__main__':
     model_param_file_paths = [] # 10252019
     
     spec_file = input('Input spec file (endtoend_spec.txt): ')
-    video_out_path = input('Input a video output path (if no video output, enter a return): ') #video risk prediction - 10182019
+    #video_out_path = input('Input a video output path (if no video output, enter a return): ') #video risk prediction - 10182019, 12102910
+    train_data = input('Input training data choice (R, V, M): ')
     with open(spec_file, "r", encoding='utf-8') as f: 
         lines = f.readlines()
     for line in lines:
@@ -124,6 +131,34 @@ if __name__ == '__main__':
             test_ds_path2 = os.path.join(os.path.dirname(test_spec_file_name2), test_ds_path2)
 #            test_ds_path2 = os.path.join('C:/Users/atsumilab/Pictures/TRIP_Dataset', test_ds_path2) #10292019
             test_risk2 = int(test_risk2)
+        # 11302019
+#        elif line.startswith('vtest_ds1:'):
+#            vtest_ds_path1, vtest_spec_file_name1, vtest_risk1 = line.split(':')[1].strip().split()
+#            vtest_ds_path1 = os.path.join(os.path.dirname(vtest_spec_file_name1), vtest_ds_path1) #10212019
+#            vtest_risk1 = int(vtest_risk1)
+#        elif line.startswith('vtest_ds2:'):
+#            vtest_ds_path2, vtest_spec_file_name2, vtest_risk2 = line.split(':')[1].strip().split()
+#            vtest_ds_path2 = os.path.join(os.path.dirname(vtest_spec_file_name2), vtest_ds_path2) #10212019
+#            vtest_risk2 = int(vtest_risk2)        
+        elif line.startswith('vtrain_ds1:'):
+            vtrain_ds_path1, vtrain_spec_file_name1, vtrain_risk1 = line.split(':')[1].strip().split()
+            vtrain_ds_path1 = os.path.join(os.path.dirname(vtrain_spec_file_name1), vtrain_ds_path1) #10212019
+            vtrain_risk1 = int(vtrain_risk1)
+        elif line.startswith('vtrain_ds2:'):
+            vtrain_ds_path2, vtrain_spec_file_name2, vtrain_risk2 = line.split(':')[1].strip().split()
+            vtrain_ds_path2 = os.path.join(os.path.dirname(vtrain_spec_file_name2), vtrain_ds_path2) #10212019
+            vtrain_risk2 = int(vtrain_risk2)
+        #End 11302019
+        # 12112019
+        elif line.startswith('mtrain_ds1:'):
+            mtrain_ds_path1, mtrain_spec_file_name1, mtrain_risk1 = line.split(':')[1].strip().split()
+            mtrain_ds_path1 = os.path.join(os.path.dirname(mtrain_spec_file_name1), mtrain_ds_path1) #10212019
+            mtrain_risk1 = int(mtrain_risk1)
+        elif line.startswith('mtrain_ds2:'):
+            mtrain_ds_path2, mtrain_spec_file_name2, mtrain_risk2 = line.split(':')[1].strip().split()
+            mtrain_ds_path2 = os.path.join(os.path.dirname(mtrain_spec_file_name2), mtrain_ds_path2) #10212019
+            mtrain_risk2 = int(mtrain_risk2)
+        #End 12112019
         elif line.startswith('layer_name:'):
             layer_name = line.split(':')[1].strip()
         elif line.startswith('box_type:'):
@@ -148,9 +183,9 @@ if __name__ == '__main__':
         elif line.startswith('gpu_id:'):
             gpu_id = int(line.split(':')[1].strip())
         # End risk prediction part
-            
     ## 10102019
-    """ #10272019
+    #10272019
+    '''
     args = parser.parse_args()
 
     input_dir = args.input_dir
@@ -303,25 +338,50 @@ if __name__ == '__main__':
 #                    DatasetGenerator.save_ebox(results, object_list, img_h, img_w, output_dir, 'e'+file+'.txt')
                     DatasetGenerator.save_ebox(bboxes, labels, layer_ids, img_h, img_w, output_dir, 'e'+file+'.txt') #10182019
                 # specfileを保存 save specfile
-                #save_specfile(output_dir, img_features)        
+                #save_specfile(output_dir, img_features)   
+    '''     
     ## End estimation part -- 10102019
-    """
     ## 10112019, 10242019, 10252019
-    for count, model_param_file_path in enumerate(model_param_file_paths):
-        print(count+1, '/', len(model_param_file_paths))
-        repeat_tlog_path = os.path.splitext(tlog_path)[0] + '_({}).txt'.format(str(count+1))
-        tripTrainer = TripTrainer(train_ds_path1, train_spec_file_name1, train_risk1,
-                                  train_ds_path2, train_spec_file_name2, train_risk2,
-                                  test_ds_path1, test_spec_file_name1, test_risk1,
-                                  test_ds_path2, test_spec_file_name2, test_risk2,
-                                  layer_name, box_type, 
-                                  execution_mode, num_of_epoch, minibatch_size, eval_interval, save_interval,
-                                  model_param_file_path, repeat_tlog_path, gpu_id)
-        if execution_mode == 'train' or execution_mode == 'retrain':
-            tripTrainer.learn_model()
-        else:
-            tripTrainer.test_model()
-    
+    if (train_data).upper() not in train_data_group:
+        print("Wrong data input!")
+    else: 
+        for count, model_param_file_path in enumerate(model_param_file_paths):
+            print(count+1, '/', len(model_param_file_paths))
+            repeat_tlog_path = os.path.splitext(tlog_path)[0] + '_({}).txt'.format(str(count+1))
+            tripTrainer = TripTrainer(train_ds_path1, train_spec_file_name1, train_risk1,
+                                      train_ds_path2, train_spec_file_name2, train_risk2,
+                                      test_ds_path1, test_spec_file_name1, test_risk1,
+                                      test_ds_path2, test_spec_file_name2, test_risk2,
+                                      # 11302019
+                                      vtrain_ds_path1, vtrain_spec_file_name1, vtrain_risk1,
+                                      vtrain_ds_path2, vtrain_spec_file_name2, vtrain_risk2,
+                                      # 12112019
+                                      mtrain_ds_path1, mtrain_spec_file_name1, mtrain_risk1,
+                                      mtrain_ds_path2, mtrain_spec_file_name2, mtrain_risk2,
+#                                      vtest_ds_path1, vtest_spec_file_name1, vtest_risk1,
+#                                      vtest_ds_path2, vtest_spec_file_name2, vtest_risk2,
+                                      layer_name, box_type, 
+                                      execution_mode, num_of_epoch, minibatch_size, eval_interval, save_interval,
+                                      model_param_file_path, repeat_tlog_path, gpu_id)
+            if execution_mode == 'train' or execution_mode == 'retrain':
+                # 12102019
+                if str(train_data).upper() in train_data_group:
+                    if str(train_data).upper() == train_data_group[0]:
+                        tripTrainer.learn_model()
+                    elif str(train_data).upper() == train_data_group[1]:                   
+                        tripTrainer.learn_model_virtual()
+                    else:
+                        tripTrainer.learn_model_mix()
+#                        tripTrainer.learn_model_mix_2() # 12142019
+                else:
+                    print("Wrong data input!")
+            else:
+#                tripTrainer.test_model()
+                # 12102019
+                if str(train_data).upper() in train_data_group:
+                    tripTrainer.test_model_select(train_data)
+                else:
+                    print("Wrong data input!")    
     ## 10112019
     ## 10182019
     """

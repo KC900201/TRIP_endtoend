@@ -15,6 +15,8 @@ Date          Comment
 10282019      Increase lstm (lstm3)
 10292019      Increase convolutional layer (input_third_middle_conv)
 11012019    　Remove max_pooling at extra input middle conv layer to prevent data loss, insert dropout in between middle conv layer
+12182019      new model architecture function to test increasing accuracy
+12242019      new model architecture function that reverts ReLu and Tanh
 """
 
 import chainer.functions as F
@@ -61,6 +63,54 @@ class TripCLSTM(TripLSTM):
             z = F.spatial_pyramid_pooling_2d(z, 3, pooling="max")
             z = F.tanh(self.input(z))
             z = F.dropout(z, ratio=dropout_ratio)
+        # 12182019
+        elif self.model_arch == 'MP-C-SPP4-FC-LSTM': # revert stride=2 as previously doesn't work - 12192019
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.tanh(self.input_conv(z)) # 512, ksize=3, stride=1. pad=1
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max")
+            z = F.tanh(self.input(z))
+        elif self.model_arch == 'MP-C-SPP4-FC-DO-LSTM': # 68.944
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.tanh(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.tanh(self.input(z))
+            z = F.dropout(z, ratio=dropout_ratio)
+        elif self.model_arch == 'MP-C-SPP4-RL-LSTM':
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.tanh(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.relu(self.input(z))
+        elif self.model_arch == 'MP-C-SPP4-RL-DO-LSTM':
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.tanh(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.relu(self.input(z))
+            z = F.dropout(z, ratio=dropout_ratio)
+        elif self.model_arch == 'MP-C-SPP4-RL2-LSTM':
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.relu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.relu(self.input(z))
+        elif self.model_arch == 'MP-C-SPP4-RL2-DO-LSTM':
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.relu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.relu(self.input(z))
+            z = F.dropout(z, ratio=dropout_ratio)
+        # end 12182019
+        # 12242019
+        elif self.model_arch == 'MP-C-RL-SPP4-LSTM':
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.relu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.tanh(self.input(z))
+        elif self.model_arch == 'MP-C-RL-SPP4-DO-LSTM':
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.relu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.tanh(self.input(z))
+            z = F.dropout(z, ratio=dropout_ratio)
+        # end 12242019
         elif self.model_arch == 'DO-MP-C-SPP-FC-LSTM':
             z = F.dropout(x, ratio=dropout_ratio)
             z = F.max_pooling_2d(z, 2)
