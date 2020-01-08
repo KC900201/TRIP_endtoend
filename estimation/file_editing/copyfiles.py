@@ -15,6 +15,7 @@ Date          Comment
 12162019      New function to remove extra files in virtual data directory (file no. 51 - 75)
 12172019      Modify new function to delete "img" folder in virtual data directory
 12262019      New function to separate A3D datasets (< 100 img and >= 100 img)
+01082020      Temporary modifications to edit A3D datasets to separate accident and non-accident 
 """
 
 import shutil
@@ -294,6 +295,7 @@ def delTreeVirtual(src, symlinks = False, ignore = None):
 def delTreeA3D(src, symlinks = False, ignore = None):
     lst = os.listdir(src)
     count = 1
+    unwanted_file_length = len(lst) - 100
     if ignore:
         excl = ignore(src, lst)
         lst = [x for x in lst if x not in excl]
@@ -313,23 +315,25 @@ def delTreeA3D(src, symlinks = False, ignore = None):
         filename = str(os.path.splitext(os.path.basename(item))[0])
         if "e" not in filename and "_" not in filename: # found no special characters in file name
             fileno = int(filename)
-            if fileno > 100:
-             s = os.path.join(src, item)
-#            new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or fileno >= 100) else filename.replace(str(fileno), str(new_fileno))
-#            os.rename(s, os.path.join(src, item.replace(filename, new_filename)))
-#            count = count + 1
-             os.remove(s)
+#            if fileno > 100:
+#            if fileno <= unwanted_file_length:
+            s = os.path.join(src, item)
+            new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or fileno >= 100) else filename.replace(str(fileno), str(new_fileno))
+            os.rename(s, os.path.join(src, item.replace(filename, new_filename)))
+            count = count + 1
+#             os.remove(s)
         else: # found special characters in file name
             if 'e' in filename:
                 fileno = int(filename.strip('e').lstrip().rstrip())
             else:
                 fileno = int(filename.split("_")[0])
-            if fileno > 100:            
-             s = os.path.join(src, item)
-#            new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or fileno >= 100) else filename.replace(str(fileno), str(new_fileno))
-#            os.rename(s, os.path.join(src, item.replace(filename, new_filename)))
-#            count = count + 1
-             os.remove(s)
+#            if fileno > 100:
+#            if fileno <= unwanted_file_length: 
+            s = os.path.join(src, item)
+            new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or fileno >= 100) else filename.replace(str(fileno), str(new_fileno))
+            os.rename(s, os.path.join(src, item.replace(filename, new_filename)))
+            count = count + 1
+#             os.remove(s)
 
 def copyTreeFormat(src, dst, list, oname):
     for dir in src:
@@ -471,8 +475,8 @@ if __name__ == '__main__':
     a3d_use_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\non_accident\*")
     a3d_after_100_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\others\after_100\*")
     
-    delTreeFormatA3D(a3d_test_dir)
-    
+    #delTreeFormatA3D(a3d_test_dir)
+    moveTreeFormatA3D(a3d_test_dir, a3d_sel_dir, "accident")
     #moveTreeFormatA3D(a3d_use_dir, a3d_sel_dir, "accident")
     #moveTreeFormatA3D(a3d_dir, a3d_sel_dir, folder_name_a3d[0])
 
