@@ -70,4 +70,6 @@ Updates
 2019/12/18 - new model architecture function to test increasing accuracy (trip_c_lstm.py), modify RP training to evaluate accuracy increase at 25th epoch (trip_dataset.py)
 2019/12/23 - remodify function to reduce accuracy value (trip_trainer.py)
 2019/12/24 - New model architecture that reverts ReLu and Tanh activation (trip_c_lstm.py)
-2019/12/26 - New function to separate A3D datasets
+2019/12/26 - New function to separate A3D datasets (copyfiles.py)
+2020/01/09 - Add in one features to extract only wanted feature files (skip interval) (trip_combined.py, trip_dataset.py, trip_trainer.py)
+	   - Import cache to speed up process (trip_dataset.py)

@@ -17,6 +17,7 @@ Date          Comment
 12142019      New (trial) function to train mixed data but separately
 12182019      Modify function to evaluate accuracy increase at 25th epoch
 12232019      Remodify function to reduce accuracy value
+01092020      Add in one features to extract only wanted feature files (skip interval)
 """
 
 import chainer
@@ -45,10 +46,9 @@ class TripTrainer(object):
                        vtrain_ds_path2, vtrain_spec_file_name2, vtrain_risk2, #11302019
                        mtrain_ds_path1, mtrain_spec_file_name1, mtrain_risk1, #12112019
                        mtrain_ds_path2, mtrain_spec_file_name2, mtrain_risk2, #12112019
-#                       vtest_ds_path1, vtest_spec_file_name1, vtest_risk1,    #11302019
-#                       vtest_ds_path2, vtest_spec_file_name2, vtest_risk2,    #11302019
                        layer_name, box_type, execution_mode, num_of_epoch, minibatch_size, 
-                       eval_interval, save_interval, model_param_file_path, tlog_path, gpu_id):
+                       eval_interval, save_interval, model_param_file_path, tlog_path, gpu_id,
+                       skip_interval=0): # 01092020
         """ Constructor
             Args:
              train_ds_path1 (str): a train dataset path 1
@@ -87,28 +87,24 @@ class TripTrainer(object):
              gpu_id (int): GPU ID (-1 for CPU) 
         """
         # set dataset
-        self.train_ds1 = TripDataset(train_ds_path1, train_spec_file_name1, layer_name, box_type)
-        self.train_ds2 = TripDataset(train_ds_path2, train_spec_file_name2, layer_name, box_type)
+        self.train_ds1 = TripDataset(train_ds_path1, train_spec_file_name1, layer_name, box_type, skip_interval)
+        self.train_ds2 = TripDataset(train_ds_path2, train_spec_file_name2, layer_name, box_type, skip_interval)
         self.train_risk1 = train_risk1
         self.train_risk2 = train_risk2
-        self.test_ds1 = TripDataset(test_ds_path1, test_spec_file_name1, layer_name, box_type)
-        self.test_ds2 = TripDataset(test_ds_path2, test_spec_file_name2, layer_name, box_type)
+        self.test_ds1 = TripDataset(test_ds_path1, test_spec_file_name1, layer_name, box_type, skip_interval)
+        self.test_ds2 = TripDataset(test_ds_path2, test_spec_file_name2, layer_name, box_type, skip_interval)
         self.test_risk1 = test_risk1
         self.test_risk2 = test_risk2
         # 11302019
-        self.vtrain_ds1 = TripDataset(vtrain_ds_path1, vtrain_spec_file_name1, layer_name, box_type)
-        self.vtrain_ds2 = TripDataset(vtrain_ds_path2, vtrain_spec_file_name2, layer_name, box_type)
+        self.vtrain_ds1 = TripDataset(vtrain_ds_path1, vtrain_spec_file_name1, layer_name, box_type, skip_interval)
+        self.vtrain_ds2 = TripDataset(vtrain_ds_path2, vtrain_spec_file_name2, layer_name, box_type, skip_interval)
         self.vtrain_risk1 = vtrain_risk1
         self.vtrain_risk2 = vtrain_risk2
         # 12112019
-        self.mtrain_ds1 = TripDataset(mtrain_ds_path1, mtrain_spec_file_name1, layer_name, box_type)
-        self.mtrain_ds2 = TripDataset(mtrain_ds_path2, mtrain_spec_file_name2, layer_name, box_type)
+        self.mtrain_ds1 = TripDataset(mtrain_ds_path1, mtrain_spec_file_name1, layer_name, box_type, skip_interval)
+        self.mtrain_ds2 = TripDataset(mtrain_ds_path2, mtrain_spec_file_name2, layer_name, box_type, skip_interval)
         self.mtrain_risk1 = mtrain_risk1
         self.mtrain_risk2 = mtrain_risk2
-#        self.vtest_ds1 = TripDataset(vtest_ds_path1, vtest_spec_file_name1, layer_name, box_type)
-#        self.vtest_ds2 = TripDataset(vtest_ds_path2, vtest_spec_file_name2, layer_name, box_type)
-#        self.vtest_risk1 = vtest_risk1
-#        self.vtest_risk2 = vtest_risk2
         # check dataset
         train_ds_length1 = self.train_ds1.get_length()
         train_ds_length2 = self.train_ds2.get_length()

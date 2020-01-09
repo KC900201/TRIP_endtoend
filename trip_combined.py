@@ -24,6 +24,7 @@ Date          Comment
 12102019      Comment out input for video prediction path, include one input for choosing training data
 12112019      Enhance risk prediction training to have one more parameter for mix data input (real + virtual)
 12142019      Train mixed data using new function
+01092020      Add in one features to extract only wanted feature files (skip interval)
 """
 
 #Import libraries
@@ -39,7 +40,7 @@ from estimation.dataset_generator.dataset_generator_function import DatasetGener
 from estimation.dataset_generator.object_detector import ObjectDetector
 
 train_data_group = ['R', 'V', 'M']
-
+  
 #Main function
 if __name__ == '__main__':
     # Initialize parameters
@@ -49,7 +50,7 @@ if __name__ == '__main__':
     spec_file = input('Input spec file (endtoend_spec.txt): ')
     #video_out_path = input('Input a video output path (if no video output, enter a return): ') #video risk prediction - 10182019, 12102910
     train_data = input('Input training data choice (R, V, M): ')
-    with open(spec_file, "r", encoding='utf-8') as f: 
+    with open(spec_file, "r", encoding='utf-8') as f:
         lines = f.readlines()
     for line in lines:
         if line[0] == '#':
@@ -173,6 +174,10 @@ if __name__ == '__main__':
             eval_interval = int(line.split(':')[1].strip())
         elif line.startswith('save_interval:'):
             save_interval = int(line.split(':')[1].strip())
+        # 01092020
+        elif line.startswith('skip_interval:'):
+            skip_interval = int(line.split(':')[1].strip())
+        #End 01092020
         elif line.startswith('model_param_file:'):
             model_param_file_path = line.split(':')[1].strip()
             model_param_file_path = os.path.join(os.path.dirname(spec_file), model_param_file_path)
@@ -344,7 +349,7 @@ if __name__ == '__main__':
     ## 10112019, 10242019, 10252019
     if (train_data).upper() not in train_data_group:
         print("Wrong data input!")
-    else: 
+    else:
         for count, model_param_file_path in enumerate(model_param_file_paths):
             print(count+1, '/', len(model_param_file_paths))
             repeat_tlog_path = os.path.splitext(tlog_path)[0] + '_({}).txt'.format(str(count+1))
@@ -362,7 +367,8 @@ if __name__ == '__main__':
 #                                      vtest_ds_path2, vtest_spec_file_name2, vtest_risk2,
                                       layer_name, box_type, 
                                       execution_mode, num_of_epoch, minibatch_size, eval_interval, save_interval,
-                                      model_param_file_path, repeat_tlog_path, gpu_id)
+                                      model_param_file_path, repeat_tlog_path, gpu_id,
+                                      skip_interval) # 01092020
             if execution_mode == 'train' or execution_mode == 'retrain':
                 # 12102019
                 if str(train_data).upper() in train_data_group:
