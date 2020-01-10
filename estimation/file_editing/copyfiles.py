@@ -315,25 +315,25 @@ def delTreeA3D(src, symlinks = False, ignore = None):
         filename = str(os.path.splitext(os.path.basename(item))[0])
         if "e" not in filename and "_" not in filename: # found no special characters in file name
             fileno = int(filename)
-#            if fileno > 100:
+            if fileno > 100:
 #            if fileno <= unwanted_file_length:
-            s = os.path.join(src, item)
-            new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or fileno >= 100) else filename.replace(str(fileno), str(new_fileno))
-            os.rename(s, os.path.join(src, item.replace(filename, new_filename)))
-            count = count + 1
-#             os.remove(s)
+             s = os.path.join(src, item)
+#             new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or fileno >= 100) else filename.replace(str(fileno), str(new_fileno))
+#             os.rename(s, os.path.join(src, item.replace(filename, new_filename)))
+#             count = count + 1
+             os.remove(s)
         else: # found special characters in file name
             if 'e' in filename:
                 fileno = int(filename.strip('e').lstrip().rstrip())
             else:
                 fileno = int(filename.split("_")[0])
-#            if fileno > 100:
-#            if fileno <= unwanted_file_length: 
-            s = os.path.join(src, item)
-            new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or fileno >= 100) else filename.replace(str(fileno), str(new_fileno))
-            os.rename(s, os.path.join(src, item.replace(filename, new_filename)))
-            count = count + 1
-#             os.remove(s)
+            if fileno > 100:
+#            if fileno <= unwanted_file_length:                 
+             s = os.path.join(src, item)
+#            new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or fileno >= 100) else filename.replace(str(fileno), str(new_fileno))
+#            os.rename(s, os.path.join(src, item.replace(filename, new_filename)))
+#            count = count + 1
+             os.remove(s)
 
 def copyTreeFormat(src, dst, list, oname):
     for dir in src:
@@ -472,11 +472,12 @@ if __name__ == '__main__':
 #    a3d_sel_dir = glob.glob(r'D:\TRIP\Datasets\A3D\frames\*')
     a3d_sel_dir = glob.glob(r'D:\TRIP\Datasets\A3D\selected\*')
     a3d_test_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\test\*")
+    a3d_test_dir_c = r'D:\TRIP\Datasets\A3D\selected\test'
     a3d_use_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\non_accident\*")
     a3d_after_100_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\others\after_100\*")
     
     #delTreeFormatA3D(a3d_test_dir)
-    moveTreeFormatA3D(a3d_test_dir, a3d_sel_dir, "accident")
+    #countFilesFolders(a3d_test_dir_c, [])
     #moveTreeFormatA3D(a3d_use_dir, a3d_sel_dir, "accident")
     #moveTreeFormatA3D(a3d_dir, a3d_sel_dir, folder_name_a3d[0])
 
