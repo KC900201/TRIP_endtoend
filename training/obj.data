@@ -1,5 +1,0 @@
-classes=7
-train = ../Dataset/KitDashV/train.txt
-valid = ../Dataset/KitDashV/valid.txt
-names = obj.names
-backup = backup/
