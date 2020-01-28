@@ -1,0 +1,22 @@
+#ds: dataset/train0 ds_spec.txt
+#ds: dataset/test1 ds_spec.txt
+#ds: ds4/test0 ds_spec.txt
+ds: ds4/train1 ds_spec.txt
+#v_layer_name: conv33,conv39,conv45
+layer_name: conv33
+box_type: ebox
+gpu_id: 0
+#model_param_file: model_tbox_param1.txt
+model_param_file: model_tbox_param10.txt
+window_size: 10
+#window_size: 5
+v_model_param_file: risk_prediction/model_tbox_param_bg_gn5.txt
+#plog_path: result/yolov3/dashcam/dashcam_test1_tlog.txt
+#plog_path: result/yolov3/dashcam/dashcam_bg_gn_test0_tlog.txt
+#plog_path: result/yolov3/dashcam/dashcam_test0_elog_20191225.txt
+#plog_path: result/yolov3/dashcam/dashcam_test0_elog_20200114.txt
+#plog_path: result/yolov3/dashcam/dashcam_vtrain1_elog_20200114.txt
+#plog_path: result/yolov3/dashcam/dashcam_mtest1_elog_20200114.txt
+plog_path: result/yolov3/dashcam/dashcam_train1_elog_20200115.txt
+
+
