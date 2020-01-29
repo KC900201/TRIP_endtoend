@@ -73,3 +73,4 @@ Updates
 2019/12/26 - New function to separate A3D datasets (copyfiles.py)
 2020/01/09 - Add in one features to extract only wanted feature files (skip interval) (trip_combined.py, trip_dataset.py, trip_trainer.py)
 	   - Import cache to speed up process (trip_dataset.py)
+2020/01/15 - Create plot graph table for vpredict result (make_result_table_vpredict.py)
