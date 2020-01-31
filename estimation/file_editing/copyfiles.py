@@ -327,8 +327,8 @@ def delTreeA3D(src, symlinks = False, ignore = None):
                 fileno = int(filename.strip('e').lstrip().rstrip())
             else:
                 fileno = int(filename.split("_")[0])
-#            if fileno > 100:
-            if fileno <= unwanted_file_length:                 
+            if fileno > 100:
+#            if fileno <= unwanted_file_length:                 
              s = os.path.join(src, item)
 #            new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or fileno >= 100) else filename.replace(str(fileno), str(new_fileno))
 #            os.rename(s, os.path.join(src, item.replace(filename, new_filename)))
@@ -470,9 +470,12 @@ if __name__ == '__main__':
     mtraindir_1 = glob.glob(r'C:\Users\atsumilab\Pictures\ds4\mtrain1\*')
     a3d_dir = glob.glob(r'D:\TRIP\Datasets\A3D\frames\*')
 #    a3d_sel_dir = glob.glob(r'D:\TRIP\Datasets\A3D\frames\*')
-    a3d_sel_dir = glob.glob(r'D:\TRIP\Datasets\A3D\selected\*')
-    a3d_test_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\test_50\*")
-    a3d_test_dir_c = r'D:\TRIP\Datasets\A3D\selected\test_50'
+#    a3d_sel_dir = glob.glob(r'D:\TRIP\Datasets\A3D\selected\*')
+    a3d_sel_dir = glob.glob(r'E:\TRIP\Datasets\A3D\selected\*')
+#    a3d_test_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\test_50\*")
+    a3d_test_dir = glob.glob(r"E:\TRIP\Datasets\A3D\selected\test_50\*")
+#    a3d_test_dir_c = r'D:\TRIP\Datasets\A3D\selected\test_50'
+    a3d_test_dir_c = r'E:\TRIP\Datasets\A3D\selected\test_50'
     a3d_use_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\non_accident\*")
     a3d_after_100_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\others\after_100\*")
     
