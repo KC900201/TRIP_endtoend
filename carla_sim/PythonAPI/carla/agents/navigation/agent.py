@@ -95,9 +95,8 @@ class Agent(object):
                     object_waypoint.lane_id != ego_vehicle_waypoint.lane_id:
                 continue
 
-            loc = traffic_light.get_location()
-            if is_within_distance_ahead(loc, ego_vehicle_location,
-                                        self._vehicle.get_transform().rotation.yaw,
+            if is_within_distance_ahead(traffic_light.get_transform(),
+                                        self._vehicle.get_transform(),
                                         self._proximity_threshold):
                 if traffic_light.state == carla.TrafficLightState.Red:
                     return (True, traffic_light)
@@ -118,12 +117,12 @@ class Agent(object):
         ego_vehicle_location = self._vehicle.get_location()
         ego_vehicle_waypoint = self._map.get_waypoint(ego_vehicle_location)
 
-        if ego_vehicle_waypoint.is_intersection:
+        if ego_vehicle_waypoint.is_junction:
             # It is too late. Do not block the intersection! Keep going!
             return (False, None)
 
         if self._local_planner.target_waypoint is not None:
-            if self._local_planner.target_waypoint.is_intersection:
+            if self._local_planner.target_waypoint.is_junction:
                 min_angle = 180.0
                 sel_magnitude = 0.0
                 sel_traffic_light = None
@@ -184,9 +183,8 @@ class Agent(object):
                     target_vehicle_waypoint.lane_id != ego_vehicle_waypoint.lane_id:
                 continue
 
-            loc = target_vehicle.get_location()
-            if is_within_distance_ahead(loc, ego_vehicle_location,
-                                        self._vehicle.get_transform().rotation.yaw,
+            if is_within_distance_ahead(target_vehicle.get_transform(),
+                                        self._vehicle.get_transform(),
                                         self._proximity_threshold):
                 return (True, target_vehicle)
 

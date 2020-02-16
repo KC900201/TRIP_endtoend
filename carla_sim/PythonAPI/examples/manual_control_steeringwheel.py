@@ -383,15 +383,16 @@ class HUD(object):
     def __init__(self, width, height):
         self.dim = (width, height)
         font = pygame.font.Font(pygame.font.get_default_font(), 20)
-        fonts = [x for x in pygame.font.get_fonts() if 'mono' in x]
+        font_name = 'courier' if os.name == 'nt' else 'mono'
+        fonts = [x for x in pygame.font.get_fonts() if font_name in x]
         default_font = 'ubuntumono'
         mono = default_font if default_font in fonts else fonts[0]
         mono = pygame.font.match_font(mono)
-        self._font_mono = pygame.font.Font(mono, 14)
+        self._font_mono = pygame.font.Font(mono, 12 if os.name == 'nt' else 14)
         self._notifications = FadingText(font, (width, 40), (0, height - 40))
         self.help = HelpText(pygame.font.Font(mono, 24), width, height)
         self.server_fps = 0
-        self.frame_number = 0
+        self.frame = 0
         self.simulation_time = 0
         self._show_info = True
         self._info_text = []
@@ -400,7 +401,7 @@ class HUD(object):
     def on_world_tick(self, timestamp):
         self._server_clock.tick()
         self.server_fps = self._server_clock.get_fps()
-        self.frame_number = timestamp.frame_count
+        self.frame = timestamp.frame
         self.simulation_time = timestamp.elapsed_seconds
 
     def tick(self, world, clock):
@@ -415,7 +416,7 @@ class HUD(object):
         heading += 'E' if 179.5 > t.rotation.yaw > 0.5 else ''
         heading += 'W' if -0.5 > t.rotation.yaw > -179.5 else ''
         colhist = world.collision_sensor.get_collision_history()
-        collision = [colhist[x + self.frame_number - 200] for x in range(0, 200)]
+        collision = [colhist[x + self.frame - 200] for x in range(0, 200)]
         max_col = max(1.0, max(collision))
         collision = [x / max_col for x in collision]
         vehicles = world.world.get_actors().filter('vehicle.*')
@@ -601,7 +602,7 @@ class CollisionSensor(object):
         self.hud.notification('Collision with %r' % actor_type)
         impulse = event.normal_impulse
         intensity = math.sqrt(impulse.x**2 + impulse.y**2 + impulse.z**2)
-        self.history.append((event.frame_number, intensity))
+        self.history.append((event.frame, intensity))
         if len(self.history) > 4000:
             self.history.pop(0)
 
@@ -694,7 +695,7 @@ class CameraManager(object):
                 bp.set_attribute('image_size_x', str(hud.dim[0]))
                 bp.set_attribute('image_size_y', str(hud.dim[1]))
             elif item[0].startswith('sensor.lidar'):
-                bp.set_attribute('range', '5000')
+                bp.set_attribute('range', '50')
             item.append(bp)
         self.index = None
 
@@ -759,7 +760,7 @@ class CameraManager(object):
             array = array[:, :, ::-1]
             self.surface = pygame.surfarray.make_surface(array.swapaxes(0, 1))
         if self.recording:
-            image.save_to_disk('_out/%08d' % image.frame_number)
+            image.save_to_disk('_out/%08d' % image.frame)
 
 
 # ==============================================================================

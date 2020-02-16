@@ -8,7 +8,7 @@ import cv2
 import math
 import tensorflow as tf
 from collections import deque
-from keras.application.xception import Xception
+from keras.applications.xception import Xception
 from keras.callbacks import TensorBoard
 from keras.layers import Dense, GlobalAveragePooling2D
 from keras.optimizers import Adam

@@ -59,7 +59,7 @@ try:
     sensor.listen(lambda image: process_img(image))
     actor_list.append(sensor)
     
-    time.sleep(60)
+    time.sleep(600)
     
 finally:
     for actor in actor_list:
