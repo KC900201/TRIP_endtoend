@@ -7,7 +7,9 @@ import numpy as np
 import cv2
 import math
 import tensorflow as tf
-import keras.backend.tensorflow_backend as backend
+#import keras.backend.tensorflow_backend as backend
+from tensorflow import keras
+from tensorflow.python.keras import backend
 from threading import Thread
 from collections import deque
 from keras.applications.xception import Xception
@@ -59,7 +61,7 @@ class ModifiedTensorBoard(TensorBoard):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.step = 1
-        self.writer = tf.summary.FileWriter(self.log_dir)
+        self.writer = tf.summary.create_file_writer(self.log_dir)
 
     # Overriding this method to stop creating default log writer
     def set_model(self, model):
@@ -181,8 +183,8 @@ class DQNAgent:
 
         self.tensorboard = ModifiedTensorBoard(log_dir=f"logs/{MODEL_NAME}-{int(time.time())}")
         self.target_update_counter = 0
-        self.graph = tf.get_default_graph()
-
+        #self.graph = tf.get_default_graph()
+        self.graph = tf.compat.v1.get_default_graph() #tensorflow version 2.0
         self.terminate = False
         self.last_logged_episode = 0
         self.training_initialized = False
