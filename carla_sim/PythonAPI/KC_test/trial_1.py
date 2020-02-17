@@ -18,6 +18,9 @@ import os
 import glob
 import sys
 import random
+import time
+import numpy as np
+import cv2
 
 IMAGE_WIDTH = 800
 IMAGE_HEIGHT = 600
@@ -33,6 +36,15 @@ except IndexError:
 import carla
 
 actor_list = []
+
+# Process image
+def process_img(image):
+    i = np.array(image.raw_data)
+    i2 = i.reshape((IMAGE_HEIGHT, IMAGE_WIDTH, 4))
+    i3 = i2[:, :, :3] # height, width, first 3 rgb value
+    cv2.imshow("", i3)
+    cv2.waitKey(5) # delay 5 seconds
+    return i3 / 255.0
 
 def main():
 #    print("Testing")
@@ -60,21 +72,24 @@ def main():
         if vehicle_bp.has_attribute('color'):
             vehicle_bp.set_attribute('color', '0, 255, 0')
         if camera_bp.has_attribute('image_size_x'):
-            camera_bp.set_attribute('image_size_x', IMAGE_WIDTH)
+            camera_bp.set_attribute('image_size_x', f"{IMAGE_WIDTH}")
         if camera_bp.has_attribute('image_size_y'):
-            camera_bp.set_attribute('image_size_y', IMAGE_HEIGHT)
+            camera_bp.set_attribute('image_size_y', f"{IMAGE_HEIGHT}")
 
         # Find spawn points for actors
         spawn_point = random.choince(world.get_map().get_spawn_points())
 
         # Spawn actors in points
         vehicle = world.spawn_actor(vehicle_bp, spawn_point)
-        camera = world.spawn_actor(camera_bp, spawn_point,attach_to=vehicle_bp) # spawn camera, attach to vehicle
+        camera = world.spawn_actor(camera_bp, spawn_point,attach_to=vehicle) # spawn camera, attach to vehicle
+        camera.listen(lambda image: process_image(image))
         # Append spawn actors to list
         actor_list.append(vehicle)
         actor_list.append(camera)
 
-        # Continue - 02172020 (midnight)
+        # Start recording, save recording
+
+        time.sleep(600) # delay 600 seconds
     
     finally: 
         for actor in actor_list:

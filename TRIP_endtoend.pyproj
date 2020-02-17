@@ -89,7 +89,6 @@
     <Content Include="spec_files\video_prediction\prediction_v3_1_tbox_spec.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="carla_sim\controller.py" />
     <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\agent.py" />
     <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\basic_agent.py" />
     <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\controller.py" />
@@ -118,7 +117,10 @@
     <Compile Include="carla_sim\PythonAPI\examples\tutorial.py" />
     <Compile Include="carla_sim\PythonAPI\examples\tutorialv2.py" />
     <Compile Include="carla_sim\PythonAPI\examples\tutorialv3.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\tutorialv5.py" />
     <Compile Include="carla_sim\PythonAPI\examples\vehicle_gallery.py" />
+    <Compile Include="carla_sim\PythonAPI\KC_test\test_1.py" />
+    <Compile Include="carla_sim\PythonAPI\KC_test\trial_1.py" />
     <Compile Include="carla_sim\PythonAPI\util\lane_explorer.py" />
     <Compile Include="carla_sim\PythonAPI\util\performance_benchmark.py" />
     <Compile Include="carla_sim\PythonAPI\util\test_connection.py" />
@@ -189,6 +191,7 @@
     <Folder Include="carla_sim\PythonAPI\carla\agents\tools\" />
     <Folder Include="carla_sim\PythonAPI\carla\dist\" />
     <Folder Include="carla_sim\PythonAPI\examples\" />
+    <Folder Include="carla_sim\PythonAPI\KC_test\" />
     <Folder Include="carla_sim\PythonAPI\util\" />
     <Folder Include="estimation" />
     <Folder Include="estimation\dataset_generator" />
