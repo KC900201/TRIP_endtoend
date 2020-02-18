@@ -73,4 +73,14 @@ Updates
 2019/12/26 - New function to separate A3D datasets (copyfiles.py)
 2020/01/09 - Add in one features to extract only wanted feature files (skip interval) (trip_combined.py, trip_dataset.py, trip_trainer.py)
 	   - Import cache to speed up process (trip_dataset.py)
-2020/01/15 - Create plot graph table for vpredict result (make_result_table_vpredict.py)
+2020/01/15 - Create plot graph table for vpredict result (make_result_table_vpredict.py);
+	     Include graph for average risk estimation value
+2020/01/22 - Remove pretraining codes (directory: training/*)
+2020/01/28 - Add in check files for checking tensorflow (tensorflow_self_check.py). Add in new spec file (vpredict_spec.txt)
+2020/01/31 - Include new folder and files for CARLA simulation (carla_sim/*)
+2020/02/17 - Include new library files for CARLA (carla-0.9.7-py3.7-win-amd64.egg),
+  	     New files for trial testing carla (carla_sim/PythonAPI/KC_test/test_1.py)
+             New test file for trial testing carla (trial_1.py)
+
+
+
