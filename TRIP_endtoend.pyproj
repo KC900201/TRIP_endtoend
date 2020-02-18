@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{b57b2640-9936-4bd4-b586-92cd2040eaae}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>estimation\file_editing\make_result_table_vpredict.py</StartupFile>
+    <StartupFile>carla_sim\PythonAPI\KC_test\trial_1.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -38,7 +38,7 @@
     <Content Include="carla_sim\HDMaps\README" />
     <Content Include="carla_sim\HDMaps\Town01.pcd" />
     <Content Include="carla_sim\HDMaps\Town02.pcd" />
-    <Content Include="carla_sim\PythonAPI\carla\dist\carla-0.9.5-py3.7-win-amd64.egg" />
+    <Content Include="carla_sim\PythonAPI\carla\dist\carla-0.9.7-py3.7-win-amd64.egg" />
     <Content Include="carla_sim\PythonAPI\carla\requirements.txt" />
     <Content Include="carla_sim\PythonAPI\examples\requirements.txt" />
     <Content Include="carla_sim\PythonAPI\util\requirements.txt" />
@@ -119,8 +119,12 @@
     <Compile Include="carla_sim\PythonAPI\examples\tutorialv3.py" />
     <Compile Include="carla_sim\PythonAPI\examples\tutorialv5.py" />
     <Compile Include="carla_sim\PythonAPI\examples\vehicle_gallery.py" />
-    <Compile Include="carla_sim\PythonAPI\KC_test\test_1.py" />
-    <Compile Include="carla_sim\PythonAPI\KC_test\trial_1.py" />
+    <Compile Include="carla_sim\PythonAPI\KC_test\test_1.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="carla_sim\PythonAPI\KC_test\trial_1.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="carla_sim\PythonAPI\util\lane_explorer.py" />
     <Compile Include="carla_sim\PythonAPI\util\performance_benchmark.py" />
     <Compile Include="carla_sim\PythonAPI\util\test_connection.py" />

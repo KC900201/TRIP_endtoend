@@ -117,8 +117,8 @@ if __name__ == '__main__':
     #change directory to E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3 
     #parser.add_argument('--input_dir', default=r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3', help='input directory') 
     #parser.add_argument('--output_dir', default=r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3', help='directory where the dataset will be created')
-    parser.add_argument('--input_dir', default=r'D:\TRIP\Datasets\A3D\selected\test_2', help='input directory')
-    parser.add_argument('--output_dir', default=r'D:\TRIP\Datasets\A3D\selected\test_2', help='directory where the dataset will be created')
+    parser.add_argument('--input_dir', default=r'D:\TRIP\Datasets\A3D\selected\Unfinished_Processing', help='input directory')
+    parser.add_argument('--output_dir', default=r'D:\TRIP\Datasets\A3D\selected\Unfinished_Processing', help='directory where the dataset will be created')
 
     parser.add_argument('--layer_name_list', default='conv33,conv39,conv45', help='list of hidden layers name to extract features')
     #parser.add_argument('--object_list', default='car,truck,person,tram,bicycle,motorbike,bus', help='list of object to get box coords')
@@ -235,8 +235,8 @@ if __name__ == '__main__':
             if video_file[-5:-2]>='0':
                 print(video_file)
                 print('save %s feature...' % video_file)
-                input_dir = orig_input_dir + '/' + video_file + '/orig_img'
-                #input_dir = orig_input_dir + '/' + video_file + '/images'
+                #input_dir = orig_input_dir + '/' + video_file + '/orig_img'
+                input_dir = orig_input_dir + '/' + video_file + '/images'
                 output_dir = orig_output_dir + '/' + video_file
                 # フォルダが無ければ新規作成 / Create a new folder if there is none previously
                 if not os.path.isdir(output_dir):
