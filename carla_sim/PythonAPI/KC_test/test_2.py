@@ -12,6 +12,7 @@ Created on Mon Jan 17 2020
 Date          Comment
 ========================
 02182020      First revision 
+02192020      Spawn npc (vehicles, pedestrians), alter weather conditions
 """
 
 import sys
@@ -21,6 +22,7 @@ import random
 import time
 import cv2
 import numpy as np
+import logging
 
 try:
     #sys.path.append(glob.glob(r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\carla_sim\PythonAPI\carla\dist\carla-*%d.%d-%s.egg' % (
@@ -33,8 +35,9 @@ except IndexError:
 
 import carla
 
-IMAGE_WIDTH = 1024
-IMAGE_HEIGHT = 768
+IMAGE_WIDTH = 800
+IMAGE_HEIGHT = 600
+NPC_AMT = random.randint(1, 1000) # amount of npc (02192020)
 
 # Create actor list
 actor_list = []
@@ -63,6 +66,7 @@ def vehicle_control(vehicle):
     
     return vehicle
 
+# Camera function
 def process_img(image):
     i = np.array(image.raw_data)
     i2 = i.reshape((IMAGE_HEIGHT, IMAGE_WIDTH, 4))
@@ -73,15 +77,74 @@ def process_img(image):
     # image.save_to_disk('test/%06d.png' % image.frame)
     return i3 / 255.0
 
+# Function to spawn NPC (02192020)
+def spawn_npc(world):
+    # 02192020
+    blueprint_library = world.get_blueprint_library()
+    npc_bp = blueprint_library.filter('vehicle.*')
+    
+    # Spawn points for NPC (02192020)
+    spawn_points = world.get_map().get_spawn_points()
+    number_of_spawn_points = len(spawn_points)
+    number_of_npc = NPC_AMT
+    
+    print("Number of spawn points: %d" % int(number_of_spawn_points))
+    print("Number of NPC: %d" % int(number_of_npc))
+    
+    if number_of_npc <= number_of_spawn_points:        
+        random.shuffle(spawn_points)
+    else:
+        number_of_npc = number_of_spawn_points
+
+    # Spawn NPC (02192020)
+    # @todo cannot import these directly
+    SpawnActor = carla.command.SpawnActor
+    SetAutopilot = carla.command.SetAutopilot
+    FutureActor = carla.command.FutureActor
+
+    batch = []
+    for n, transform in enumerate(spawn_points):
+        if n >= number_of_npc:
+            break
+        blueprint = random.choice(npc_bp)
+        if blueprint.has_attribute('color'):
+            color = random.choice(blueprint.get_attribute('color').recommended_values)
+            blueprint.set_attribute('color', color)
+        blueprint.set_attribute('role_name', 'autopilot')
+        batch.append(SpawnActor(blueprint, transform).then(SetAutopilot(FutureActor, True)))
+
+    return batch
+
+# Function to change weather (02192020)
+def dynamic_weather(world):
+    # Set weather parameters (02192020)
+    print(world.get_weather())
+    
+    new_weather = carla.WeatherParameters(
+            cloudyness=80.45,
+            precipitation=33.33,
+            precipitation_deposits=20.0,
+            wind_intensity = 50,
+            sun_azimuth_angle=90)
+    
+    world.set_weather(new_weather)
+    
+    print(world.get_weather())
+
 def main():
     try:
         # Set up connection
         client = carla.Client('localhost', 2000)
         client.set_timeout(3.0)
         
+        # Start logging
+        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+                
         # Retrieve world map
-        world = client.load_world('Town03') # load map town 01
-        
+        world = client.load_world('Town04') # load map town 01
+
+        #dynamic_weather(world)
+                        
         # Retrieve blueprint
         blueprint_library = world.get_blueprint_library()
         
@@ -91,8 +154,8 @@ def main():
         
         # Set attributes for actors
         audi_bp.set_attribute("color", "0, 0, 128")
-        audi_bp.set_attribute("role_name", "test_audi")
-        audi_bp.set_attribute("sticky_control", "false")
+        audi_bp.set_attribute("role_name", "autpilot")
+#        audi_bp.set_attribute("sticky_control", "false")
         
         camera_bp.set_attribute("image_size_x", f"{IMAGE_WIDTH}")
         camera_bp.set_attribute("image_size_y", f"{IMAGE_HEIGHT}")
@@ -100,28 +163,48 @@ def main():
 #        camera_bp.set_attribute("iso", f"1200")
         
         # Define spawn point (manual) for actor
-        transform_2 = carla.Transform(carla.Location(x=2.5, y=0.7))
+        transform_2 = carla.Transform(carla.Location(x=2.0, y=5.0))
         transform = random.choice(world.get_map().get_spawn_points())
-        
+                        
         # Spawn actor
         audi = world.spawn_actor(audi_bp, transform)
-        audi = vehicle_control(audi)
+        #audi = vehicle_control(audi) # change vehicle physics control
         audi.set_autopilot(True)
-#        audi.apply_control(carla.VehicleControl(throttle=2.0, steer=1.0))
+        audi.apply_control(carla.VehicleControl(throttle=1.0, steer=1.0))
         actor_list.append(audi)
         # Spawn sensor, attach to vehicle
         camera = world.spawn_actor(camera_bp, transform_2, attach_to=audi)
         camera.listen(lambda image: process_img(image))
         actor_list.append(camera)
+       
+        npc_batch = spawn_npc(world) # return NPC actors 
+         
+        for response in client.apply_batch_sync(npc_batch):
+            if response.error:
+                logging.error(response.error)
+            else:
+                actor_list.append(response.actor_id)
+        
+        print('spawned %d NPC vehicles' % len(actor_list))
+        
+        while True:
+            world.wait_for_tick() # wait for world to get actors
         
         # Delay time
-        time.sleep(600) # 4 minutes
+        #time.sleep(600) # 4 minutes
         
     finally:
-        for actor in actor_list:
-            actor.destroy()
+#        for actor in actor_list:
+#            actor.destroy()
+        print("\n Destroying %d actors" % len(actor_list))
+        client.apply_batch([carla.command.DestroyActor(x) for x in actor_list])
         print("All cleaned up!")
 
 # Main function
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        print('\ndone.')

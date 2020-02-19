@@ -81,6 +81,7 @@ Updates
 2020/02/17 - Include new library files for CARLA (carla-0.9.7-py3.7-win-amd64.egg),
   	     New files for trial testing carla (carla_sim/PythonAPI/KC_test/test_1.py)
              New test file for trial testing carla (trial_1.py)
-
+2020/02/18 - New test file for CARLA coding familiarization (KC_TEST\test_2.py)
+2020/02/19 - Generate NPC and alter dynamic weather (test_2.py)
 
 
