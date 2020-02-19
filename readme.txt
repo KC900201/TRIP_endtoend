@@ -70,4 +70,18 @@ Updates
 2019/12/18 - new model architecture function to test increasing accuracy (trip_c_lstm.py), modify RP training to evaluate accuracy increase at 25th epoch (trip_dataset.py)
 2019/12/23 - remodify function to reduce accuracy value (trip_trainer.py)
 2019/12/24 - New model architecture that reverts ReLu and Tanh activation (trip_c_lstm.py)
-2019/12/26 - New function to separate A3D datasets
+2019/12/26 - New function to separate A3D datasets (copyfiles.py)
+2020/01/09 - Add in one features to extract only wanted feature files (skip interval) (trip_combined.py, trip_dataset.py, trip_trainer.py)
+	   - Import cache to speed up process (trip_dataset.py)
+2020/01/15 - Create plot graph table for vpredict result (make_result_table_vpredict.py);
+	     Include graph for average risk estimation value
+2020/01/22 - Remove pretraining codes (directory: training/*)
+2020/01/28 - Add in check files for checking tensorflow (tensorflow_self_check.py). Add in new spec file (vpredict_spec.txt)
+2020/01/31 - Include new folder and files for CARLA simulation (carla_sim/*)
+2020/02/17 - Include new library files for CARLA (carla-0.9.7-py3.7-win-amd64.egg),
+  	     New files for trial testing carla (carla_sim/PythonAPI/KC_test/test_1.py)
+             New test file for trial testing carla (trial_1.py)
+2020/02/18 - New test file for CARLA coding familiarization (KC_TEST\test_2.py)
+2020/02/19 - Generate NPC and alter dynamic weather (test_2.py)
+
+

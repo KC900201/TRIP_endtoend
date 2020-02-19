@@ -5,22 +5,43 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{b57b2640-9936-4bd4-b586-92cd2040eaae}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>trip_combined.py</StartupFile>
+    <StartupFile>carla_sim\PythonAPI\KC_test\trial_1.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId />
-    <InterpreterVersion />
+    <TestFramework>unittest</TestFramework>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <PropertyGroup>
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
-    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\NVIDIA\NVaftermath\Win64\GFSDK_Aftermath_Lib.x64.dll" />
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\Ogg\Win64\VS2015\libogg_64.dll" />
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\PhysX3\Win64\VS2015\ApexFrameworkPROFILE_x64.dll" />
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\PhysX3\Win64\VS2015\APEX_ClothingPROFILE_x64.dll" />
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\PhysX3\Win64\VS2015\APEX_LegacyPROFILE_x64.dll" />
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\PhysX3\Win64\VS2015\NvClothPROFILE_x64.dll" />
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\PhysX3\Win64\VS2015\PhysX3CommonPROFILE_x64.dll" />
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\PhysX3\Win64\VS2015\PhysX3CookingPROFILE_x64.dll" />
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\PhysX3\Win64\VS2015\PhysX3PROFILE_x64.dll" />
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\PhysX3\Win64\VS2015\PxFoundationPROFILE_x64.dll" />
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\PhysX3\Win64\VS2015\PxPvdSDKPROFILE_x64.dll" />
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\Vorbis\Win64\VS2015\libvorbisfile_64.dll" />
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\Vorbis\Win64\VS2015\libvorbis_64.dll" />
+    <Content Include="carla_sim\Engine\Binaries\ThirdParty\Windows\DirectX\x64\WinPixEventRuntime.dll" />
+    <Content Include="carla_sim\Engine\Extras\Redist\en-us\UE4PrereqSetup_x64.exe" />
+    <Content Include="carla_sim\Engine\Saved\Config\WindowsNoEditor\Manifest.ini" />
+    <Content Include="carla_sim\HDMaps\README" />
+    <Content Include="carla_sim\HDMaps\Town01.pcd" />
+    <Content Include="carla_sim\HDMaps\Town02.pcd" />
+    <Content Include="carla_sim\PythonAPI\carla\dist\carla-0.9.7-py3.7-win-amd64.egg" />
+    <Content Include="carla_sim\PythonAPI\carla\requirements.txt" />
+    <Content Include="carla_sim\PythonAPI\examples\requirements.txt" />
+    <Content Include="carla_sim\PythonAPI\util\requirements.txt" />
     <Content Include="estimation\Readme.txt" />
     <Content Include="readme.txt" />
     <Content Include="result\yolov3\dashcam\dashcam_test0_tlog.txt" />
@@ -68,6 +89,45 @@
     <Content Include="spec_files\video_prediction\prediction_v3_1_tbox_spec.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\agent.py" />
+    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\basic_agent.py" />
+    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\controller.py" />
+    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\global_route_planner.py" />
+    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\global_route_planner_dao.py" />
+    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\local_planner.py" />
+    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\roaming_agent.py" />
+    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\__init__.py" />
+    <Compile Include="carla_sim\PythonAPI\carla\agents\tools\misc.py" />
+    <Compile Include="carla_sim\PythonAPI\carla\agents\tools\__init__.py" />
+    <Compile Include="carla_sim\PythonAPI\carla\agents\__init__.py" />
+    <Compile Include="carla_sim\PythonAPI\carla\scene_layout.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\automatic_control.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\dynamic_weather.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\manual_control.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\manual_control_steeringwheel.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\no_rendering_mode.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\show_recorder_actors_blocked.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\show_recorder_collisions.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\show_recorder_file_info.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\spawn_npc.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\start_recording.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\start_replaying.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\synchronous_mode.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\tensorflow_self_check.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\tutorial.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\tutorialv2.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\tutorialv3.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\tutorialv5.py" />
+    <Compile Include="carla_sim\PythonAPI\examples\vehicle_gallery.py" />
+    <Compile Include="carla_sim\PythonAPI\KC_test\test_1.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="carla_sim\PythonAPI\KC_test\trial_1.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="carla_sim\PythonAPI\util\lane_explorer.py" />
+    <Compile Include="carla_sim\PythonAPI\util\performance_benchmark.py" />
+    <Compile Include="carla_sim\PythonAPI\util\test_connection.py" />
     <Compile Include="estimation\dataset_generator\dataset_generator_function.py" />
     <Compile Include="estimation\dataset_generator\dataset_generator_img.py" />
     <Compile Include="estimation\dataset_generator\dataset_generator_two.py" />
@@ -86,6 +146,7 @@
     <Compile Include="estimation\file_editing\csvtotxt.py" />
     <Compile Include="estimation\file_editing\folder.py" />
     <Compile Include="estimation\file_editing\gta2yolo.py" />
+    <Compile Include="estimation\file_editing\make_result_table_vpredict.py" />
     <Compile Include="estimation\file_editing\weighttonpz.py" />
     <Compile Include="risk_prediction\main_trip_prediction.py" />
     <Compile Include="risk_prediction\main_trip_repeat_training.py" />
@@ -101,6 +162,41 @@
     <Compile Include="trip_combined.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="carla_sim\" />
+    <Folder Include="carla_sim\Engine\" />
+    <Folder Include="carla_sim\Engine\Binaries\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\NVIDIA\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\NVIDIA\NVaftermath\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\NVIDIA\NVaftermath\Win64\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\Ogg\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\Ogg\Win64\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\Ogg\Win64\VS2015\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\PhysX3\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\PhysX3\Win64\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\PhysX3\Win64\VS2015\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\Vorbis\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\Vorbis\Win64\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\Vorbis\Win64\VS2015\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\Windows\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\Windows\DirectX\" />
+    <Folder Include="carla_sim\Engine\Binaries\ThirdParty\Windows\DirectX\x64\" />
+    <Folder Include="carla_sim\Engine\Extras\" />
+    <Folder Include="carla_sim\Engine\Extras\Redist\" />
+    <Folder Include="carla_sim\Engine\Extras\Redist\en-us\" />
+    <Folder Include="carla_sim\Engine\Saved\" />
+    <Folder Include="carla_sim\Engine\Saved\Config\" />
+    <Folder Include="carla_sim\Engine\Saved\Config\WindowsNoEditor\" />
+    <Folder Include="carla_sim\HDMaps\" />
+    <Folder Include="carla_sim\PythonAPI\" />
+    <Folder Include="carla_sim\PythonAPI\carla\" />
+    <Folder Include="carla_sim\PythonAPI\carla\agents\" />
+    <Folder Include="carla_sim\PythonAPI\carla\agents\navigation\" />
+    <Folder Include="carla_sim\PythonAPI\carla\agents\tools\" />
+    <Folder Include="carla_sim\PythonAPI\carla\dist\" />
+    <Folder Include="carla_sim\PythonAPI\examples\" />
+    <Folder Include="carla_sim\PythonAPI\KC_test\" />
+    <Folder Include="carla_sim\PythonAPI\util\" />
     <Folder Include="estimation" />
     <Folder Include="estimation\dataset_generator" />
     <Folder Include="estimation\dataset_generator\lib" />
@@ -116,6 +212,5 @@
     <Folder Include="spec_files\risk_prediction" />
     <Folder Include="spec_files\video_prediction" />
   </ItemGroup>
-  <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

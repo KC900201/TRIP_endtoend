@@ -11,6 +11,8 @@ Date          Comment
 09142019      First revision
 10282019      Temp solution to change directory when training, 
               comment out when finished training feature extraction
+01092020      Import cache to speed up process
+01092020      Add in one features to extract only wanted feature files (skip interval)
 """
 
 from chainer import dataset
@@ -18,11 +20,14 @@ import os
 import numpy as np
 #import cv2
 import math
+from functools import lru_cache # 01092020
 
 class TripDataset(dataset.DatasetMixin):
     """ A class of TRIP(Traffic Risk Prediction) dataset
     """
-    def __init__(self, ds_path, spec_file, layer_name, box_type=None):
+    @lru_cache()
+#    def __init__(self, ds_path, spec_file, layer_name, box_type=None):
+    def __init__(self, ds_path, spec_file, layer_name, box_type=None, sp=0): # 01092020
         """Constructor
            Args:
             ds_path (str): a dataset path
@@ -41,8 +46,8 @@ class TripDataset(dataset.DatasetMixin):
         # set dataset path (ds_path)
         self.ds_path = ds_path
         # set dataset spec (feature_type, layer_info, box_type)
-        #os.chdir('C:/Users/atsumilab/Pictures/TRIP_Dataset') #10282019
-        os.chdir('C:/Users/atsumilab/Pictures') #12052019
+        os.chdir('C:/Users/atsumilab/Pictures/TRIP_Dataset') #10282019
+        #os.chdir('D:/TRIP/Datasets/YOLO_KitDashV') #12052019
         with open(os.path.join(self.ds_path, spec_file), 'r', encoding='utf-8') as f:
             lines = f.readlines()
         for line in lines:
@@ -93,10 +98,14 @@ class TripDataset(dataset.DatasetMixin):
             if(type(layer_names) == str):
                 #flist = [os.path.join(d, layer, f) for f in os.listdir(os.path.join(self.ds_path, d, layer_names))] #Fix naming error in extracing layer from ds_spec - 20190423
                 flist = [os.path.join(d, layer_names, f) for f in os.listdir(os.path.join(self.ds_path, d, layer_names))]
+                if(sp > 0):
+                    flist = flist[sp:len(flist)]
                 elist.append(flist)
             else:
                 for layer in layer_names:
                     flist = [os.path.join(d, layer, f) for f in os.listdir(os.path.join(self.ds_path, d, layer))] 
+                    if(sp > 0):
+                        flist = flist[sp:len(flist)]
                     elist.append(flist)
                 #self.feature_data.append(tuple(flist))
             self.feature_data.append(list(zip(*elist)))
@@ -104,6 +113,7 @@ class TripDataset(dataset.DatasetMixin):
             self.box_data.append(tuple(blist))
         #print("length of feature data: " + str(len(self.feature_data)) + ", length of box_data: " + str(len(self.box_data)))
 
+    @lru_cache()
     def get_example(self, i):
         """Get the i-th example
            Args:
