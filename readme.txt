@@ -83,5 +83,6 @@ Updates
              New test file for trial testing carla (trial_1.py)
 2020/02/18 - New test file for CARLA coding familiarization (KC_TEST\test_2.py)
 2020/02/19 - Generate NPC and alter dynamic weather (test_2.py)
+2020/02/20 - Spawn pedestrian NPC and control NPC dynamics 
 
 
