@@ -75,15 +75,118 @@ def spawn_walker(world):
         if n >= number_of_npc:
             break
         blueprint = random.choice(walker_bp)
-#        if blueprint.has_attribute('age'):
-#            age = random.choice(blueprint.get_attribute('age').recommended_values)
-#            blueprint.set_attribute('age', age)
-#        if blueprint.has_attribute('gender'):
-#            gender = random.choice(blueprint.get_attribute('gender').recommended_values)
-#            blueprint.set_attribute('gender', gender)
+        if blueprint.has_attribute('speed'):
+            speed = random.choice(blueprint.get_attribute('speed').recommended_values)
+            blueprint.set_attribute('speed', speed)
         batch.append(carla.command.SpawnActor(blueprint, transform))
         
     return batch
+
+def spawn_walker2(world):
+    blueprint_library  = world.get_blueprint_library()
+    walker_bp = blueprint_library.filter('walker.pedestrian.*')
+    bp = random.choice(walker_bp)
+    
+    # Spawn points
+    spawn_points = world.get_map().get_spawn_points()
+    '''
+    for i in range(random.randint(0, 100)):
+        spawn_point = carla.Transform()
+        spawn_point.location = world.get_random_location_from_navigation()
+        if (spawn_point.location != None):
+            spawn_points.append(spawn_point)
+    '''
+    
+    # Build batch of commands to spawn pedestrian
+    batch = []
+    for spawn_point in spawn_points:
+        batch.append(carla.command.SpawnActor(bp, spawn_point))
+
+    return batch 
+
+# Test create walker - 02/20/2020
+def main_walker():
+    try:
+        # Set up connection
+        client = carla.Client('localhost', 2000)
+        client.set_timeout(3.0)
+        
+        # Start logging
+        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+                
+        # Retrieve world map
+        world = client.get_world() # retrieve map
+        
+        # Create list/dictionary for walkers
+        walkers_list = []
+        spawn_points = []
+        walker_batch = []
+        #walkers_list = {}
+
+#        walker_batch = spawn_walker2(world) # Retrieve walker batch blueprint
+        
+        walker_bp = random.choice(world.get_blueprint_library().filter("walker.pedestrian.*"))
+        
+        for i in range(0, 50):
+            spawn_point = carla.Transform()
+            spawn_point.location = world.get_random_location_from_navigation()
+            if (spawn_point.location != None):
+                spawn_points.append(spawn_point)
+        
+        for spawn_point in spawn_points:
+            walker_batch.append(carla.command.SpawnActor(walker_bp, spawn_point))
+            
+        # Apply batch
+        results = client.apply_batch_sync(walker_batch, True)
+        
+        for i in range(len(results)):
+            if results[i].error:
+                logging.error(results[i].error)
+            else:
+                walkers_list.append({"id": results[i].actor_id})
+        
+        # Spawn walker AI controller batch for each walker
+        walker_ai_batch = []
+        walker_ai_bp = world.get_blueprint_library().find('controller.ai.walker')
+        for i in range(len(walkers_list)):
+            walker_ai_batch.append(carla.command.SpawnActor(walker_ai_bp, carla.Transform(), walkers_list[i]["id"]))
+            
+        # Apply walker AI batch
+        ai_results = client.apply_batch_sync(walker_ai_batch, True)
+        
+        for i in range(len(ai_results)):
+            if ai_results[i].error:
+                logging.error(ai_results[i].error)
+                break # stop error
+            else:
+                walkers_list[i]["con"] = ai_results[i].actor_id
+                #walker_ai_list.append({"con": ai_results[i].actor_id})
+        
+        # Put altogether the walker and controller ids
+        for i in range(len(walkers_list)):
+            #print(walkers_list[i])
+            actor_list.append(walkers_list[i]["con"])
+            actor_list.append(walkers_list[i]["id"])
+        all_actors = world.get_actors(actor_list)
+        
+        while True:
+            world.wait_for_tick()
+            
+            for i in range(0, len(all_actors), 2):
+                all_actors[i].start()
+                #all_actors[i].go_to_location(carla.Location(x=random.randint(0, 10), y=random.randint(0, 10), z=random.randint(0, 10)))
+                all_actors[i].go_to_location(world.get_random_location_from_navigation())
+                all_actors[i].set_max_speed(1 + random.random())
+            
+            #time.sleep(180)
+            
+            #for i in range(0, len(actor_list), 2):
+            #    all_actors[i].stop()
+
+    finally:
+        print("\n Destroying %d actors" % len(actor_list))
+        client.apply_batch([carla.command.DestroyActor(x) for x in actor_list])
+        print("All cleaned up!")
 
 def main():
     try:
@@ -140,9 +243,10 @@ def main():
                 actor_list.append(response.actor_id)
     
         for actor in actor_list:
-            print(actor.attributes)
-            if "walker" in actor.type_id:
-                actor.apply_control(carla.WalkerControl(speed=1.0, jump=False))
+            print(actor)
+#            print(actor.attributes)
+#            if "walker" in actor.type_id:
+#            actor.apply_control(carla.WalkerControl(speed=1.0, jump=False))
     
         print('spawned %d NPC actors' % len(actor_list))
         
@@ -157,6 +261,7 @@ def main():
 if __name__ == '__main__':
     try:
         main()
+#        main_walker()
     except KeyboardInterrupt:
         pass
     finally:
