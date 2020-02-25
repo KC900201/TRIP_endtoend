@@ -1,0 +1,10 @@
+!!!!CAUTION!!!!
+----------------
+DO NOT DELETE THE .NPZ FILES IN THIS FOLDER (USED FOR SIMULATION AND EVALUATION)
+
+
+HIGHEST ACCURACY PREDICTION MODEL
+--------------------------------
+DATE CREATED		HIGHEST ACCURACY (TEST-%)
+------------		------------------------
+01/13/2020		70.393
