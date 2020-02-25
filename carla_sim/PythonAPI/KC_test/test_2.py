@@ -14,6 +14,7 @@ Date          Comment
 02182020      First revision 
 02192020      Spawn npc (vehicles), alter weather conditions
 02202020      Spawn npc (pedestrian, spectator), edit NPC attributes
+02252020      Rectify pedestrian NPC attributes
 """
 
 import sys
@@ -42,6 +43,7 @@ NPC_AMT = random.randint(1, 400) # amount of npc (02192020)
 
 # Create actor list
 actor_list = []
+all_id = []
 
 # Function to control physics of vehicle (actor)
 def vehicle_control(vehicle):
@@ -120,8 +122,11 @@ def spawn_npc(world):
 def spawn_walker(world):
     
     blueprint_library = world.get_blueprint_library()
-    walker_bp = blueprint_library.filter('walker.*')
-     
+    walker_bp = blueprint_library.filter('walker.pedestrian.*')
+    
+    # walker speed setting
+    percentagePedestriansRunning = 0.0 # how many pedestrians will run
+    percentagePedestriansCrossing = 0.0 # how many pedestrians will cross roads    
     # Spawn points 
     spawn_points = world.get_map().get_spawn_points()
     number_of_spawn_points = len(spawn_points)
@@ -136,41 +141,26 @@ def spawn_walker(world):
         number_of_npc = number_of_spawn_points      
         
     batch = []
+    walker_speed = []
     for n, transform in enumerate(spawn_points):
         if n >= number_of_npc:
             break
         blueprint = random.choice(walker_bp)
-        if blueprint.has_attribute('age'):
-            age = random.choice(blueprint.get_attribute('age').recommended_values)
-            blueprint.set_attribute('age', age)
-#        if blueprint.has_attribute('gender'):
-#            gender = random.choice(blueprint.get_attribute('gender').recommended_values)
-#            blueprint.set_attribute('gender', gender)
+        if blueprint.has_attribute('is_invincible'):
+            blueprint.set_attribute('is_invincible', 'false')
+        if blueprint.has_attribute('speed'):
+            if(random.random() > percentagePedestriansRunning):
+                # walking
+                walker_speed.append(blueprint.get_attribute('speed').recommended_values[1])
+            else:
+                # running
+                walker_speed.append(blueprint.get_attribute('speed').recommended_values[2])
+        else:
+            print("Walker has no speed")
+            walker_speed.append(0.0)
         batch.append(carla.command.SpawnActor(blueprint, transform))
         
     return batch
-
-def spawn_walker2(world):
-    blueprint_library  = world.get_blueprint_library()
-    walker_bp = blueprint_library.filter('walker.pedestrian.*')
-    bp = random.choice(walker_bp)
-    
-    # Spawn points
-    spawn_points = world.get_map().get_spawn_points()
-    '''
-    for i in range(random.randint(0, 100)):
-        spawn_point = carla.Transform()
-        spawn_point.location = world.get_random_location_from_navigation()
-        if (spawn_point.location != None):
-            spawn_points.append(spawn_point)
-    '''
-    
-    # Build batch of commands to spawn pedestrian
-    batch = []
-    for spawn_point in spawn_points:
-        batch.append(carla.command.SpawnActor(bp, spawn_point))
-
-    return batch 
 
 # Function to change weather (02192020)
 def dynamic_weather(world):
@@ -200,58 +190,101 @@ def main_walker():
                 
         # Retrieve world map
         world = client.get_world() # retrieve map
+        blueprint_library = world.get_blueprint_library()
         
-        # Create list for walkers
+        # Blueprint for walker (pedestrian)
+        walker_bp = blueprint_library.filter('walker.pedestrian.*')
+
+        # Create list for walkers, walkers speed
         walkers_list = []
+        batch = []
+        walker_speed = []
+        walker_speed2 = []
         
-        walker_batch = spawn_walker2(world) # Retrieve walker batch blueprint
+        # walker speed setting
+        percentagePedestriansRunning = 0.0 # how many pedestrians will run
+        percentagePedestriansCrossing = 0.0 # how many pedestrians will cross roads    
+        # Spawn points 
+        spawn_points = world.get_map().get_spawn_points()
+        number_of_spawn_points = len(spawn_points)
+        number_of_npc = random.randint(0, 100)
         
-        # Apply batch
-        results = client.apply_batch_sync(walker_batch, True)
+        print("Number of spawn points: %d" % int(number_of_spawn_points))
+        print("Number of NPC: %d" % int(number_of_npc))
+    
+        if number_of_npc <= number_of_spawn_points:        
+            random.shuffle(spawn_points)
+        else:
+            number_of_npc = number_of_spawn_points      
+
+        for n, spawn_point in enumerate(spawn_points):
+            if n >= number_of_npc:
+                break
+            blueprint = random.choice(walker_bp)
+            # set as not invencible
+            if blueprint.has_attribute('is_invincible'):
+                blueprint.set_attribute('is_invincible', 'false')
+            # set the max speed
+            if blueprint.has_attribute('speed'):
+                if (random.random() > percentagePedestriansRunning):
+                    # walking
+                    walker_speed.append(blueprint.get_attribute('speed').recommended_values[1])
+                else:
+                    # running
+                    walker_speed.append(blueprint.get_attribute('speed').recommended_values[2])
+            else:
+                print("Walker has no speed")
+                walker_speed.append(0.0)
+            batch.append(carla.command.SpawnActor(blueprint, spawn_point))
+        
+        results = client.apply_batch_sync(batch, True)
         
         for i in range(len(results)):
             if results[i].error:
                 logging.error(results[i].error)
             else:
                 walkers_list.append({"id": results[i].actor_id})
+                walker_speed2.append(walker_speed[i])
+        walker_speed = walker_speed2 
         
-        # Spawn walker AI controller batch for each walker
-        walker_ai_batch = []
-        walker_ai_bp = world.get_blueprint_library().find('controller.ai.walker')
-        for i in range(len(actor_list)):
-            walker_ai_batch.append(carla.command.SpawnActor(walker_ai_bp, carla.Transform(), walkers_list[i]["id"]))
-            
-        # Apply walker AI batch
-        ai_results = client.apply_batch_sync(walker_ai_batch, True)
-        
-        for i in range(len(ai_results)):
-            if ai_results[i].error:
-                logging.error(ai_results[i].error)
-            else:
-                walkers_list[i]["con"] = ai_results[i].actor_id
-        
-        # Put altogether the walker and controller ids
+        # 3. we spawn the walker controller
+        batch = []
+        walker_controller_bp = world.get_blueprint_library().find('controller.ai.walker')
         for i in range(len(walkers_list)):
-            actor_list.append(walkers_list[i]["con"])
-            actor_list.append(walkers_list[i]["id"])
-        all_actors = world.get_actors(actor_list)
+            batch.append(carla.command.SpawnActor(walker_controller_bp, carla.Transform(), walkers_list[i]["id"]))
+        results = client.apply_batch_sync(batch, True)
+        for i in range(len(results)):
+            if results[i].error:
+                logging.error(results[i].error)
+            else:
+                walkers_list[i]["con"] = results[i].actor_id
+        # 4. we put altogether the walkers and controllers id to get the objects from their id
+        for i in range(len(walkers_list)):
+            all_id.append(walkers_list[i]["con"])
+            all_id.append(walkers_list[i]["id"])
+        all_actors = world.get_actors(all_id)
         
+        world.wait_for_tick()
+
+        # 5. initialize each controller and set target to walk to (list is [controler, actor, controller, actor ...])
+        # set how many pedestrians can cross the road
+        world.set_pedestrians_cross_factor(percentagePedestriansCrossing)
+        for i in range(0, len(all_id), 2):
+            # start walker
+            all_actors[i].start()
+            # set walk to random point
+            all_actors[i].go_to_location(world.get_random_location_from_navigation())
+            # max speed
+            all_actors[i].set_max_speed(float(walker_speed[int(i/2)]))
+
+        print('spawned %d walkers, press Ctrl+C to exit.' % len(walkers_list))
+
         while True:
             world.wait_for_tick()
-            
-            for i in range(0, len(all_actors), 2):
-                all_actors[i].start()
-                all_actors[i].go_to_location(carla.Location(x=random.randint(), y=random.randint(), z=random.randint()))
-                all_actors[i].set_max_speed(1 + random.random())
-            
-            time.delay(180)
-            
-            for i in range(0, len(actor_list), 2):
-                all_actors[i].stop()
-
+        
     finally:
-        print("\n Destroying %d actors" % len(actor_list))
-        client.apply_batch([carla.command.DestroyActor(x) for x in actor_list])
+        print("\n Destroying %d walkers" % len(walkers_list))
+        client.apply_batch([carla.command.DestroyActor(x) for x in all_id])
         print("All cleaned up!")
 
 # Test create actor spectator - 02/20/2020
@@ -365,15 +398,7 @@ def main():
                 logging.error(response.error)
             else:
                 actor_list.append(response.actor_id)
-        ''' 
-        walker_batch = spawn_walker(world) # return NPC pedestrians
-        
-        for response in client.apply_batch_sync(walker_batch):
-            if response.error:
-                logging.error(response.error)
-            else:
-                actor_list.append(response.actor_id)
-        '''
+         
         print('spawned %d NPC actors' % len(actor_list))
                         
         while True:
@@ -392,8 +417,8 @@ def main():
 # Main function
 if __name__ == '__main__':
     try:
-        main()
-#        main_walker()
+#        main()
+        main_walker()
 #        main_spectator()
     except KeyboardInterrupt:
         pass
