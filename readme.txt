@@ -84,5 +84,8 @@ Updates
 2020/02/18 - New test file for CARLA coding familiarization (KC_TEST\test_2.py)
 2020/02/19 - Generate NPC and alter dynamic weather (test_2.py)
 2020/02/20 - Spawn pedestrian NPC and control NPC dynamics 
+2020/02/23 - New test file for testing pedestrian (test_3.py)
+2020/02/24 - Modify spawn walker code
+2020/02/25 - Edit src code to fix camera angle, spawn actors. Further improve walker npc (test_2.py) 
 
 
