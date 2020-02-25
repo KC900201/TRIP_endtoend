@@ -38,7 +38,7 @@ import carla
 
 IMAGE_WIDTH = 800
 IMAGE_HEIGHT = 600
-NPC_AMT = random.randint(1, 1000) # amount of npc (02192020)
+NPC_AMT = random.randint(1, 400) # amount of npc (02192020)
 
 # Create actor list
 actor_list = []
@@ -254,7 +254,6 @@ def main_walker():
         client.apply_batch([carla.command.DestroyActor(x) for x in actor_list])
         print("All cleaned up!")
 
-
 # Test create actor spectator - 02/20/2020
 def main_spectator():
     try:
@@ -317,8 +316,8 @@ def main():
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
                 
         # Retrieve world map
-        world = client.load_world('Town04') # load map town 01
-
+        #world = client.load_world('Town04') # load map town 01
+        world = client.get_world()
         #dynamic_weather(world)
                         
         # Retrieve blueprint
@@ -326,33 +325,39 @@ def main():
         
         # Create actors
         audi_bp = random.choice(blueprint_library.filter('vehicle.audi.*'))
+        #audi_bp = blueprint_library.find('vehicle.tesla.model3')
         camera_bp = blueprint_library.find('sensor.camera.rgb')
-                
+        
+        # Load blueprint attributes
+        print(audi_bp)
+        print(camera_bp)
+        
         # Set attributes for actors
-        audi_bp.set_attribute("color", "0, 0, 128")
+        audi_bp.set_attribute("color", "0, 255, 0")
         audi_bp.set_attribute("role_name", "autpilot")
 #        audi_bp.set_attribute("sticky_control", "false")
         
         camera_bp.set_attribute("image_size_x", f"{IMAGE_WIDTH}")
         camera_bp.set_attribute("image_size_y", f"{IMAGE_HEIGHT}")
-        camera_bp.set_attribute("fov", f"100")
+        camera_bp.set_attribute("fov", f"110")
 #        camera_bp.set_attribute("iso", f"1200")
         
         # Define spawn point (manual) for actor
-        transform_2 = carla.Transform(carla.Location(x=2.0, y=5.0))
         transform = random.choice(world.get_map().get_spawn_points())
-                        
+        transform_2 = carla.Transform(carla.Location(x=2.5, y=1.1, z=0.7))
+
         # Spawn actor
-        audi = world.spawn_actor(audi_bp, transform)
+        audi = world.try_spawn_actor(audi_bp, transform)
+#        audi = carla.command.SpawnActor(audi_bp, transform).then(carla.command.SetAutopilot(carla.command.FutureActor, True))
         #audi = vehicle_control(audi) # change vehicle physics control
         audi.set_autopilot(True)
         audi.apply_control(carla.VehicleControl(throttle=2.0, steer=0.0))
         actor_list.append(audi)
         # Spawn sensor, attach to vehicle
-        camera = world.spawn_actor(camera_bp, transform_2, attach_to=audi)
+        camera = world.try_spawn_actor(camera_bp, transform_2, attach_to=audi)
         camera.listen(lambda image: process_img(image))
         actor_list.append(camera)
-       
+        
         npc_batch = spawn_npc(world) # return NPC actors 
          
         for response in client.apply_batch_sync(npc_batch):
@@ -360,8 +365,7 @@ def main():
                 logging.error(response.error)
             else:
                 actor_list.append(response.actor_id)
-         
-        '''
+        ''' 
         walker_batch = spawn_walker(world) # return NPC pedestrians
         
         for response in client.apply_batch_sync(walker_batch):
