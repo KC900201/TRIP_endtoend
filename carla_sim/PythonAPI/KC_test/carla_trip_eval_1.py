@@ -18,6 +18,8 @@ Created on Mon Jan 17 2020
 Date          Comment
 ========================
 02262020      First revision 
+02282020      Fix saving image (images.save_to_disk) - original format,
+              Fix NPC spawn amount <= total amt of available spawn points
 """
 
 import sys
@@ -40,10 +42,10 @@ except IndexError:
 
 import carla
 
-IMAGE_WIDTH = 480
-IMAGE_HEIGHT = 360
-NPC_AMT = random.randint(0, 300) # amount of npc to be spawned
-NPC_WALKER_AMT = random.randint(50, 100) # amount of npc walker to be spawned
+IMAGE_WIDTH = 1280
+IMAGE_HEIGHT = 960
+#NPC_AMT = random.randint(0, 265) # amount of npc to be spawned
+#NPC_WALKER_AMT = random.randint(50, 100) # amount of npc walker to be spawned
 
 # Create list of actors for test agent, NPC (vehicles, pedestrians)
 actor_list = []
@@ -59,7 +61,7 @@ def process_img(image):
     cv2.imshow("", i3)
     cv2.waitKey(2) # delay 2 seconds
     # save image
-    # image.save_to_disk('test/%06d.png' % image.frame)
+    image.save_to_disk('_out/%08d' % image.frame) # 02282020
     return i3 / 255.0
 
 # Start recording function
@@ -85,7 +87,7 @@ def main():
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
         
         # 3. Retrieve world from CARLA simulation
-        world = client.get_world()
+        world = client.load_world("Town01")
         # 3.1 Retrieve blueprint
         blueprint_library = world.get_blueprint_library()
         
@@ -109,15 +111,20 @@ def main():
         test_cam_bp.set_attribute('image_size_y', f'{IMAGE_HEIGHT}')
         test_cam_bp.set_attribute("fov", f"110")
                 
-        # 7 Spawn NPC agents in environment
+        # 6 Spawn NPC agents in environment
         npc_vehicle_bp = blueprint_library.filter('vehicle.*')
         npc_walker_bp = blueprint_library.filter('walker.pedestrian.*')
+        # Avoid spawning NPC prone to accident
+        npc_vehicle_bp = [x for x in npc_vehicle_bp if int(x.get_attribute('number_of_wheels')) == 4]
+        npc_vehicle_bp = [x for x in npc_vehicle_bp if not x.id.endswith('isetta')]
+        npc_vehicle_bp = [x for x in npc_vehicle_bp if not x.id.endswith('carlacola')]
         # ---------------------
-        # 7.1 Spawn NPC vehicle    
+        # 6.1 Spawn NPC vehicle    
         # ---------------------
         spawn_points = world.get_map().get_spawn_points()
         num_spawn_points = len(spawn_points)
-        npc_amt = NPC_AMT
+        #npc_amt = NPC_AMT
+        npc_amt = random.randint(0, num_spawn_points) # 02282020
         
         if npc_amt <= num_spawn_points:
             random.shuffle(spawn_points)
@@ -142,14 +149,15 @@ def main():
             vehicle.set_autopilot(True)
             vehicle_list.append(vehicle)            
         # ----------------------
-        # 7.2 Spawn NPC walkers    
+        # 6.2 Spawn NPC walkers    
         # ----------------------
         # some settings
         percentagePedestriansRunning = 5.0      # how many pedestrians will run
         percentagePedestriansCrossing = 10.0     # how many pedestrians will walk through the road
-        # 7.2.1 take all random locations to spawn
+        # 6.2.1 take all random locations to spawn
         spawn_points = []
-        npc_walker_amt = NPC_WALKER_AMT
+        #npc_walker_amt = NPC_WALKER_AMT
+        npc_walker_amt = random.randint(0, npc_amt) # 02282020
         
         if npc_walker_amt > npc_amt:
             npc_walker_amt = npc_amt
@@ -163,7 +171,7 @@ def main():
             if (loc != None):
                 spawn_point.location = loc
                 spawn_points.append(spawn_point)
-        # 7.2.2 spawn walker object
+        # 6.2.2 spawn walker object
         batch = []
         walker_speed = []
         for spawn_point in spawn_points:
@@ -192,7 +200,7 @@ def main():
                 walker_list.append({"id": results[i].actor_id})
                 walker_speed2.append(walker_speed[i])
         walker_speed = walker_speed2
-        # 7.2.3 spawn walker controller
+        # 6.2.3 spawn walker controller
         batch = []
         walker_controller_bp = world.get_blueprint_library().find('controller.ai.walker')
         for i in range(len(walker_list)):
@@ -203,14 +211,14 @@ def main():
                 logging.error(results[i].error)
             else:
                 walker_list[i]["con"] = results[i].actor_id
-        # 7.2.4 we put altogether the walkers and controllers id to get the objects from their id
+        # 6.2.4 we put altogether the walkers and controllers id to get the objects from their id
         for i in range(len(walker_list)):
             all_id.append(walker_list[i]["con"])
             all_id.append(walker_list[i]["id"])
         all_actors = world.get_actors(all_id)
         
         world.wait_for_tick()
-        # 7.2.5 initialize each controller and set target to walk to (list is [controler, actor, controller, actor ...])
+        # 6.2.5 initialize each controller and set target to walk to (list is [controler, actor, controller, actor ...])
         # set how many pedestrians can cross the road
         world.set_pedestrians_cross_factor(percentagePedestriansCrossing)
         for i in range(0, len(all_id), 2):
@@ -225,15 +233,15 @@ def main():
         
         world.wait_for_tick()
         
-        # 6. Define spawn point (manual) for test agents
+        # 7. Define spawn point (manual) for test agents
         transform = random.choice(world.get_map().get_spawn_points())
         transform_2 = carla.Transform(carla.Location(x=2.5, y=1.1, z=0.7))
-        # 6.1 Spawn test agents to simulation
+        # 7.1 Spawn test agents to simulation
         test_agent = world.try_spawn_actor(test_agent_bp, transform)
         test_agent.set_autopilot(True)
         test_agent.apply_control(carla.VehicleControl(gear=3, throttle=2.0, steer=1.0, hand_brake=True))
         actor_list.append(test_agent)
-        # 6.2 Spawn sensor, attach to test vehicle
+        # 7.2 Spawn sensor, attach to test vehicle
         test_cam = world.try_spawn_actor(test_cam_bp, transform_2, attach_to=test_agent)
         test_cam.listen(lambda image: process_img(image))
         actor_list.append(test_cam) 
