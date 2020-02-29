@@ -304,8 +304,8 @@ def main():
 if __name__ == '__main__':
     try:
         # Run main method
-        spawn_npc()
-#        main()
+        #spawn_npc()
+        main()
 #        start_replay()
     except KeyboardInterrupt:
         pass
