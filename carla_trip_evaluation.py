@@ -44,6 +44,7 @@ import carla
 
 # Import TRIP module - video prediction
 from risk_prediction.trip_vpredictor import TripVPredictor 
+from risk_prediction.trip_predictor import TripPredictor
 
 IMAGE_WIDTH = 1280
 IMAGE_HEIGHT = 960
