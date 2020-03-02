@@ -21,6 +21,7 @@ Date          Comment
 02282020      Fix saving image (images.save_to_disk) - original format,
               Fix NPC spawn amount <= total amt of available spawn points
 02292020      Separate spawn NPC and spawn test agent functions (spawn_NPC)
+03022020      Disable random world, set minimum number of spawn NPCs
 """
 
 import sys
@@ -88,8 +89,9 @@ def spawn_npc():
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
         
         # 3. Retrieve world from CARLA simulation        
-        world = client.load_world(random.choice(client.get_available_maps()).split("/")[4])
-        print(world)
+#        world = client.load_world(random.choice(client.get_available_maps()).split("/")[4])
+        world = client.get_world()
+#        print(world)
 #        world = client.get_world()
         # 3.1 Retrieve blueprint
         blueprint_library = world.get_blueprint_library()
@@ -107,7 +109,7 @@ def spawn_npc():
         spawn_points = world.get_map().get_spawn_points()
         num_spawn_points = len(spawn_points)
         #npc_amt = NPC_AMT
-        npc_amt = random.randint(0, num_spawn_points) # 02282020
+        npc_amt = random.randint(100, num_spawn_points) # 02282020 #03022020 (minimum no of NPC vehicles = 100)
         
         if npc_amt <= num_spawn_points:
             random.shuffle(spawn_points)
@@ -140,7 +142,7 @@ def spawn_npc():
         # 6.2.1 take all random locations to spawn
         spawn_points = []
         #npc_walker_amt = NPC_WALKER_AMT
-        npc_walker_amt = random.randint(0, npc_amt) # 02282020
+        npc_walker_amt = random.randint(50, npc_amt) # 02282020 #03022020 (minimum number of NPC walker = 50)
         
         if npc_walker_amt > npc_amt:
             npc_walker_amt = npc_amt
