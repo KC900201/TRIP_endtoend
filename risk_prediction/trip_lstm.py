@@ -11,6 +11,7 @@ Date          Comment
 09142019      First revision
 10252019      Enhancement code to improve result (>70% accuracy in risk prediction)
 10282019      Increase one more lstm (lstm3)
+03022020      Predict maximum risk function in between n frames 
 """
 from chainer import Chain, cuda, Variable
 import chainer.links as L
@@ -77,6 +78,27 @@ class TripLSTM(Chain):
             r = F.sigmoid(self.ho(h))
             mr += r
         return mr/len(x)
+    # Max risk value - 03022020
+    def predict_max_risk(self, x):
+        """ Risk prediction (mean)
+            Args:
+             x (a list of feature array): a feature array list
+            Returns:
+             r (a Variavle of float): a risk value
+        """
+        # reset lstm state
+        self.lstm.reset_state()
+        # recurrent reasoning and risk prediction
+        max_r = 0
+        for t in range(len(x)):
+            v = Variable(self.xp.array(x[t], dtype=self.xp.float32))
+            h = self(v)
+            r = F.sigmoid(self.ho(h))
+            if r > max_r:
+                max_r = r
+            else:
+                max_r = max_r
+        return max_r
     #
     def comparative_loss(self, ra, rc, rel, margin=0.05):
         """ Comparative loss function

@@ -60,7 +60,8 @@ class TripVPredictor(TripPredictor):
                         r = self.model.predict_risk(input_feature_win)
                     elif self.risk_type == 'seq_mean_risk':
                         r = self.model.predict_mean_risk(input_feature_win)
-
+                    elif self.risk_type == 'seq_max_risk': # find maximum risk value
+                        r = self.model.predict_max_risk(input_feature_win)
                     # show original and ROI images and the risk (visualization)
                     for f in range(t, t+self.window_size):
                         # read an original image

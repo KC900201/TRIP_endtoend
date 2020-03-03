@@ -87,5 +87,6 @@ Updates
 2020/02/23 - New test file for testing pedestrian (test_3.py)
 2020/02/24 - Modify spawn walker code
 2020/02/25 - Edit src code to fix camera angle, spawn actors. Further improve walker npc (test_2.py) 
+2020/03/02 - Predict maximum risk function in between n frames (trip_lstm.py)
 
 
