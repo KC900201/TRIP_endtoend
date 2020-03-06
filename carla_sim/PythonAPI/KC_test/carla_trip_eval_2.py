@@ -66,6 +66,16 @@ def process_img(image):
     image.save_to_disk('_out/%08d' % image.frame) # 02282020
     return i3 / 255.0
 
+def process_img_town(town_map, image):
+    i = np.array(image.raw_data)
+    i2 = i.reshape((IMAGE_HEIGHT, IMAGE_WIDTH, 4))
+    i3 = i2[:, :, :3] # height, width, first 3 rgb value
+    cv2.imshow("", i3)
+    cv2.waitKey(2) # delay 2 seconds
+    # save image
+    image.save_to_disk('_out/%s/%08d' % (town_map, image.frame)) # 02282020
+    return i3 / 255.0
+
 # Start recording function
 def start_replay():
     try:
@@ -90,7 +100,7 @@ def spawn_npc():
         
         # 3. Retrieve world from CARLA simulation        
 #        world = client.load_world(random.choice(client.get_available_maps()).split("/")[4])
-        world = client.get_world()
+        world = client.get_world()        
 #        print(world)
 #        world = client.get_world()
         # 3.1 Retrieve blueprint
@@ -250,6 +260,7 @@ def main():
         # 3. Retrieve world from CARLA simulation
 #        world = client.load_world("Town01")
         world = client.get_world()
+        map_name = world.get_map().name
 #        world = client.load_world(random.choice(client.get_available_maps()).split("/")[4])
         # 3.1 Retrieve blueprint
         blueprint_library = world.get_blueprint_library()
@@ -286,7 +297,8 @@ def main():
         actor_list.append(test_agent)
         # 7.2 Spawn sensor, attach to test vehicle
         test_cam = world.try_spawn_actor(test_cam_bp, transform_2, attach_to=test_agent)
-        test_cam.listen(lambda image: process_img(image))
+#        test_cam.listen(lambda image: process_img(image))
+        test_cam.listen(lambda image: process_img_town(map_name, image))               
         actor_list.append(test_cam) 
         
         print('spawned %d test agents' % len(actor_list))

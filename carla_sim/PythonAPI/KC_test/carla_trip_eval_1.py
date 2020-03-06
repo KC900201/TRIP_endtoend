@@ -89,10 +89,11 @@ def spawn_npc():
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
         
         # 3. Retrieve world from CARLA simulation        
-#        world = client.load_world(random.choice(client.get_available_maps()).split("/")[4])
-        world = client.get_world()
-#        print(world)
+        world = client.load_world(random.choice(client.get_available_maps()).split("/")[4])
+#        world = client.load_world("Town07")
+        print(world.get_map().name)
 #        world = client.get_world()
+#        print(world)
         # 3.1 Retrieve blueprint
         blueprint_library = world.get_blueprint_library()
 
@@ -131,7 +132,8 @@ def spawn_npc():
                 blueprint.set_attribute('driver_id', driver_id)
             blueprint.set_attribute('role_name', 'autopilot')
             vehicle = world.try_spawn_actor(blueprint, transform)
-            vehicle.set_autopilot(True)
+            #vehicle.set_autopilot(True)
+            vehicle.set_autopilot(enabled=True)
             vehicle_list.append(vehicle)            
         # ----------------------
         # 6.2 Spawn NPC walkers    
