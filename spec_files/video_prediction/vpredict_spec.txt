@@ -11,9 +11,6 @@ model_param_file: model_tbox_param10.txt
 window_size: 10
 #window_size: 5
 v_model_param_file: risk_prediction/model_tbox_param_bg_gn5.txt
-#plog_path: result/yolov3/dashcam/dashcam_test1_tlog.txt
-#plog_path: result/yolov3/dashcam/dashcam_bg_gn_test0_tlog.txt
-#plog_path: result/yolov3/dashcam/dashcam_test0_elog_20191225.txt
 #plog_path: result/yolov3/dashcam/dashcam_test0_elog_20200114.txt
 #plog_path: result/yolov3/dashcam/dashcam_vtrain1_elog_20200114.txt
 #plog_path: result/yolov3/dashcam/dashcam_mtest1_elog_20200114.txt

@@ -88,5 +88,12 @@ Updates
 2020/02/24 - Modify spawn walker code
 2020/02/25 - Edit src code to fix camera angle, spawn actors. Further improve walker npc (test_2.py) 
 2020/03/02 - Predict maximum risk function in between n frames (trip_lstm.py)
+	     Disable random world generation, set minimum no. of spawn NPCs (carla_trip_eval_1.py, carla_trip_eval_2.py)
+	     New evaluation src code (carla_trip_evaluation.py)
+2020/03/03 - New function to measure maximum predicted risk (trip_lstm.py, trip_vpredictor.py)
+2020/03/04 - Update csv data files and excel for predicted risk record
+2020/03/06 - src code update (carla_trip_eval_1.py, carla_trip_eval_2.py)
+
+	     
 
 

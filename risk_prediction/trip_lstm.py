@@ -94,10 +94,13 @@ class TripLSTM(Chain):
             v = Variable(self.xp.array(x[t], dtype=self.xp.float32))
             h = self(v)
             r = F.sigmoid(self.ho(h))
-            if r > max_r:
+            if t == 0:
                 max_r = r
             else:
-                max_r = max_r
+                if r.data > max_r.data:
+                    max_r = r
+                else:
+                    max_r = max_r
         return max_r
     #
     def comparative_loss(self, ra, rc, rel, margin=0.05):

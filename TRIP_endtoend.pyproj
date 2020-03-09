@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{b57b2640-9936-4bd4-b586-92cd2040eaae}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>carla_sim\PythonAPI\KC_test\trial_1.py</StartupFile>
+    <StartupFile>risk_prediction\main_trip_vpredictor.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -38,9 +38,6 @@
     <Content Include="carla_sim\HDMaps\README" />
     <Content Include="carla_sim\HDMaps\Town01.pcd" />
     <Content Include="carla_sim\HDMaps\Town02.pcd" />
-    <Content Include="carla_sim\PythonAPI\carla\dist\carla-0.9.7-py3.7-win-amd64.egg" />
-    <Content Include="carla_sim\PythonAPI\carla\requirements.txt" />
-    <Content Include="carla_sim\PythonAPI\examples\requirements.txt" />
     <Content Include="carla_sim\PythonAPI\util\requirements.txt" />
     <Content Include="estimation\Readme.txt" />
     <Content Include="readme.txt" />
@@ -89,42 +86,8 @@
     <Content Include="spec_files\video_prediction\prediction_v3_1_tbox_spec.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\agent.py" />
-    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\basic_agent.py" />
-    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\controller.py" />
-    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\global_route_planner.py" />
-    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\global_route_planner_dao.py" />
-    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\local_planner.py" />
-    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\roaming_agent.py" />
-    <Compile Include="carla_sim\PythonAPI\carla\agents\navigation\__init__.py" />
-    <Compile Include="carla_sim\PythonAPI\carla\agents\tools\misc.py" />
-    <Compile Include="carla_sim\PythonAPI\carla\agents\tools\__init__.py" />
-    <Compile Include="carla_sim\PythonAPI\carla\agents\__init__.py" />
-    <Compile Include="carla_sim\PythonAPI\carla\scene_layout.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\automatic_control.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\dynamic_weather.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\manual_control.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\manual_control_steeringwheel.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\no_rendering_mode.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\show_recorder_actors_blocked.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\show_recorder_collisions.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\show_recorder_file_info.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\spawn_npc.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\start_recording.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\start_replaying.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\synchronous_mode.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\tensorflow_self_check.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\tutorial.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\tutorialv2.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\tutorialv3.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\tutorialv5.py" />
-    <Compile Include="carla_sim\PythonAPI\examples\vehicle_gallery.py" />
-    <Compile Include="carla_sim\PythonAPI\KC_test\test_1.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="carla_sim\PythonAPI\KC_test\trial_1.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="carla_sim\PythonAPI\KC_test\carla_trip_eval_1.py" />
+    <Compile Include="carla_sim\PythonAPI\KC_test\carla_trip_eval_2.py" />
     <Compile Include="carla_sim\PythonAPI\util\lane_explorer.py" />
     <Compile Include="carla_sim\PythonAPI\util\performance_benchmark.py" />
     <Compile Include="carla_sim\PythonAPI\util\test_connection.py" />
@@ -190,11 +153,6 @@
     <Folder Include="carla_sim\HDMaps\" />
     <Folder Include="carla_sim\PythonAPI\" />
     <Folder Include="carla_sim\PythonAPI\carla\" />
-    <Folder Include="carla_sim\PythonAPI\carla\agents\" />
-    <Folder Include="carla_sim\PythonAPI\carla\agents\navigation\" />
-    <Folder Include="carla_sim\PythonAPI\carla\agents\tools\" />
-    <Folder Include="carla_sim\PythonAPI\carla\dist\" />
-    <Folder Include="carla_sim\PythonAPI\examples\" />
     <Folder Include="carla_sim\PythonAPI\KC_test\" />
     <Folder Include="carla_sim\PythonAPI\util\" />
     <Folder Include="estimation" />

@@ -21,6 +21,7 @@ Date          Comment
 02282020      Fix saving image (images.save_to_disk) - original format,
               Fix NPC spawn amount <= total amt of available spawn points
 02292020      Separate spawn NPC and spawn test agent functions (spawn_NPC)
+03092020      Apply TRIP risk prediction function in CARLA sensor
 """
 import sys
 import glob
@@ -65,6 +66,13 @@ def process_img(image):
     # save image
     image.save_to_disk('_out/%08d' % image.frame) # 02282020
     return i3 / 255.0
+
+def predict_risk_img(image):
+    i = np.array(image.raw_data)
+    i2 = i.reshape((IMAGE_HEIGHT, IMAGE_WIDTH, 4))
+    i3 = i2[:, :, :3] # height, width, first 3 rgb value
+    cv2.imshow("", i3)
+    cv2.waitKey(2) # delay 2 seconds
 
 # Start recording function
 def start_replay():
