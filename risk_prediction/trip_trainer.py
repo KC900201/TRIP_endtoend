@@ -18,7 +18,7 @@ Date          Comment
 12182019      Modify function to evaluate accuracy increase at 25th epoch
 12232019      Remodify function to reduce accuracy value
 01092020      Add in one features to extract only wanted feature files (skip interval)
-03092020      Include predic_max_risk() method in evaluation
+03092020      Include predict_max_risk() method in evaluation
 """
 
 import chainer
@@ -486,8 +486,8 @@ class TripTrainer(object):
                 r1 = self.model.predict_mean_risk(input_feature_seq1)
                 r2 = self.model.predict_mean_risk(input_feature_seq2)
             elif self.risk_type == 'seq_max_risk': #03092020
-                r1 = self.model.predict_max_risk(input_feature_seq1)
-                r2 = self.model.predict_max_risk(input_feature_seq2)
+                r1 = self.model.predict_max_risk_2(input_feature_seq1)
+                r2 = self.model.predict_max_risk_2(input_feature_seq2)
             # compute comparative loss
             rel = self.compare_risk_level(train_batch1, train_batch2, self.train_risk1, self.train_risk2)
             batch_loss = self.model.comparative_loss(r1, r2, rel, self.comparative_loss_margin)
@@ -577,8 +577,8 @@ class TripTrainer(object):
                 r1 = self.model.predict_mean_risk(input_feature_seq1)
                 r2 = self.model.predict_mean_risk(input_feature_seq2)
             elif self.risk_type == 'seq_max_risk': #03092020
-                r1 = self.model.predict_max_risk(input_feature_seq1)
-                r2 = self.model.predict_max_risk(input_feature_seq2)
+                r1 = self.model.predict_max_risk_2(input_feature_seq1)
+                r2 = self.model.predict_max_risk_2(input_feature_seq2)
             # compute comparative loss
             rel = self.compare_risk_level(train_batch1, train_batch2, self.mtrain_risk1, self.mtrain_risk2)
             batch_loss = self.model.comparative_loss(r1, r2, rel, self.comparative_loss_margin)
@@ -671,8 +671,8 @@ class TripTrainer(object):
                 r1 = self.model.predict_mean_risk(input_feature_seq1)
                 r2 = self.model.predict_mean_risk(input_feature_seq2)
             elif self.risk_type == 'seq_max_risk': #03092020
-                r1 = self.model.predict_max_risk(input_feature_seq1)
-                r2 = self.model.predict_max_risk(input_feature_seq2)
+                r1 = self.model.predict_max_risk_2(input_feature_seq1)
+                r2 = self.model.predict_max_risk_2(input_feature_seq2)
             # compute comparative loss
             rel = self.compare_risk_level(train_batch1, train_batch2, self.train_risk1, self.train_risk2)
             batch_loss = self.model.comparative_loss(r1, r2, rel, self.comparative_loss_margin)
@@ -738,8 +738,8 @@ class TripTrainer(object):
                 r1 = self.model.predict_mean_risk(input_feature_seq1)
                 r2 = self.model.predict_mean_risk(input_feature_seq2)
             elif self.risk_type == 'seq_max_risk': #03092020
-                r1 = self.model.predict_max_risk(input_feature_seq1)
-                r2 = self.model.predict_max_risk(input_feature_seq2)
+                r1 = self.model.predict_max_risk_2(input_feature_seq1)
+                r2 = self.model.predict_max_risk_2(input_feature_seq2)
             # compute comparative loss
             rel = self.compare_risk_level(train_batch1, train_batch2, self.vtrain_risk1, self.vtrain_risk2)
             batch_loss = self.model.comparative_loss(r1, r2, rel, self.comparative_loss_margin)
@@ -829,8 +829,8 @@ class TripTrainer(object):
                 r1 = self.model.predict_mean_risk(input_feature_seq1)
                 r2 = self.model.predict_mean_risk(input_feature_seq2)
             elif self.risk_type == 'seq_max_risk': #03092020
-                r1 = self.model.predict_max_risk(input_feature_seq1)
-                r2 = self.model.predict_max_risk(input_feature_seq2)
+                r1 = self.model.predict_max_risk_2(input_feature_seq1)
+                r2 = self.model.predict_max_risk_2(input_feature_seq2)
             # compute comparative loss
             rel = self.compare_risk_level(train_batch1, train_batch2, self.vtrain_risk1, self.vtrain_risk2)
             batch_loss = self.model.comparative_loss(r1, r2, rel, self.comparative_loss_margin)
@@ -980,8 +980,8 @@ class TripTrainer(object):
                     r1 = self.model.predict_mean_risk(input_feature_seq1)
                     r2 = self.model.predict_mean_risk(input_feature_seq2)
                 elif self.risk_type == 'seq_max_risk': #03092020
-                    r1 = self.model.predict_max_risk(input_feature_seq1)
-                    r2 = self.model.predict_max_risk(input_feature_seq2)
+                    r1 = self.model.predict_max_risk_2(input_feature_seq1)
+                    r2 = self.model.predict_max_risk_2(input_feature_seq2)
                 rel = self.compare_risk_level(sample1, sample2, risk1, risk2) # a numpy array each element of which is one of {[1], [-1], [0]}
                 rd1 = cuda.to_cpu(r1.data)
                 rd2 = cuda.to_cpu(r2.data)
@@ -1052,8 +1052,8 @@ class TripTrainer(object):
                     r1 = self.model.predict_mean_risk(input_feature_seq1)
                     r2 = self.model.predict_mean_risk(input_feature_seq2)
                 elif self.risk_type == 'seq_max_risk': #03092020
-                    r1 = self.model.predict_max_risk(input_feature_seq1)
-                    r2 = self.model.predict_max_risk(input_feature_seq2)
+                    r1 = self.model.predict_max_risk_2(input_feature_seq1)
+                    r2 = self.model.predict_max_risk_2(input_feature_seq2)
                 rel = self.compare_risk_level(sample1, sample2, risk1, risk2) # a numpy array each element of which is one of {[1], [-1], [0]}
                 rd1 = cuda.to_cpu(r1.data)
                 rd2 = cuda.to_cpu(r2.data)
@@ -1124,8 +1124,8 @@ class TripTrainer(object):
                     r1 = self.model.predict_mean_risk(input_feature_seq1)
                     r2 = self.model.predict_mean_risk(input_feature_seq2)
                 elif self.risk_type == 'seq_max_risk': #03092020
-                    r1 = self.model.predict_max_risk(input_feature_seq1)
-                    r2 = self.model.predict_max_risk(input_feature_seq2)
+                    r1 = self.model.predict_max_risk_2(input_feature_seq1)
+                    r2 = self.model.predict_max_risk_2(input_feature_seq2)
                 rel = self.compare_risk_level(sample1, sample2, risk1, risk2) # a numpy array each element of which is one of {[1], [-1], [0]}
                 rd1 = cuda.to_cpu(r1.data)
                 rd2 = cuda.to_cpu(r2.data)

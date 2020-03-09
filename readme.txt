@@ -93,6 +93,7 @@ Updates
 2020/03/03 - New function to measure maximum predicted risk (trip_lstm.py, trip_vpredictor.py)
 2020/03/04 - Update csv data files and excel for predicted risk record
 2020/03/06 - src code update (carla_trip_eval_1.py, carla_trip_eval_2.py)
+2020/03/09 - New predict_max_risk() method for risk prediction experiment (trip_lstm.py, trip_trainer.py)
 
 	     
 
