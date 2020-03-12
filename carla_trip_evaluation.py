@@ -44,8 +44,8 @@ except IndexError:
 import carla
 
 # Import TRIP module - video prediction
-from risk_prediction.trip_vpredictor import TripVPredictor 
-from risk_prediction.trip_predictor import TripPredictor
+from risk_prediction.trip_vpredictor_carla import TripVPredictorCarla 
+from risk_prediction.trip_predictor_carla import TripPredictorCarla
 
 IMAGE_WIDTH = 1280
 IMAGE_HEIGHT = 960
@@ -97,9 +97,10 @@ def spawn_npc():
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
         
         # 3. Retrieve world from CARLA simulation        
-#        world = client.load_world(random.choice(client.get_available_maps()).split("/")[4])
-        world = client.get_world()
-#        print(world)
+#        world = client.load_world(random.choice(client.get_available_maps()).split("/")[4])            
+#        world = client.get_world()
+        world = client.load_world('Town01')
+        print(world.get_map().name)
 #        world = client.get_world()
         # 3.1 Retrieve blueprint
         blueprint_library = world.get_blueprint_library()
@@ -314,8 +315,8 @@ def main():
 if __name__ == '__main__':
     try:
         # Run main method
-#        spawn_npc()
-        main()
+        spawn_npc()
+#        main()
 #        start_replay()
     except KeyboardInterrupt:
         pass
