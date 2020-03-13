@@ -31,6 +31,7 @@ import random
 import numpy as np
 import logging
 import time
+import argparse
 
 try:
     sys.path.append(glob.glob(r'CARLA_0.9.7_project/PythonAPI/carla/dist/carla-*%d.%d-%s.egg' % (
@@ -44,8 +45,10 @@ except IndexError:
 import carla
 
 # Import TRIP module - video prediction
-from risk_prediction.trip_vpredictor_carla import TripVPredictorCarla 
-from risk_prediction.trip_predictor_carla import TripPredictorCarla
+#from risk_prediction.trip_vpredictor_carla import TripVPredictorCarla 
+#from risk_prediction.trip_predictor_carla import TripPredictorCarla
+from estimation.dataset_generator.dataset_generator_function import DatasetGenerator
+from estimation.dataset_generator.object_detector import ObjectDetector
 
 IMAGE_WIDTH = 1280
 IMAGE_HEIGHT = 960
@@ -67,12 +70,44 @@ def process_img(image):
     image.save_to_disk('_out/%08d' % image.frame) # 02282020
     return i3 / 255.0
 
+def generate_dataset(image):
+    parser = argparse.ArgumentParser(description='dataset_maker')
+    parser.add_argument('--object_model_type', choices=('yolo_v2', 'yolo_v3'), default='yolo_v3')
+    parser.add_argument('--object_model_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\accident_KitDashV_6000.npz')
+    parser.add_argument('--object_label_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\obj.names') # must be specified other than 'coco' and 'voc'    
+    parser.add_argument('--object_cfg_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\yolo-obj.cfg')
+    parser.add_argument('--object_detection_threshold', type=float, default=0.1)
+    parser.add_argument('--gpu', type=int, default=0)
+    parser.add_argument('--save_img', type=bool, default=True, help='save_img option')
+    parser.add_argument('--video', type=bool, default=False, help='video option')
+    parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='input directory')
+    parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='directory where the dataset will be created')
+    parser.add_argument('--layer_name_list', default='conv33,conv39,conv45', help='list of hidden layers name to extract features')
+    args = parser.parse_args()
+    output_dir = args.output_dir
+    
+    # Process spatio-temporal information for captured image
+    yolov3_predictor = ObjectDetector(args.object_model_type, args.object_model_path, 
+                                     args.object_label_path, args.object_cfg_path, args.object_detection_threshold,
+                                     device=args.gpu)    
+    orig_img = image
+    img_h, img_w = image.shape[:2]
+
+    bboxes, labels, scores, layer_ids, features = yolov3_predictor(orig_img)
+    DatasetGenerator.save_images(orig_img, bboxes, output_dir, image.frame) #10182019
+    DatasetGenerator.save_feature(features, output_dir, image.frame+'.npz')    
+    DatasetGenerator.save_ebox(bboxes, labels, layer_ids, img_h, img_w, output_dir, 'e'+image.frame+'.txt') #10182019
+
 def predict_risk_img(image):
+    # Process image
     i = np.array(image.raw_data)
     i2 = i.reshape((IMAGE_HEIGHT, IMAGE_WIDTH, 4))
     i3 = i2[:, :, :3] # height, width, first 3 rgb value
     cv2.imshow("", i3)
     cv2.waitKey(2) # delay 2 seconds
+    # save image
+    generate_dataset(image)
+    return i3 / 255.0
 
 # Start recording function
 def start_replay():
@@ -91,7 +126,7 @@ def spawn_npc():
     try:
         # 1. Set up CARLA client connection
         client = carla.Client('localhost', 2000)
-        client.set_timeout(4.0)
+        client.set_timeout(5.0)
         
         # 2. Start logging
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
@@ -295,7 +330,8 @@ def main():
         actor_list.append(test_agent)
         # 7.2 Spawn sensor, attach to test vehicle
         test_cam = world.try_spawn_actor(test_cam_bp, transform_2, attach_to=test_agent)
-        test_cam.listen(lambda image: process_img(image))
+#        test_cam.listen(lambda image: process_img(image))
+        test_cam.listen(lambda image: predict_risk_img(image))
         actor_list.append(test_cam) 
         
         print('spawned %d test agents' % len(actor_list))
