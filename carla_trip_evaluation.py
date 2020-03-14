@@ -312,6 +312,19 @@ def spawn_motorbike():
         # 2. Start logging
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
+        # 6 Spawn NPC agents in environment
+        blueprint_library = world.get_blueprint_library()
+        npc_vehicle_bp = blueprint_library.filter('vehicle.*')
+
+        # Avoid spawning NPC prone to accident
+        npc_vehicle_bp = [x for x in npc_vehicle_bp if int(x.get_attribute('number_of_wheels')) == 2]
+        npc_vehicle_bp = [x for x in npc_vehicle_bp if not x.id.endswith('bike')]
+        npc_vehicle_bp = [x for x in npc_vehicle_bp if not x.id.endswith('isetta')]
+        npc_vehicle_bp = [x for x in npc_vehicle_bp if not x.id.endswith('carlacola')]
+
+
+
+
     finally:
         print("\nDestroying %d vehicles" % len(vehicle_list))
         client.apply_batch_sync([carla.command.DestroyActor(x) for x in vehicle_list])
@@ -324,6 +337,43 @@ def spawn_bicycle():
         
         # 2. Start logging
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+
+        # 3. Retrieve world from CARLA simulation        
+        world = client.get_world()
+        print(world.get_map().name)
+        # 3.1 Retrieve blueprint
+        blueprint_library = world.get_blueprint_library()
+
+        # ---------------------
+        # 6.1 Spawn NPC vehicle    
+        # ---------------------
+        spawn_points = world.get_map().get_spawn_points()
+        num_spawn_points = len(spawn_points)
+        #npc_amt = NPC_AMT
+        npc_amt = random.randint(100, num_spawn_points) # 02282020 #03022020 (minimum no of NPC vehicles = 100)
+        
+        if npc_amt <= num_spawn_points:
+            random.shuffle(spawn_points)
+        elif npc_amt > num_spawn_points:
+            msg = 'Requested %d vehicles, but could only find %d spawn points'
+            logging.warning(msg, npc_amt, num_spawn_points)
+            print('Requested %d vehicles, but could only find %d spawn points' % (npc_amt, num_spawn_points))
+            npc_amt = int(num_spawn_points / 2)  # Assign half number of spawn points to NPC to prevent spawning error
+        
+        for n, transform in enumerate(spawn_points):
+            if n >= npc_amt:
+                break
+            blueprint = random.choice(npc_vehicle_bp)
+            if blueprint.has_attribute('color'):
+                color = random.choice(blueprint.get_attribute('color').recommended_values)
+                blueprint.set_attribute('color', color)
+            if blueprint.has_attribute('driver_id'):
+                driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
+                blueprint.set_attribute('driver_id', driver_id)
+            blueprint.set_attribute('role_name', 'autopilot')
+            vehicle = world.try_spawn_actor(blueprint, transform)
+            vehicle.set_autopilot(True)
+            vehicle_list.append(vehicle)            
 
     finally:
         print("\nDestroying %d vehicles" % len(vehicle_list))
