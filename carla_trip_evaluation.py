@@ -22,6 +22,8 @@ Date          Comment
               Fix NPC spawn amount <= total amt of available spawn points
 02292020      Separate spawn NPC and spawn test agent functions (spawn_NPC)
 03092020      Apply TRIP risk prediction function in CARLA sensor
+03132020      Apply TRIP dataset generation function in CARLA sensor
+03142020      Create diverse spawn NPC functions according to vehicle class: car, motorbike, 
 """
 import sys
 import glob
@@ -47,8 +49,8 @@ import carla
 # Import TRIP module - video prediction
 #from risk_prediction.trip_vpredictor_carla import TripVPredictorCarla 
 #from risk_prediction.trip_predictor_carla import TripPredictorCarla
-from estimation.dataset_generator.dataset_generator_function import DatasetGenerator
-from estimation.dataset_generator.object_detector import ObjectDetector
+from estimation.dataset_generator.dataset_generator_function import DatasetGenerator # 03132020
+from estimation.dataset_generator.object_detector import ObjectDetector # 03132020
 
 IMAGE_WIDTH = 1280
 IMAGE_HEIGHT = 960
@@ -70,6 +72,7 @@ def process_img(image):
     image.save_to_disk('_out/%08d' % image.frame) # 02282020
     return i3 / 255.0
 
+# 03132020
 def generate_dataset(image):
     parser = argparse.ArgumentParser(description='dataset_maker')
     parser.add_argument('--object_model_type', choices=('yolo_v2', 'yolo_v3'), default='yolo_v3')
@@ -106,7 +109,7 @@ def predict_risk_img(image):
     cv2.imshow("", i3)
     cv2.waitKey(2) # delay 2 seconds
     # save image
-    generate_dataset(image)
+    generate_dataset(image) # 03132020
     return i3 / 255.0
 
 # Start recording function
@@ -120,7 +123,225 @@ def start_replay():
     
     finally:
         pass    
-    
+ 
+# Spawn Pedestrian - 03142020
+def spawn_walker():
+    try:
+        # 1. Set up CARLA client connection
+        client = carla.Client('localhost', 2000)
+        client.set_timeout(3.0)
+
+        # 2. Start logging
+        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+        
+        # 3. Retrieve world from CARLA simulation        
+        world = client.get_world()
+        print(world.get_map().name)
+        # 3.1 Retrieve blueprint
+        blueprint_library = world.get_blueprint_library()
+        npc_walker_bp = blueprint_library.filter('walker.pedestrian.*')
+        # ----------------------
+        # 4 Spawn NPC walkers    
+        # ----------------------
+        # some settings
+        percentagePedestriansRunning = 5.0      # how many pedestrians will run
+        percentagePedestriansCrossing = 10.0     # how many pedestrians will walk through the road
+        # 4.1 take all random locations to spawn
+        spawn_points = world.get_map().get_spawn_points()
+        num_spawn_points = len(spawn_points)
+        npc_walker_amt = random.randint(100, num_spawn_points) 
+        
+        if npc_walker_amt <= num_spawn_points:
+            random.shuffle(spawn_points)
+        elif npc_walker_amt > num_spawn_points:
+            msg = 'Requested %d walkers, but could only find %d spawn points'
+            logging.warning(msg, npc_walker_amt, num_spawn_points)
+            print('Requested %d walkers, but could only find %d spawn points' % (npc_amt, num_spawn_points))
+            npc_walker_amt = int(num_spawn_points / 2)
+
+        spawn_points = []
+        for i in range(npc_walker_amt):
+            spawn_point = carla.Transform()
+            loc = world.get_random_location_from_navigation()
+            if (loc != None):
+                spawn_point.location = loc
+                spawn_points.append(spawn_point)
+
+        # 6.2.2 spawn walker object
+        batch = []
+        walker_speed = []
+        for spawn_point in spawn_points:
+            walker_bp = random.choice(npc_walker_bp)
+            # set as not invincible
+            if walker_bp.has_attribute('is_invincible'):
+                walker_bp.set_attribute('is_invincible', 'false')
+            # set max speed
+            if walker_bp.has_attribute('speed'):
+                if(random.random() > percentagePedestriansRunning):
+                    # walking
+                    walker_speed.append(walker_bp.get_attribute('speed').recommended_values[1])
+                else:
+                    # running
+                    walker_speed.append(walker_bp.get_attribute('speed').recommended_values[2])
+            else:
+                print("Walker has no speed")
+                walker_speed.append(0.0)
+            batch.append(carla.command.SpawnActor(walker_bp, spawn_point))
+        results = client.apply_batch_sync(batch, True)
+        walker_speed2 = []
+        for i in range(len(results)):
+            if results[i].error:
+                logging.error(results[i].error)
+            else:
+                walker_list.append({"id": results[i].actor_id})
+                walker_speed2.append(walker_speed[i])
+        walker_speed = walker_speed2
+        # 6.2.3 spawn walker controller
+        batch = []
+        walker_controller_bp = world.get_blueprint_library().find('controller.ai.walker')
+        for i in range(len(walker_list)):
+            batch.append(carla.command.SpawnActor(walker_controller_bp, carla.Transform(), walker_list[i]["id"]))
+        results = client.apply_batch_sync(batch, True)
+        for i in range(len(results)):
+            if results[i].error:
+                logging.error(results[i].error)
+            else:
+                walker_list[i]["con"] = results[i].actor_id
+        # 6.2.4 we put altogether the walkers and controllers id to get the objects from their id
+        for i in range(len(walker_list)):
+            all_id.append(walker_list[i]["con"])
+            all_id.append(walker_list[i]["id"])
+        all_actors = world.get_actors(all_id)
+
+        # 6.2.5 initialize each controller and set target to walk to (list is [controler, actor, controller, actor ...])
+        # set how many pedestrians can cross the road
+        world.set_pedestrians_cross_factor(percentagePedestriansCrossing)
+        for i in range(0, len(all_id), 2):
+            # start walker
+            all_actors[i].start()
+            # set walk to random point
+            all_actors[i].go_to_location(world.get_random_location_from_navigation())
+            # max speed
+            all_actors[i].set_max_speed(float(walker_speed[int(i/2)]))
+        
+        print('Spawned %d walkers, press Ctrl+C to exit.' % len(walker_list))
+        
+        world.wait_for_tick()
+
+        while True:
+            world.wait_for_tick() # wait for world to get actors
+            time.sleep(1)
+
+    finally:        
+        # stop walker controllers (list is [controller, actor, controller, actor ...])
+        for i in range(0, len(all_id), 2):
+            all_actors[i].stop()
+        
+        print("\nDestroying %d walkers" % len(walker_list))
+        client.apply_batch_sync([carla.command.DestroyActor(x) for x in all_id])
+
+# Spawn Car - 03142020
+def spawn_car():
+    try:
+        # 1. Set up CARLA client connection
+        client = carla.Client('localhost', 2000)
+        client.set_timeout(5.0)
+
+        # 2. Start logging
+        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+
+        # 3. Retrieve world from CARLA simulation        
+        world = client.get_world()
+        print(world.get_map().name)
+        # 3.1 Retrieve blueprint
+        blueprint_library = world.get_blueprint_library()
+
+        # 6 Spawn NPC agents in environment
+        npc_vehicle_bp = blueprint_library.filter('vehicle.*')
+        # Sort out blueprint (car)
+        npc_vehicle_bp = [x for x in npc_vehicle_bp if int(x.get_attribute('number_of_wheels')) == 4]
+        npc_vehicle_bp = [x for x in npc_vehicle_bp if not x.id.endswith('carlacola')]
+        # ---------------------
+        # 6.1 Spawn NPC vehicle    
+        # ---------------------
+        spawn_points = world.get_map().get_spawn_points()
+        num_spawn_points = len(spawn_points)
+        npc_amt = random.randint(100, num_spawn_points) # 02282020 #03022020 (minimum no of NPC vehicles = 100)
+
+        if npc_amt <= num_spawn_points:
+            random.shuffle(spawn_points)
+        elif npc_amt > num_spawn_points:
+            msg = 'Requested %d vehicles, but could only find %d spawn points'
+            logging.warning(msg, npc_amt, num_spawn_points)
+            print('Requested %d vehicles, but could only find %d spawn points' % (npc_amt, num_spawn_points))
+            npc_amt = int(num_spawn_points / 2)  # Assign half number of spawn points to NPC to prevent spawning error
+
+        for n, transform in enumerate(spawn_points):
+            if n >= npc_amt:
+                break
+            blueprint = random.choice(npc_vehicle_bp)
+            if blueprint.has_attribute('color'):
+                color = random.choice(blueprint.get_attribute('color').recommended_values)
+                blueprint.set_attribute('color', color)
+            if blueprint.has_attribute('driver_id'):
+                driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
+                blueprint.set_attribute('driver_id', driver_id)
+            blueprint.set_attribute('role_name', 'autopilot')
+            vehicle = world.try_spawn_actor(blueprint, transform)
+            vehicle.set_autopilot(True)
+            vehicle_list.append(vehicle)            
+
+        print('Spawned %d vehicles, press Ctrl+C to exit.' % len(vehicle_list))
+        
+        world.wait_for_tick()
+
+        while True:
+            world.wait_for_tick() # wait for world to get actors
+            time.sleep(1)
+
+    finally:
+        print("\nDestroying %d vehicles" % len(vehicle_list))
+        client.apply_batch_sync([carla.command.DestroyActor(x) for x in vehicle_list])
+
+def spawn_motorbike():
+    try:
+        # 1. Set up CARLA client connection
+        client = carla.Client('localhost', 2000)
+        client.set_timeout(5.0)
+        
+        # 2. Start logging
+        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+
+    finally:
+        print("\nDestroying %d vehicles" % len(vehicle_list))
+        client.apply_batch_sync([carla.command.DestroyActor(x) for x in vehicle_list])
+
+def spawn_bicycle():
+    try:
+        # 1. Set up CARLA client connection
+        client = carla.Client('localhost', 2000)
+        client.set_timeout(5.0)
+        
+        # 2. Start logging
+        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+
+    finally:
+        print("\nDestroying %d vehicles" % len(vehicle_list))
+        client.apply_batch_sync([carla.command.DestroyActor(x) for x in vehicle_list])
+
+def spawn_lorry():
+    try:
+        # 1. Set up CARLA client connection
+        client = carla.Client('localhost', 2000)
+        client.set_timeout(5.0)
+        
+        # 2. Start logging
+        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+
+    finally:
+        print("\nDestroying %d vehicles" % len(vehicle_list))
+        client.apply_batch_sync([carla.command.DestroyActor(x) for x in vehicle_list])
+
 # Spawn NPC function - 02292020
 def spawn_npc():
     try:
