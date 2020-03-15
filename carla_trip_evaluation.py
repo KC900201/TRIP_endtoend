@@ -388,9 +388,9 @@ def spawn_bicycle():
 
         # Avoid spawning NPC prone to accident
         npc_vehicle_bp = [x for x in npc_vehicle_bp if int(x.get_attribute('number_of_wheels')) == 2]
-        npc_vehicle_bp = [x for x in npc_vehicle_bp if x.id.endswith('bike')]
-        npc_vehicle_bp = [x for x in npc_vehicle_bp if x.id.endswith('century')]
-        npc_vehicle_bp = [x for x in npc_vehicle_bp if x.id.endswith('omafiets')]
+        npc_vehicle_bp = [x for x in npc_vehicle_bp if x.id.endswith('bike') or x.id.endswith('bike') or x.id.endswith('omafiets')]
+#        npc_vehicle_bp = [x for x in npc_vehicle_bp if x.id.endswith('century')]
+#        npc_vehicle_bp = [x for x in npc_vehicle_bp if x.id.endswith('omafiets')]
 
         # ---------------------
         # 6.1 Spawn NPC vehicle    
@@ -681,7 +681,8 @@ if __name__ == '__main__':
 #        spawn_npc()
 #        spawn_walker()
 #        spawn_car()
-        spawn_motorbike()
+#        spawn_motorbike()
+        spawn_bicycle()
 #        main()
 #        start_replay()
     except KeyboardInterrupt:
