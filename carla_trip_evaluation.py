@@ -49,8 +49,8 @@ import carla
 # Import TRIP module - video prediction
 #from risk_prediction.trip_vpredictor_carla import TripVPredictorCarla 
 #from risk_prediction.trip_predictor_carla import TripPredictorCarla
-from estimation.dataset_generator.dataset_generator_function import DatasetGenerator # 03132020
-from estimation.dataset_generator.object_detector import ObjectDetector # 03132020
+#from estimation.dataset_generator.dataset_generator_function import DatasetGenerator # 03132020
+#from estimation.dataset_generator.object_detector import ObjectDetector # 03132020
 
 IMAGE_WIDTH = 1280
 IMAGE_HEIGHT = 960
@@ -135,7 +135,8 @@ def spawn_walker():
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
         
         # 3. Retrieve world from CARLA simulation        
-        world = client.get_world()
+#        world = client.get_world()
+        world = client.load_world('Town04')
         print(world.get_map().name)
         # 3.1 Retrieve blueprint
         blueprint_library = world.get_blueprint_library()
@@ -251,7 +252,8 @@ def spawn_car():
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
         # 3. Retrieve world from CARLA simulation        
-        world = client.get_world()
+        world = client.load_world('Town01')
+#        world = client.get_world()
         print(world.get_map().name)
         # 3.1 Retrieve blueprint
         blueprint_library = world.get_blueprint_library()
@@ -461,7 +463,7 @@ def spawn_npc():
         # 3. Retrieve world from CARLA simulation        
 #        world = client.load_world(random.choice(client.get_available_maps()).split("/")[4])            
 #        world = client.get_world()
-        world = client.load_world('Town01')
+        world = client.load_world('Town05')
         print(world.get_map().name)
 #        world = client.get_world()
         # 3.1 Retrieve blueprint
@@ -678,11 +680,11 @@ def main():
 if __name__ == '__main__':
     try:
         # Run main method
-#        spawn_npc()
+        spawn_npc()
 #        spawn_walker()
 #        spawn_car()
 #        spawn_motorbike()
-        spawn_bicycle()
+#        spawn_bicycle()
 #        main()
 #        start_replay()
     except KeyboardInterrupt:
