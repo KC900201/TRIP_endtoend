@@ -23,7 +23,8 @@ Date          Comment
 02292020      Separate spawn NPC and spawn test agent functions (spawn_NPC)
 03092020      Apply TRIP risk prediction function in CARLA sensor
 03132020      Apply TRIP dataset generation function in CARLA sensor
-03142020      Create diverse spawn NPC functions according to vehicle class: car, motorbike, 
+03142020      Create diverse spawn NPC functions according to vehicle class: car, motorbike, walker, bicycle
+03202020      Code modification for TRIP module
 """
 import sys
 import glob
@@ -49,11 +50,11 @@ import carla
 # Import TRIP module - video prediction
 #from risk_prediction.trip_vpredictor_carla import TripVPredictorCarla 
 #from risk_prediction.trip_predictor_carla import TripPredictorCarla
-#from estimation.dataset_generator.dataset_generator_function import DatasetGenerator # 03132020
-#from estimation.dataset_generator.object_detector import ObjectDetector # 03132020
+from estimation.dataset_generator.dataset_generator_function import DatasetGenerator # 03132020
+from estimation.dataset_generator.object_detector import ObjectDetector # 03132020
 
 IMAGE_WIDTH = 1280
-IMAGE_HEIGHT = 960
+IMAGE_HEIGHT = 720
 
 # Create list of actors for test agent, NPC (vehicles, pedestrians)
 actor_list = []
@@ -72,36 +73,8 @@ def process_img(image):
     image.save_to_disk('_out/%08d' % image.frame) # 02282020
     return i3 / 255.0
 
-# 03132020
-def generate_dataset(image):
-    parser = argparse.ArgumentParser(description='dataset_maker')
-    parser.add_argument('--object_model_type', choices=('yolo_v2', 'yolo_v3'), default='yolo_v3')
-    parser.add_argument('--object_model_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\accident_KitDashV_6000.npz')
-    parser.add_argument('--object_label_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\obj.names') # must be specified other than 'coco' and 'voc'    
-    parser.add_argument('--object_cfg_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\yolo-obj.cfg')
-    parser.add_argument('--object_detection_threshold', type=float, default=0.1)
-    parser.add_argument('--gpu', type=int, default=0)
-    parser.add_argument('--save_img', type=bool, default=True, help='save_img option')
-    parser.add_argument('--video', type=bool, default=False, help='video option')
-    parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='input directory')
-    parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='directory where the dataset will be created')
-    parser.add_argument('--layer_name_list', default='conv33,conv39,conv45', help='list of hidden layers name to extract features')
-    args = parser.parse_args()
-    output_dir = args.output_dir
-    
-    # Process spatio-temporal information for captured image
-    yolov3_predictor = ObjectDetector(args.object_model_type, args.object_model_path, 
-                                     args.object_label_path, args.object_cfg_path, args.object_detection_threshold,
-                                     device=args.gpu)    
-    orig_img = image
-    img_h, img_w = image.shape[:2]
-
-    bboxes, labels, scores, layer_ids, features = yolov3_predictor(orig_img)
-    DatasetGenerator.save_images(orig_img, bboxes, output_dir, image.frame) #10182019
-    DatasetGenerator.save_feature(features, output_dir, image.frame+'.npz')    
-    DatasetGenerator.save_ebox(bboxes, labels, layer_ids, img_h, img_w, output_dir, 'e'+image.frame+'.txt') #10182019
-
-def predict_risk_img(image):
+# 03132020   
+def predict_risk_img(image, output_dir):
     # Process image
     i = np.array(image.raw_data)
     i2 = i.reshape((IMAGE_HEIGHT, IMAGE_WIDTH, 4))
@@ -109,7 +82,7 @@ def predict_risk_img(image):
     cv2.imshow("", i3)
     cv2.waitKey(2) # delay 2 seconds
     # save image
-    generate_dataset(image) # 03132020
+    image.save_to_disk(output_dir + '/test/orig_img/%08d' % image.frame)
     return i3 / 255.0
 
 # Start recording function
@@ -611,7 +584,11 @@ def main():
         # 1. Set up CARLA client connection
         client = carla.Client('localhost', 2000)
         client.set_timeout(4.0)
-        
+
+        parser = argparse.ArgumentParser(description='dataset_maker')
+        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='directory where the dataset will be created')
+        args = parser.parse_args()
+        output_dir = args.output_dir
         # 2. Start logging
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
         # 2.1
@@ -660,12 +637,13 @@ def main():
         # 7.2 Spawn sensor, attach to test vehicle
         test_cam = world.try_spawn_actor(test_cam_bp, transform_2, attach_to=test_agent)
 #        test_cam.listen(lambda image: process_img(image))
-        test_cam.listen(lambda image: predict_risk_img(image))
+        test_cam.listen(lambda image: predict_risk_img(image, output_dir))
         actor_list.append(test_cam) 
         
         print('spawned %d test agents' % len(actor_list))
         
         while True:
+            generate_data()
             world.wait_for_tick() # wait for world to get actors
             time.sleep(1)
         
@@ -676,16 +654,87 @@ def main():
         print("Stop recording")
         client.stop_recorder()
         print("\nAll cleaned up.")
-        
+
+# 03202020
+def generate_data():
+        # 1.1 Initialize TRIP module (dataset generator)
+        parser = argparse.ArgumentParser(description='dataset_maker')
+        parser.add_argument('--object_model_type', choices=('yolo_v2', 'yolo_v3'), default='yolo_v3')
+        parser.add_argument('--object_model_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\accident_KitDashV_6000.npz')
+        parser.add_argument('--object_label_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\obj.names') # must be specified other than 'coco' and 'voc'    
+        parser.add_argument('--object_cfg_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\yolo-obj.cfg')
+        parser.add_argument('--object_detection_threshold', type=float, default=0.1)
+        parser.add_argument('--gpu', type=int, default=0)
+        parser.add_argument('--save_img', type=bool, default=True, help='save_img option')
+        parser.add_argument('--video', type=bool, default=False, help='video option')
+        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='input directory')
+        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='directory where the dataset will be created')
+        parser.add_argument('--layer_name_list', default='conv33,conv39,conv45', help='list of hidden layers name to extract features')
+        args = parser.parse_args()
+        save_img = args.save_img
+        output_dir = args.output_dir
+        input_dir = args.input_dir
+        layer_name_list = args.layer_name_list.split(',')
+
+        # Process spatio-temporal information for captured image
+        yolov3_predictor = ObjectDetector(args.object_model_type, args.object_model_path, 
+                                         args.object_label_path, args.object_cfg_path, args.object_detection_threshold,
+                                     device=args.gpu)    
+        # Dataset generation
+        orig_input_dir = input_dir
+        orig_output_dir = output_dir
+        video_files = os.listdir(input_dir)
+        for video_file in video_files:
+            if video_file[-5:-2]>='0':                
+                print(video_file)
+                print('save %s feature...' % video_file)
+                input_dir = orig_input_dir + '/' + video_file + '/orig_img'
+                output_dir = orig_output_dir + '/' + video_file
+                # フォルダが無ければ新規作成 / Create a new folder if there is none previously
+                if not os.path.isdir(output_dir):
+                    os.makedirs(output_dir)
+                for layer in layer_name_list:
+                    if not os.path.isdir(os.path.join(output_dir, layer)):
+                        os.mkdir(os.path.join(output_dir, layer))
+                if save_img and not os.path.isdir(os.path.join(output_dir, 'img')):
+                    os.mkdir(os.path.join(output_dir, 'img'))
+                if not os.path.isdir(os.path.join(output_dir, 'ebox')):
+                    os.mkdir(os.path.join(output_dir, 'ebox'))
+
+                # 画像ファイルのリストを作成 / Create a list of image files
+                print('load image...')
+                file_list = os.listdir(input_dir)
+                img_files = [f for f in file_list if os.path.isfile(os.path.join(input_dir, f))]                
+                # 最初の画像を読み込み / Loading the first image
+                orig_img = cv2.imread(os.path.join(input_dir, img_files[0]))
+                # 基準となる画像の高さと幅を取得
+                img_h, img_w = orig_img.shape[:2]
+                # ファイル数分繰り返す / Repeat files for a few minutes 
+                for img_file in img_files:
+                     # 拡張子とファイル名を分ける / Separate file names from extensions
+                    file, ext = os.path.splitext(img_file)
+                    # 画像読み込み / load image
+                    orig_img = cv2.imread(os.path.join(input_dir, img_file))
+                    # サイズが異なる場合は変形してから入力 / If the size is different, deform and then enter
+                    if (img_h, img_w) != orig_img.shape[:2] :
+                        orig_img = cv2.resize(orig_img, (img_w, img_h))
+
+                    bboxes, labels, scores, layer_ids, features = yolov3_predictor(orig_img)    
+                    DatasetGenerator.save_images(orig_img, bboxes, output_dir, file) #10182019
+                    DatasetGenerator.save_feature(features, layer_name_list, output_dir, file+'.npz')    
+                    DatasetGenerator.save_ebox(bboxes, labels, layer_ids, img_h, img_w, output_dir, 'e'+file+'.txt')
+            # End Dataset generation
+
 if __name__ == '__main__':
     try:
         # Run main method
-        spawn_npc()
+#        spawn_npc()
 #        spawn_walker()
 #        spawn_car()
 #        spawn_motorbike()
 #        spawn_bicycle()
-#        main()
+        main()
+#        generate_data()
 #        start_replay()
     except KeyboardInterrupt:
         pass
