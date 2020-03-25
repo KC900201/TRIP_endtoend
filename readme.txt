@@ -94,6 +94,13 @@ Updates
 2020/03/04 - Update csv data files and excel for predicted risk record
 2020/03/06 - src code update (carla_trip_eval_1.py, carla_trip_eval_2.py)
 2020/03/09 - New predict_max_risk() method for risk prediction experiment (trip_lstm.py, trip_trainer.py)
+	     predict_max_risk_2() method during risk prediction training
+2020/03/12 - Import newly created video predictor src code (trip_vpredictor_carla.py) in carla_trip_evaluation src code
+2020/03/13 - Add in dataset generation code in CARLA evaluation code
+2020/03/14 - Function to spawn different vehicle classes in separate functions
+2020/03/15 - Update on CARLA src code
+2020/03/18 - Update src code for making result table (make_result_table_vpredict.py)
+
 
 	     
 
