@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{b57b2640-9936-4bd4-b586-92cd2040eaae}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>risk_prediction\main_trip_vpredictor.py</StartupFile>
+    <StartupFile>estimation\dataset_generator\dataset_generator_two.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
