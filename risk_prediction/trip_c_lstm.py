@@ -17,11 +17,13 @@ Date          Comment
 11012019    　Remove max_pooling at extra input middle conv layer to prevent data loss, insert dropout in between middle conv layer
 12182019      new model architecture function to test increasing accuracy
 12242019      new model architecture function that reverts ReLu and Tanh
+03252020      new model architecture (RRelu)
 """
 
 import chainer.functions as F
 import chainer.links as L
-from risk_prediction.trip_lstm import TripLSTM
+#from risk_prediction.trip_lstm import TripLSTM
+from trip_lstm import TripLSTM
 
 class TripCLSTM(TripLSTM):
     """A class of TRIP(Traffic Risk Prediction) model, which has a pooling layer on the input side
@@ -111,6 +113,19 @@ class TripCLSTM(TripLSTM):
             z = F.tanh(self.input(z))
             z = F.dropout(z, ratio=dropout_ratio)
         # end 12242019
+        # 03252020
+        elif self.model_arch == 'MP-C-RRL-SPP4-LSTM':
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.rrelu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.tanh(self.input(z))
+        elif self.model_arch == 'MP-C-RRL-SPP4-DO-LSTM'
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.rrelu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.tanh(self.input(z))
+            z = F.dropout(z, ratio=dropout_ratio)
+        # 03252020
         elif self.model_arch == 'DO-MP-C-SPP-FC-LSTM':
             z = F.dropout(x, ratio=dropout_ratio)
             z = F.max_pooling_2d(z, 2)
