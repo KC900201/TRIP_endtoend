@@ -53,7 +53,7 @@ import carla
 #from risk_prediction.trip_predictor_carla import TripPredictorCarla
 from estimation.dataset_generator.dataset_generator_function import DatasetGenerator # 03132020
 from estimation.dataset_generator.object_detector import ObjectDetector # 03132020
-from risk_prediction.trip_predictor import TripVPredictor
+from risk_prediction.trip_vpredictor import TripVPredictor
 
 IMAGE_WIDTH = 1280
 IMAGE_HEIGHT = 720
@@ -646,6 +646,7 @@ def main():
         
         while True:
             generate_data()
+#            predict_traffic_risk()
             world.wait_for_tick() # wait for world to get actors
             time.sleep(1)
         
@@ -728,15 +729,35 @@ def generate_data():
             # End Dataset generation
 
 # 03282020:
-def video_prediction():
-        # 1.1 Initialize TRIP module (dataset generator)
-        parser = argparse.ArgumentParser(description='video_prediction')
-        parser.add_argument('--video_out_path', default=r'yolo_v3')
-        parser.add_argument('--object_model_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\accident_KitDashV_6000.npz')
-        parser.add_argument('--object_label_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\obj.names') # must be specified other than 'coco' and 'voc'    
-        parser.add_argument('--object_cfg_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\yolo-obj.cfg')
-        parser.add_argument('--object_detection_threshold', type=float, default=0.1)
+def predict_traffic_risk():
+    # 1.1 Initialize TRIP module (dataset generator)
+    parser = argparse.ArgumentParser(description='video_prediction')
+    parser.add_argument('--video_out_path', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip\test_carla_video.mp4')
+    parser.add_argument('--ds_path', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip')
+    parser.add_argument('--ds_spec_file_name', default='ds_spec.txt')
+    parser.add_argument('--layer_name',  choices=('conv33', 'conv39', 'conv45'), default='conv33') # must be specified other than 'coco' and 'voc'    
+    parser.add_argument('--box_type', choices=('ebox', 'tbox'), default='ebox')
+    parser.add_argument('--window_size', type=int, default=10)
+    parser.add_argument('--model_param_file', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\model_ebox_param_carla.txt')
+    parser.add_argument('--plog_path', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\result\yolov3\dashcam\dashcam_carla_trip_elog.txt')
+    parser.add_argument('--gpu_id', type=int, default=0)
+    
+    args = parser.parse_args()    
+    video_out_path = args.video_out_path
+    ds_path = args.ds_path
+    ds_spec_file_name = args.ds_spec_file_name
+    layer_name = args.layer_name
+    box_type = args.box_type
+    window_size = args.window_size
+    model_param_file_path = args.model_param_file
+    plog_path = args.plog_path
+    gpu_id = args.gpu_id
 
+    trip_predictor = TripVPredictor(ds_path, ds_spec_file_name, layer_name, box_type, window_size, model_param_file_path, plog_path, gpu_id)
+    if video_out_path != '':
+        trip_predictor.set_video_out(video_out_path) 
+    trip_predictor.vpredict()   
+ 
 
 if __name__ == '__main__':
     try:
@@ -746,7 +767,8 @@ if __name__ == '__main__':
 #        spawn_car()
 #        spawn_motorbike()
 #        spawn_bicycle()
-        main()
+#        main()
+        predict_traffic_risk()
 #        generate_data()
 #        start_replay()
     except KeyboardInterrupt:
