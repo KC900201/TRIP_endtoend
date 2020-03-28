@@ -24,7 +24,8 @@ Date          Comment
 03092020      Apply TRIP risk prediction function in CARLA sensor
 03132020      Apply TRIP dataset generation function in CARLA sensor
 03142020      Create diverse spawn NPC functions according to vehicle class: car, motorbike, walker, bicycle
-03202020      Code modification for TRIP module
+03202020      Code modification in dataset generation for TRIP module
+03282020      Include video risk prediction for TRIP module during CARLA evaluation process
 """
 import sys
 import glob
@@ -52,6 +53,7 @@ import carla
 #from risk_prediction.trip_predictor_carla import TripPredictorCarla
 from estimation.dataset_generator.dataset_generator_function import DatasetGenerator # 03132020
 from estimation.dataset_generator.object_detector import ObjectDetector # 03132020
+from risk_prediction.trip_predictor import TripVPredictor
 
 IMAGE_WIDTH = 1280
 IMAGE_HEIGHT = 720
@@ -724,6 +726,17 @@ def generate_data():
                     DatasetGenerator.save_feature(features, layer_name_list, output_dir, file+'.npz')    
                     DatasetGenerator.save_ebox(bboxes, labels, layer_ids, img_h, img_w, output_dir, 'e'+file+'.txt')
             # End Dataset generation
+
+# 03282020:
+def video_prediction():
+        # 1.1 Initialize TRIP module (dataset generator)
+        parser = argparse.ArgumentParser(description='video_prediction')
+        parser.add_argument('--video_out_path', default=r'yolo_v3')
+        parser.add_argument('--object_model_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\accident_KitDashV_6000.npz')
+        parser.add_argument('--object_label_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\obj.names') # must be specified other than 'coco' and 'voc'    
+        parser.add_argument('--object_cfg_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\yolo-obj.cfg')
+        parser.add_argument('--object_detection_threshold', type=float, default=0.1)
+
 
 if __name__ == '__main__':
     try:
