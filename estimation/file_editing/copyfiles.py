@@ -445,25 +445,25 @@ if __name__ == '__main__':
     testdir_0 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test0\*')
     testdir_1 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test1\*')
     vtraindir_0 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\vtrain0\*')
-#    traindir_dashcam0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\train0'
-#   traindir_dashcam1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\train1'
-    traindir_dashcam0 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\train0'
-    traindir_dashcam1 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\train1'
-#    testdir_dashcam0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test0'
-#    testdir_dashcam1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test1'
-    testdir_dashcam0 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\test0'
-    testdir_dashcam1 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\test1'
-#    traindir_viena0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\vtrain0'
-#    traindir_viena1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\vtrain1'
-    traindir_viena0 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\vtrain0'
-    traindir_viena1 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\vtrain1'
+    traindir_dashcam0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\train0'
+    traindir_dashcam1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\train1'
+#    traindir_dashcam0 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\train0'
+#    traindir_dashcam1 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\train1'
+    testdir_dashcam0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test0'
+    testdir_dashcam1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\test1'
+#    testdir_dashcam0 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\test0'
+#    testdir_dashcam1 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\test1'
+    traindir_viena0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\vtrain0'
+    traindir_viena1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\vtrain1'
+#    traindir_viena0 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\vtrain0'
+#    traindir_viena1 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\vtrain1'
     viena_dir = r'E:\AtsumiLabMDS-2\TRIP\Dataset\VIENA2\image\Scenario2'
     dashcam_train = r'E:\AtsumiLabMDS-2\TRIP\Trip2019Q2\Dashcam_dataset\training\positive'
     dashcam_test = r'E:\AtsumiLabMDS-2\TRIP\Trip2019Q2\Dashcam_dataset\testing\positive'
 #    traindir_mixed0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain0'
 #    traindir_mixed1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain1' 
-    traindir_mixed0 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\mtrain0'
-    traindir_mixed1 = r'D:\TRIP\Datasets\YOLO_KitDashV\ds4\mtrain1' 
+    traindir_mixed0 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain0'
+    traindir_mixed1 = r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain1' 
 #    mtraindir_0 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain0\*')
 #    mtraindir_1 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds4\mtrain1\*') 
     mtraindir_0 = glob.glob(r'C:\Users\atsumilab\Pictures\ds4\mtrain0\*')
@@ -479,11 +479,18 @@ if __name__ == '__main__':
     a3d_use_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\non_accident\*")
     a3d_after_100_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\others\after_100\*")
     
+    countFilesFolders(traindir_mixed0, [])
+    countFilesFolders(traindir_mixed1, [])
+    countFilesFolders(traindir_dashcam0, [])
+    countFilesFolders(traindir_dashcam1, [])
+    countFilesFolders(traindir_viena0, [])
+    countFilesFolders(traindir_viena1, [])
+    
     #delTreeFormatA3D(a3d_test_dir)
     #delTreeFormatA3D(a3d_test_dir)
     #countFilesFolders(a3d_test_dir_c, [])
     #moveTreeFormatA3D(a3d_use_dir, a3d_sel_dir, "accident")
-    moveTreeFormatA3D(a3d_test_dir, a3d_sel_dir, "accident")
+    #moveTreeFormatA3D(a3d_test_dir, a3d_sel_dir, "accident")
     #moveTreeFormatA3D(a3d_dir, a3d_sel_dir, folder_name_a3d[0])
 
     #delTreeFormatVirtual(mtraindir_0, Folder.accident_car)

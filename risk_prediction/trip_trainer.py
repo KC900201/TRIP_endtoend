@@ -18,7 +18,7 @@ Date          Comment
 12182019      Modify function to evaluate accuracy increase at 25th epoch
 12232019      Remodify function to reduce accuracy value
 01092020      Add in one features to extract only wanted feature files (skip interval)
-03092020      Include predict_max_risk() method in evaluation
+03092020      Include predic_max_risk() method in evaluation
 """
 
 import chainer

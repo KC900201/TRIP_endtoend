@@ -8,6 +8,7 @@ Created on Tue Sep 10 17:35:17 2019
 """
 
 from risk_prediction.trip_predictor import TripPredictor
+#from trip_predictor import TripPredictor
 import chainer
 from chainer import cuda
 import os
@@ -60,7 +61,7 @@ class TripVPredictor(TripPredictor):
                         r = self.model.predict_risk(input_feature_win)
                     elif self.risk_type == 'seq_mean_risk':
                         r = self.model.predict_mean_risk(input_feature_win)
-                    elif self.risk_type == 'seq_max_risk': # find maximum risk value
+                    elif self.risk_type == 'seq_max_risk':
                         r = self.model.predict_max_risk(input_feature_win)
                     # show original and ROI images and the risk (visualization)
                     for f in range(t, t+self.window_size):
@@ -69,6 +70,9 @@ class TripVPredictor(TripPredictor):
                         # prepare ROI image
                         roi_img = self.extract_roi_image(orig_img, sample[0][1][f][1])
                         # put a risk on the ROI image
+                        # test print r.data
+#                        print(r.data)
+#                        print(r.array)
                         rval = cuda.to_cpu(r.data)[0][0]
                         fcolor = (0, 255, 255)
                         fsize = 2 + 3*rval

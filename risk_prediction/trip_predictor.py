@@ -10,7 +10,7 @@ Date          Comment
 ========================
 09142019      First revision
 10232019      Amend file path for npz file
-03092020      Implement max risk prediction
+03092020      Include predic_max_risk() method in evaluation
 """
 
 import chainer
@@ -21,8 +21,8 @@ from risk_prediction.trip_lstm import TripLSTM
 #from trip_lstm import TripLSTM
 import os
 # <ADD>
-from risk_prediction.trip_c_lstm import TripCLSTM
-#from trip_c_lstm import TripCLSTM
+#from risk_prediction.trip_c_lstm import TripCLSTM
+from trip_c_lstm import TripCLSTM
 # </ADD>
 
 class TripPredictor(object):
@@ -183,8 +183,7 @@ class TripPredictor(object):
                         r = self.model.predict_risk(input_feature_win)
                     elif self.risk_type == 'seq_mean_risk':
                         r = self.model.predict_mean_risk(input_feature_win)
-                    # 03092020
-                    elif self.risk_type == 'seq_max_risk':
+                    elif self.risk_type == 'seq_max_risk': #03092020
                         r = self.model.predict_max_risk(input_feature_win)
                     # log
                     end = min(t+self.window_size, len(input_feature_seq))
