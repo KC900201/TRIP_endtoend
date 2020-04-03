@@ -10,7 +10,7 @@ Date          Comment
 ========================
 09142019      First revision
 10232019      Amend file path for npz file
-03092020      Include predic_max_risk() method in evaluation
+03092020      Implement max risk prediction
 """
 
 import chainer

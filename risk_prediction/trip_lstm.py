@@ -84,7 +84,7 @@ class TripLSTM(Chain):
             Args:
              x (a list of feature array): a feature array list
             Returns:
-             r (a Variavle of float): a risk value
+             r (a Variable of float): a risk value
         """
         # reset lstm state
         self.lstm.reset_state()
@@ -109,7 +109,7 @@ class TripLSTM(Chain):
             Args:
              x (a list of feature array): a feature array list
             Returns:
-             r (a Variavle of float): a risk value
+             r (a Variable of float): a risk value
         """
         # reset lstm state
         self.lstm.reset_state()
