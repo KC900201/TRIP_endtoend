@@ -104,12 +104,12 @@ class TripCLSTM(TripLSTM):
             z = F.dropout(z, ratio=dropout_ratio)
         # end 12182019
         # 12242019
-        elif self.model_arch == 'MP-C-RL-SPP4-LSTM':
+        elif self.model_arch == 'MP-C-RL-SPP4-LSTM': # Avg = 67.251 (highest), Highest acc = 68.580
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
             z = F.relu(self.input_conv(z))
             z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
             z = F.tanh(self.input(z))
-        elif self.model_arch == 'MP-C-RL-SPP4-DO-LSTM':
+        elif self.model_arch == 'MP-C-RL-SPP4-DO-LSTM': # Avg = 67.613 (highest), Highest acc = 70.393
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
             z = F.relu(self.input_conv(z))
             z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
@@ -124,12 +124,12 @@ class TripCLSTM(TripLSTM):
             z = F.zoneout(previous_z, z, ratio=dropout_ratio)
         # end 12242019
         # 03252020
-        elif self.model_arch == 'MP-C-RRL-SPP4-LSTM':
+        elif self.model_arch == 'MP-C-RRL-SPP4-LSTM': # Avg = 66.515 (highest), Highest acc = 68.946
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
             z = F.rrelu(self.input_conv(z))
             z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
             z = F.tanh(self.input(z))
-        elif self.model_arch == 'MP-C-RRL-SPP4-DO-LSTM':
+        elif self.model_arch == 'MP-C-RRL-SPP4-DO-LSTM': # Avg = 65.641 (highest), Highest acc = 66.952
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
             z = F.rrelu(self.input_conv(z))
             z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
@@ -168,12 +168,12 @@ class TripCLSTM(TripLSTM):
             z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
             z = F.tanh(self.input(z))
             z = F.dropout(z, ratio=dropout_ratio)
-        elif self.model_arch == 'MP-C-EL-SPP4-LSTM':
+        elif self.model_arch == 'MP-C-EL-SPP4-LSTM': # Avg = 66.382 (highest), Highest acc = 68.376
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
             z = F.elu(self.input_conv(z), alpha=1.0)
             z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
             z = F.tanh(self.input(z))
-        elif self.model_arch == 'MP-C-EL-SPP4-DO-LSTM':
+        elif self.model_arch == 'MP-C-EL-SPP4-DO-LSTM': # Avg = 66.325 (highest), Highest acc = 68.091
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
             z = F.elu(self.input_conv(z), alpha=1.0)
             z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
