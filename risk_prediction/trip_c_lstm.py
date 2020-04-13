@@ -20,6 +20,7 @@ Date          Comment
 03252020      New model architecture (RReLU)
 03292020      New model architecture (CReLU, ELU)
 04032020      New variant model architecture (CReLU, ELU)
+04132020      Implement zoneout on ReLU model architecture
 """
 
 import chainer.functions as F
@@ -114,6 +115,13 @@ class TripCLSTM(TripLSTM):
             z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
             z = F.tanh(self.input(z))
             z = F.dropout(z, ratio=dropout_ratio)
+        elif self.model_arch == 'MP-C-RL-SPP4-ZO-LSTM': # 04132020
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.relu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            previous_z = z
+            z = F.tanh(self.input(z))
+            z = F.zoneout(previous_z, z, ratio=dropout_ratio)
         # end 12242019
         # 03252020
         elif self.model_arch == 'MP-C-RRL-SPP4-LSTM':

@@ -100,6 +100,13 @@ Updates
 2020/03/14 - Function to spawn different vehicle classes in separate functions
 2020/03/15 - Update on CARLA src code
 2020/03/18 - Update src code for making result table (make_result_table_vpredict.py)
+2020/03/20 - Update src code for dataset generation during CARLA simulation (carla_trip_evaluation.py)
+2020/03/25 - Test new model architecture using diverse activation functions (RReLU, CReLU, ELU)
+2020/03/28 - Update src code to run video prediction during CARLA simulation (carla_trip_evaluation.py)
+2020/03/29 - Implement CReLU and ELU activation function in new model architecture (trip_c_lstm.py)
+2020/04/03 - Bug fixes in new model architecture
+           - Fixes on wrongly uploaded files (make_result_table_vpredict.py, trip_dataset.py, risk_prediction_graph.xls, etc..)
+2020/04/13 - Implement ZONEOUT loss function on ReLU activation function model architecture
 
 
 	     

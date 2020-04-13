@@ -20,8 +20,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="estimation\Readme.txt" />
-    <Content Include="examples\.gitignore" />
-    <Content Include="examples\requirements.txt" />
     <Content Include="readme.txt" />
     <Content Include="result\yolov3\dashcam\dashcam_test0_tlog.txt" />
     <Content Include="result\yolov3\dashcam\dashcam_test0_tlog_20191025.txt" />
@@ -91,26 +89,6 @@
     <Compile Include="estimation\file_editing\make_result_table_vpredict.py" />
     <Compile Include="estimation\file_editing\weighttonpz.py" />
     <Compile Include="carla_trip_evaluation.py" />
-    <Compile Include="examples\automatic_control.py" />
-    <Compile Include="examples\client_bounding_boxes.py" />
-    <Compile Include="examples\dynamic_weather.py" />
-    <Compile Include="examples\manual_control.py" />
-    <Compile Include="examples\manual_control_rss.py" />
-    <Compile Include="examples\manual_control_steeringwheel.py" />
-    <Compile Include="examples\no_rendering_mode.py" />
-    <Compile Include="examples\show_recorder_actors_blocked.py" />
-    <Compile Include="examples\show_recorder_collisions.py" />
-    <Compile Include="examples\show_recorder_file_info.py" />
-    <Compile Include="examples\spawn_npc.py" />
-    <Compile Include="examples\start_recording.py" />
-    <Compile Include="examples\start_replaying.py" />
-    <Compile Include="examples\synchronous_mode.py" />
-    <Compile Include="examples\tm_spawn_npc.py" />
-    <Compile Include="examples\tutorial.py" />
-    <Compile Include="examples\tutorialv2.py" />
-    <Compile Include="examples\tutorialv3.py" />
-    <Compile Include="examples\tutorialv5.py" />
-    <Compile Include="examples\vehicle_gallery.py" />
     <Compile Include="risk_prediction\main_trip_prediction.py" />
     <Compile Include="risk_prediction\main_trip_repeat_training.py" />
     <Compile Include="risk_prediction\main_trip_training.py" />
@@ -143,8 +121,6 @@
     <Folder Include="estimation\dataset_generator\lib" />
     <Folder Include="estimation\dataset_generator\lib\functions" />
     <Folder Include="estimation\file_editing" />
-    <Folder Include="examples\" />
-    <Folder Include="examples\_out\" />
     <Folder Include="result\" />
     <Folder Include="result\yolov3\" />
     <Folder Include="result\yolov3\dashcam" />
