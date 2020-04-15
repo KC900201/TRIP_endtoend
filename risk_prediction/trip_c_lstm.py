@@ -21,6 +21,7 @@ Date          Comment
 03292020      New model architecture (CReLU, ELU)
 04032020      New variant model architecture (CReLU, ELU)
 04132020      Implement zoneout on ReLU model architecture
+04142020      Modify model architecture to reinsert TanH function
 """
 
 import chainer.functions as F
@@ -122,6 +123,21 @@ class TripCLSTM(TripLSTM):
             previous_z = z
             z = F.tanh(self.input(z))
             z = F.zoneout(previous_z, z, ratio=dropout_ratio)
+        # 04152020
+        elif self.model_arch == 'MP-C-RL2-SPP4-LSTM': 
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.relu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.relu(self.input_conv(z))
+            z = F.tanh(self.input(z))
+        elif self.model_arch == 'MP-C-RL2-SPP4-DO-LSTM': 
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.relu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.relu(self.input_conv(z))
+            z = F.tanh(self.input(z))        
+            z = F.dropout(z, ratio=dropout_ratio)
+        # end 04152020
         # end 12242019
         # 03252020
         elif self.model_arch == 'MP-C-RRL-SPP4-LSTM': # Avg = 66.515 (highest), Highest acc = 68.946
@@ -142,7 +158,22 @@ class TripCLSTM(TripLSTM):
             previous_z = z
             z = F.tanh(self.input(z))
             z = F.zoneout(previous_z, z, ratio=dropout_ratio)
-        # 03252020
+        # 04152020
+        elif self.model_arch == 'MP-C-RRL2-SPP4-LSTM': 
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.rrelu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.rrelu(self.input_conv(z))
+            z = F.tanh(self.input(z))
+        elif self.model_arch == 'MP-C-RRL2-SPP4-DO-LSTM': 
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.rrelu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.rrelu(self.input_conv(z))
+            z = F.tanh(self.input(z))        
+            z = F.dropout(z, ratio=dropout_ratio)
+        # end 04152020    
+        # end 03252020
         # 04032020
         elif self.model_arch == 'MP-C-RRL-SPP4-RRL-LSTM':
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
