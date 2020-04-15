@@ -127,14 +127,14 @@ class TripCLSTM(TripLSTM):
         elif self.model_arch == 'MP-C-RL2-SPP4-LSTM': 
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
             z = F.relu(self.input_conv(z))
-            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
             z = F.relu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
             z = F.tanh(self.input(z))
         elif self.model_arch == 'MP-C-RL2-SPP4-DO-LSTM': 
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
             z = F.relu(self.input_conv(z))
-            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
             z = F.relu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
             z = F.tanh(self.input(z))        
             z = F.dropout(z, ratio=dropout_ratio)
         # end 04152020
@@ -162,14 +162,14 @@ class TripCLSTM(TripLSTM):
         elif self.model_arch == 'MP-C-RRL2-SPP4-LSTM': 
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
             z = F.rrelu(self.input_conv(z))
-            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
             z = F.rrelu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
             z = F.tanh(self.input(z))
         elif self.model_arch == 'MP-C-RRL2-SPP4-DO-LSTM': 
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
             z = F.rrelu(self.input_conv(z))
-            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
             z = F.rrelu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
             z = F.tanh(self.input(z))        
             z = F.dropout(z, ratio=dropout_ratio)
         # end 04152020    
