@@ -27,6 +27,7 @@ Date          Comment
 03202020      Code modification in dataset generation for TRIP module
 03282020      Include video risk prediction for TRIP module during CARLA evaluation process
 04162020      Implement Traffic Manager module during spawning AI and test agent (CARLA v0.9.8)
+04172020      Implement Traffic Manager module to every spawn function
 """
 import sys
 import glob
@@ -86,14 +87,15 @@ def predict_risk_img(image, output_dir):
     cv2.imshow("", i3)
     cv2.waitKey(2) # delay 2 seconds
     # save image
-    image.save_to_disk(output_dir + '/test/orig_img/%08d' % image.frame)
+#    image.save_to_disk(output_dir + '/test/orig_img/%08d' % image.frame)
+    image.save_to_disk(output_dir + '/Town01/orig_img/%08d' % image.frame)
     return i3 / 255.0
 
 # Start recording function
 def start_replay():
+    client = carla.Client('localhost', 2000)
+    client.set_timeout(3.0)
     try:
-        client = carla.Client('localhost', 2000)
-        client.set_timeout(3.0)
     
         client.set_replayer_time_factor(1.0)
         print(client.replay_file("test_record_01.log", 0.0, 120.0, 0))
@@ -103,11 +105,10 @@ def start_replay():
  
 # Spawn Pedestrian - 03142020
 def spawn_walker():
+    # 1. Set up CARLA client connection
+    client = carla.Client('localhost', 2000)
+    client.set_timeout(3.0)
     try:
-        # 1. Set up CARLA client connection
-        client = carla.Client('localhost', 2000)
-        client.set_timeout(3.0)
-
         # 2. Start logging
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
         
@@ -220,21 +221,35 @@ def spawn_walker():
 
 # Spawn Car - 03142020
 def spawn_car():
+    # 1. Set up CARLA client connection
+    client = carla.Client('localhost', 2000)
+    client.set_timeout(5.0)
     try:
-        # 1. Set up CARLA client connection
-        client = carla.Client('localhost', 2000)
-        client.set_timeout(5.0)
-
         # 2. Start logging
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
         # 3. Retrieve world from CARLA simulation        
-        world = client.load_world('Town01')
-#        world = client.get_world()
+#        world = client.load_world('Town01')
+        world = client.get_world()
         print(world.get_map().name)
         # 3.1 Retrieve blueprint
         blueprint_library = world.get_blueprint_library()
+        # 3.1 Create traffic manager client
+        tm = client.get_trafficmanager() # default port = 8000
 
+        # 4 Setting synchronous mode (04172020)
+        synchronous_master = False
+#        settings = world.get_settings()
+#        tm.set_synchronous_mode(True)
+        '''
+        if not settings.synchronous_mode:
+            synchronous_master = True
+            settings.synchronous_mode = True
+            settings.fixed_delta_seconds = 0.05
+            world.apply_settings(settings)
+        else:
+            synchronous_master = False            
+        '''
         # 6 Spawn NPC agents in environment
         npc_vehicle_bp = blueprint_library.filter('vehicle.*')
         # Sort out blueprint (car)
@@ -267,15 +282,24 @@ def spawn_car():
                 blueprint.set_attribute('driver_id', driver_id)
             blueprint.set_attribute('role_name', 'autopilot')
             vehicle = world.try_spawn_actor(blueprint, transform)
-            vehicle.set_autopilot(True)
+            vehicle.set_autopilot(enabled=True)
+            # 04172020
+            tm.ignore_lights_percentage(vehicle, 90) # 04062020
+            tm.distance_to_leading_vehicle(vehicle, 30)
+            tm.ignore_walkers_percentage(vehicle, 80)
+            tm.ignore_vehicles_percentage(vehicle, 80)
+            tm.auto_lane_change(vehicle, False)
             vehicle_list.append(vehicle)            
 
         print('Spawned %d vehicles, press Ctrl+C to exit.' % len(vehicle_list))
         
-        world.wait_for_tick()
+        # 7 set global speed difference for Traffic Manager
+#        tm.global_percentage_speed_difference(30.0)
+        
+#        world.wait_for_tick()
 
-        while True:
-            world.wait_for_tick() # wait for world to get actors
+        while True: # wait for world to get actors
+            world.wait_for_tick()
             time.sleep(1)
 
     finally:
@@ -283,18 +307,32 @@ def spawn_car():
         client.apply_batch_sync([carla.command.DestroyActor(x) for x in vehicle_list])
 
 def spawn_motorbike():
-    try:
-        # 1. Set up CARLA client connection
-        client = carla.Client('localhost', 2000)
-        client.set_timeout(3.0)
-        
+    # 1. Set up CARLA client connection
+    client = carla.Client('localhost', 2000)
+    client.set_timeout(3.0)
+
+    try:        
         # 2. Start logging
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
         # 3. Retrieve world from CARLA simulation
         world = client.get_world()
         print(world.get_map().name)
-
+        # 3.1 Create traffic manager client
+        tm = client.get_trafficmanager() # default port = 8000
+        
+        # 4 Setting synchronous mode (04172020)
+        synchronous_master = False
+        settings = world.get_settings()
+        tm.set_synchronous_mode(True)
+        if not settings.synchronous_mode:
+            synchronous_master = True
+            settings.synchronous_mode = True
+            settings.fixed_delta_seconds = 0.05
+            world.apply_settings(settings)
+        else:
+            synchronous_master = False
+        
         # 6 Spawn NPC agents in environment
         blueprint_library = world.get_blueprint_library()
         npc_vehicle_bp = blueprint_library.filter('vehicle.*')
@@ -334,32 +372,54 @@ def spawn_motorbike():
             blueprint.set_attribute('role_name', 'autopilot')
             vehicle = world.try_spawn_actor(blueprint, transform)
             vehicle.set_autopilot(True)
+            # 04172020
+            tm.ignore_lights_percentage(vehicle, 90) # 04062020
+            tm.distance_to_leading_vehicle(vehicle, 30)
+            tm.ignore_walkers_percentage(vehicle, 80)
+            tm.ignore_vehicles_percentage(vehicle, 80)
+            tm.auto_lane_change(vehicle, False)
             vehicle_list.append(vehicle)
 
         print('Spawned %d vehicles, press Ctrl+C to exit.' % len(vehicle_list))
         
-        world.wait_for_tick()
+#        world.wait_for_tick()
 
-        while True:
-            world.wait_for_tick() # wait for world to get actors
-            time.sleep(1)
+        while True: # wait for world to get actors
+            if synchronous_master:
+                world.tick() 
+            else:
+                world.wait_for_tick()
+                time.sleep(1)
 
     finally:
         print("\nDestroying %d vehicles" % len(vehicle_list))
         client.apply_batch_sync([carla.command.DestroyActor(x) for x in vehicle_list])
 
 def spawn_bicycle():
+    # 1. Set up CARLA client connection
+    client = carla.Client('localhost', 2000)
+    client.set_timeout(3.0)
     try:
-       # 1. Set up CARLA client connection
-        client = carla.Client('localhost', 2000)
-        client.set_timeout(3.0)
-        
         # 2. Start logging
         logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
         # 3. Retrieve world from CARLA simulation
         world = client.get_world()
         print(world.get_map().name)
+        # 3.1 Create traffic manager client
+        tm = client.get_trafficmanager() # default port = 8000
+
+        # 4 Setting synchronous mode (04172020)
+        synchronous_master = False
+        settings = world.get_settings()
+        tm.set_synchronous_mode(True)
+        if not settings.synchronous_mode:
+            synchronous_master = True
+            settings.synchronous_mode = True
+            settings.fixed_delta_seconds = 0.05
+            world.apply_settings(settings)
+        else:
+            synchronous_master = False            
 
         # 6 Spawn NPC agents in environment
         blueprint_library = world.get_blueprint_library()
@@ -399,17 +459,29 @@ def spawn_bicycle():
                 blueprint.set_attribute('driver_id', driver_id)
             blueprint.set_attribute('role_name', 'autopilot')
             vehicle = world.try_spawn_actor(blueprint, transform)
-            vehicle.set_autopilot(True)
+            vehicle.set_autopilot(enabled=True)
+            # 04172020
+            tm.ignore_lights_percentage(vehicle, 90) # 04062020
+            tm.distance_to_leading_vehicle(vehicle, 30)
+            tm.ignore_walkers_percentage(vehicle, 80)
+            tm.ignore_vehicles_percentage(vehicle, 80)
+            tm.auto_lane_change(vehicle, False)
             vehicle_list.append(vehicle)
 
         print('Spawned %d vehicles, press Ctrl+C to exit.' % len(vehicle_list))
         
-        world.wait_for_tick()
+        # 7 set global speed difference for Traffic Manager
+        tm.global_percentage_speed_difference(30.0)
 
-        while True:
-            world.wait_for_tick() # wait for world to get actors
-            time.sleep(1)
-            
+#        world.wait_for_tick()
+
+        while True: # wait for world to get actors
+            if synchronous_master:
+                world.tick() 
+            else:
+                world.wait_for_tick()
+                time.sleep(1)
+           
     finally:
         print("\nDestroying %d vehicles" % len(vehicle_list))
         client.apply_batch_sync([carla.command.DestroyActor(x) for x in vehicle_list])
@@ -587,7 +659,6 @@ def main():
     # 1. Set up CARLA client connection
     client = carla.Client('localhost', 2000)
     client.set_timeout(4.0)
-
     try:
         parser = argparse.ArgumentParser(description='dataset_maker')
         parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='directory where the dataset will be created')
@@ -604,11 +675,24 @@ def main():
 #        world = client.load_world("Town01")
         world = client.get_world()
 #        world = client.load_world(random.choice(client.get_available_maps()).split("/")[4])
+        print(world.get_map().name)
         # 3.1 Retrieve blueprint
         blueprint_library = world.get_blueprint_library()
         # 3.2 Create traffic manager client
         tm = client.get_trafficmanager() # default port = 8000
-        
+        # 3.3 Setting synchronous mode (04172020)
+#        synchronous_master = False
+#        settings = world.get_settings()
+        tm.set_synchronous_mode(True)
+        '''
+        if not settings.synchronous_mode:
+            synchronous_master = True
+            settings.synchronous_mode = True
+            settings.fixed_delta_seconds = 0.05
+            world.apply_settings(settings)
+        else:
+            synchronous_master = False 
+        '''
         # 4. Create test agents
         test_agent_bp = blueprint_library.filter('vehicle.*')
         test_agent_bp = random.choice([x for x in test_agent_bp if int(x.get_attribute('number_of_wheels')) == 4])
@@ -682,6 +766,8 @@ def generate_data():
         parser.add_argument('--video', type=bool, default=False, help='video option')
 #        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='input directory') # 04162020
 #        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='directory where the dataset will be created')
+#        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='input directory')
+#        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='directory where the dataset will be created')
         parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='input directory')
         parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='directory where the dataset will be created')
 #        parser.add_argument('--layer_name_list', default='conv33,conv39,conv45', help='list of hidden layers name to extract features')
@@ -780,12 +866,12 @@ if __name__ == '__main__':
         # Run main method
 #        spawn_npc()
 #        spawn_walker()
-#        spawn_car()
+        spawn_car()
 #        spawn_motorbike()
 #        spawn_bicycle()
 #        main()
-        generate_data()
-        predict_traffic_risk()
+#        generate_data()
+#        predict_traffic_risk()
 #        start_replay()
     except KeyboardInterrupt:
         pass
