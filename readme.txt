@@ -108,6 +108,7 @@ Updates
            - Fixes on wrongly uploaded files (make_result_table_vpredict.py, trip_dataset.py, risk_prediction_graph.xls, etc..)
 2020/04/13 - Implement ZONEOUT loss function on ReLU activation function model architecture
 2020/04/14 - Modify function to check image size for preventing error (dataset_generator_two.py)
+2020/04/15 - Modify model architecture to reinsert TanH function for ReLU and RReLU act. function (trip_c_lstm.py)
 2020/04/17 - Include new src for CARLA Traffic Manager implementation (carla_traffic_manager.py)
              Implement Traffic Manager on existing src code (carla_trip_evaluation.py)
 
