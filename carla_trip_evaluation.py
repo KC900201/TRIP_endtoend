@@ -26,6 +26,7 @@ Date          Comment
 03142020      Create diverse spawn NPC functions according to vehicle class: car, motorbike, walker, bicycle
 03202020      Code modification in dataset generation for TRIP module
 03282020      Include video risk prediction for TRIP module during CARLA evaluation process
+04162020      Implement Traffic Manager module during spawning AI and test agent (CARLA v0.9.8)
 """
 import sys
 import glob
@@ -38,7 +39,8 @@ import time
 import argparse
 
 try:
-    sys.path.append(glob.glob(r'CARLA_0.9.7_project/PythonAPI/carla/dist/carla-*%d.%d-%s.egg' % (
+    sys.path.append(glob.glob(r'CARLA_0.9.8_project/PythonAPI/carla/dist/carla-*%d.%d-%s.egg' % ( # 04162020
+#    sys.path.append(glob.glob(r'CARLA_0.9.7_project/PythonAPI/carla/dist/carla-*%d.%d-%s.egg' % (        
 #    sys.path.append(glob.glob(r'../carla/dist/carla-*%d.%d-%s.egg' % (
         sys.version_info.major,
         sys.version_info.minor,
@@ -582,13 +584,13 @@ def spawn_npc():
 
 # Main method
 def main():
-    try:
-        # 1. Set up CARLA client connection
-        client = carla.Client('localhost', 2000)
-        client.set_timeout(4.0)
+    # 1. Set up CARLA client connection
+    client = carla.Client('localhost', 2000)
+    client.set_timeout(4.0)
 
+    try:
         parser = argparse.ArgumentParser(description='dataset_maker')
-        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='directory where the dataset will be created')
+        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='directory where the dataset will be created')
         args = parser.parse_args()
         output_dir = args.output_dir
         # 2. Start logging
@@ -604,6 +606,8 @@ def main():
 #        world = client.load_world(random.choice(client.get_available_maps()).split("/")[4])
         # 3.1 Retrieve blueprint
         blueprint_library = world.get_blueprint_library()
+        # 3.2 Create traffic manager client
+        tm = client.get_trafficmanager() # default port = 8000
         
         # 4. Create test agents
         test_agent_bp = blueprint_library.filter('vehicle.*')
@@ -635,6 +639,12 @@ def main():
         test_agent.set_autopilot(True)
 #        test_agent.apply_control(carla.VehicleControl(gear=3, throttle=2.0, steer=0.0, hand_brake=True))
         test_agent.apply_control(carla.VehicleControl(throttle=1.0, steer=1.0, hand_brake=False))
+        # 7.1.1 Setting Traffic Manager to test agent (04162020)
+        tm.distance_to_leading_vehicle(test_agent, 1)
+        tm.ignore_walkers_percentage(test_agent, 80)
+        tm.ignore_vehicles_percentage(test_agent, 90)
+        tm.ignore_lights_percentage(test_agent, 90)
+        tm.vehicle_percentage_speed_difference(test_agent, -20)
         actor_list.append(test_agent)
         # 7.2 Spawn sensor, attach to test vehicle
         test_cam = world.try_spawn_actor(test_cam_bp, transform_2, attach_to=test_agent)
@@ -670,9 +680,12 @@ def generate_data():
         parser.add_argument('--gpu', type=int, default=0)
         parser.add_argument('--save_img', type=bool, default=True, help='save_img option')
         parser.add_argument('--video', type=bool, default=False, help='video option')
-        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='input directory')
-        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='directory where the dataset will be created')
-        parser.add_argument('--layer_name_list', default='conv33,conv39,conv45', help='list of hidden layers name to extract features')
+#        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='input directory') # 04162020
+#        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='directory where the dataset will be created')
+        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='input directory')
+        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='directory where the dataset will be created')
+#        parser.add_argument('--layer_name_list', default='conv33,conv39,conv45', help='list of hidden layers name to extract features')
+        parser.add_argument('--layer_name_list', default='conv33', help='list of hidden layers name to extract features')
         args = parser.parse_args()
         save_img = args.save_img
         output_dir = args.output_dir
@@ -732,14 +745,17 @@ def generate_data():
 def predict_traffic_risk():
     # 1.1 Initialize TRIP module (dataset generator)
     parser = argparse.ArgumentParser(description='video_prediction')
-    parser.add_argument('--video_out_path', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip\test_carla_video.mp4')
-    parser.add_argument('--ds_path', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip')
+#    parser.add_argument('--video_out_path', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip\test_carla_video.mp4')
+    parser.add_argument('--video_out_path', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_traffic_manager_video.mp4')
+#    parser.add_argument('--ds_path', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip')
+    parser.add_argument('--ds_path', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2')
     parser.add_argument('--ds_spec_file_name', default='ds_spec.txt')
     parser.add_argument('--layer_name',  choices=('conv33', 'conv39', 'conv45'), default='conv33') # must be specified other than 'coco' and 'voc'    
     parser.add_argument('--box_type', choices=('ebox', 'tbox'), default='ebox')
     parser.add_argument('--window_size', type=int, default=10)
     parser.add_argument('--model_param_file', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\model_ebox_param_carla.txt')
-    parser.add_argument('--plog_path', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\result\yolov3\dashcam\dashcam_carla_trip_elog.txt')
+#    parser.add_argument('--plog_path', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\result\yolov3\dashcam\dashcam_carla_trip_elog.txt')
+    parser.add_argument('--plog_path', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\dashcam_carla_traffic_manager_elog.txt')
     parser.add_argument('--gpu_id', type=int, default=0)
     
     args = parser.parse_args()    
@@ -768,8 +784,8 @@ if __name__ == '__main__':
 #        spawn_motorbike()
 #        spawn_bicycle()
 #        main()
+        generate_data()
         predict_traffic_risk()
-#        generate_data()
 #        start_replay()
     except KeyboardInterrupt:
         pass

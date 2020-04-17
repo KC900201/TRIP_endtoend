@@ -10,6 +10,7 @@ Date          Comment
 10102019      First revision
 10112019      Amend directory
 11292019      Modification for bbox assignment 
+04142020      Added checking image size error to prevent !_img.empty after doing bbox assignment
 """
 
 import os
@@ -38,10 +39,11 @@ def save_images(orig_img, bboxes, output_dir, file):
         right = int(bbox[3]) if (int(bbox[3]) <= orig_img.shape[1]) else orig_img.shape[1] 
         #End 11292019
         #left, top = result['box'].int_left_top()
-        #right, bottom = result['box'].int_right_bottom()
-        filename = os.path.join(output_dir,'img',file+'_'+str(counter)+'.jpg')
-        cv2.imwrite(filename, orig_img[top:bottom, left:right])
-        counter+=1
+        #right, bottom = result['box'].int_right_bottom()       
+        if(orig_img[top:bottom, left:right].size > 0): # 04142020
+            filename = os.path.join(output_dir,'img',file+'_'+str(counter)+'.jpg')
+            cv2.imwrite(filename, orig_img[top:bottom, left:right])
+            counter+=1
 
 def save_feature(features, layer_name_list, output_dir, file):
     # 指定したレイヤーの特徴を保存 / Save the specified layer's feature
@@ -117,8 +119,13 @@ if __name__ == '__main__':
     #change directory to E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3 
     #parser.add_argument('--input_dir', default=r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3', help='input directory') 
     #parser.add_argument('--output_dir', default=r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3', help='directory where the dataset will be created')
-    parser.add_argument('--input_dir', default=r'D:\TRIP\Datasets\A3D\selected\Unfinished_Processing', help='input directory')
-    parser.add_argument('--output_dir', default=r'D:\TRIP\Datasets\A3D\selected\Unfinished_Processing', help='directory where the dataset will be created')
+    #parser.add_argument('--input_dir', default=r'D:\TRIP\Datasets\A3D\selected\Unfinished_Processing', help='input directory')
+    #parser.add_argument('--output_dir', default=r'D:\TRIP\Datasets\A3D\selected\Unfinished_Processing', help='directory where the dataset will be created')
+#    parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='input directory')
+#    parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='directory where the dataset will be created')
+    parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\traffic_manager', help='input directory')
+    parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\traffic_manager', help='directory where the dataset will be created')
+
 
     parser.add_argument('--layer_name_list', default='conv33,conv39,conv45', help='list of hidden layers name to extract features')
     #parser.add_argument('--object_list', default='car,truck,person,tram,bicycle,motorbike,bus', help='list of object to get box coords')
@@ -235,8 +242,8 @@ if __name__ == '__main__':
             if video_file[-5:-2]>='0':
                 print(video_file)
                 print('save %s feature...' % video_file)
-                #input_dir = orig_input_dir + '/' + video_file + '/orig_img'
-                input_dir = orig_input_dir + '/' + video_file + '/images'
+                input_dir = orig_input_dir + '/' + video_file + '/orig_img'
+                #input_dir = orig_input_dir + '/' + video_file + '/images'
                 output_dir = orig_output_dir + '/' + video_file
                 # フォルダが無ければ新規作成 / Create a new folder if there is none previously
                 if not os.path.isdir(output_dir):
