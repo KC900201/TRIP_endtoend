@@ -22,6 +22,7 @@ Date          Comment
 04032020      New variant model architecture (CReLU, ELU)
 04132020      Implement zoneout on ReLU model architecture
 04142020      Modify model architecture to reinsert TanH function
+04192020      Implement ReLU and RReLU together in new model architecture
 """
 
 import chainer.functions as F
@@ -174,6 +175,34 @@ class TripCLSTM(TripLSTM):
             z = F.dropout(z, ratio=dropout_ratio)
         # end 04152020    
         # end 03252020
+        # 04192020
+        elif self.model_arch == 'MP-C-RL-RRL-SPP4-LSTM': 
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.relu(self.input_conv(z))
+            z = F.rrelu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.tanh(self.input(z))
+        elif self.model_arch == 'MP-C-RL-RRL-SPP4-DO-LSTM': 
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.relu(self.input_conv(z))
+            z = F.rrelu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.tanh(self.input(z))        
+            z = F.dropout(z, ratio=dropout_ratio)
+        elif self.model_arch == 'MP-C-RRL-RL-SPP4-LSTM': 
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.rrelu(self.input_conv(z))
+            z = F.relu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.tanh(self.input(z))
+        elif self.model_arch == 'MP-C-RRL-RL-SPP4-DO-LSTM': 
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.rrelu(self.input_conv(z))
+            z = F.relu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.tanh(self.input(z))        
+            z = F.dropout(z, ratio=dropout_ratio)
+        # end 04192020
         # 04032020
         elif self.model_arch == 'MP-C-RRL-SPP4-RRL-LSTM':
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
