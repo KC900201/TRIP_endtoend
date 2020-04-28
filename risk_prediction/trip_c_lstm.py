@@ -23,6 +23,7 @@ Date          Comment
 04132020      Implement zoneout on ReLU model architecture
 04142020      Modify model architecture to reinsert TanH function
 04192020      Implement ReLU and RReLU together in new model architecture
+04282020      Implement ELU and ReLU in new model architecture
 """
 
 import chainer.functions as F
@@ -240,6 +241,21 @@ class TripCLSTM(TripLSTM):
             z = F.tanh(self.input(z))
             z = F.dropout(z, ratio=dropout_ratio)
         # 03292020
+        # 04282020
+        elif self.model_arch == 'MP-C-EL-RL-SPP4-LSTM': # Avg = 66.382 (highest), Highest acc = 68.376
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.elu(self.input_conv(z), alpha=1.0)
+            z = F.relu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.tanh(self.input(z))
+        elif self.model_arch == 'MP-C-EL-RL-SPP4-DO-LSTM': # Avg = 66.325 (highest), Highest acc = 68.091
+            z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
+            z = F.elu(self.input_conv(z), alpha=1.0)
+            z = F.relu(self.input_conv(z))
+            z = F.spatial_pyramid_pooling_2d(z, 4, pooling="max") #pyramid_height=4
+            z = F.tanh(self.input(z))
+            z = F.dropout(z, ratio=dropout_ratio)        
+        # end 04282020
         # 04032020
         elif self.model_arch == 'MP-C-EL-SPP4-EL-LSTM':
             z = F.max_pooling_2d(x, 2) # ksize=2, stride=2
