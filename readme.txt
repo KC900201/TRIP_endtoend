@@ -112,6 +112,7 @@ Updates
 2020/04/17 - Include new src for CARLA Traffic Manager implementation (carla_traffic_manager.py)
              Implement Traffic Manager on existing src code (carla_trip_evaluation.py)
 2020/04/19 - Implement both ReLU and RReLU together in new model architecture (trip_c_lstm.py)
+2020/04/28 - Implement both ReLU and ELU in new model architecture (trip_c_lstm.py)
 
 
 	     
