@@ -20,9 +20,9 @@ Requirements
 
 Task for IW-FCV2020
 -------------------
-Deadline: Next Wednesday (10/23)
+Deadline: 7/1/2020
 1. Fine tune risk prediction
-2. Run TRIP simulation on CARLA
+2. Run TRIP simulation on CARLA (done)
 3. 1st evaluation on risk prediction - risky and not risky
 
 Updates
@@ -113,6 +113,7 @@ Updates
              Implement Traffic Manager on existing src code (carla_trip_evaluation.py)
 2020/04/19 - Implement both ReLU and RReLU together in new model architecture (trip_c_lstm.py)
 2020/04/28 - Implement both ReLU and ELU in new model architecture (trip_c_lstm.py)
+2020/04/30 - Replace multithread iterator with multiprocess iterator to reduce training time and increase efficiency (trip_trainer.py)
 
 
 	     
