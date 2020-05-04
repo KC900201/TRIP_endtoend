@@ -20,6 +20,7 @@ Date          Comment
 01092020      Add in one features to extract only wanted feature files (skip interval)
 03092020      Include predict_max_risk() method in evaluation
 04302020      Replace Multithreading with Multiprocessing (first trial in learn_model_mix())
+05042020      Revert to Multithreading
 """
 
 import chainer
@@ -541,11 +542,11 @@ class TripTrainer(object):
                                             # cf. optimizer.t: the number of iterations
         num_of_epoch = self.num_of_epoch - start_epoch
         # set iterators (real + virtual)
-#        train_iterator1 = iterators.MultithreadIterator(self.mtrain_ds1, self.minibatch_size)
-#        train_iterator2 = iterators.MultithreadIterator(self.mtrain_ds2, self.minibatch_size)
+        train_iterator1 = iterators.MultithreadIterator(self.mtrain_ds1, self.minibatch_size)
+        train_iterator2 = iterators.MultithreadIterator(self.mtrain_ds2, self.minibatch_size)
         # 04302020
-        train_iterator1 = iterators.MultiprocessIterator(self.mtrain_ds1, self.minibatch_size)
-        train_iterator2 = iterators.MultiprocessIterator(self.mtrain_ds2, self.minibatch_size)
+#        train_iterator1 = iterators.MultiprocessIterator(self.mtrain_ds1, self.minibatch_size)
+#        train_iterator2 = iterators.MultiprocessIterator(self.mtrain_ds2, self.minibatch_size)
         # end 04302020
         # training loop
         epoch = 0
