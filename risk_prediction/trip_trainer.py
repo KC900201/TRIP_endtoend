@@ -21,6 +21,7 @@ Date          Comment
 03092020      Include predict_max_risk() method in evaluation
 04302020      Replace Multithreading with Multiprocessing (first trial in learn_model_mix())
 05042020      Revert to Multithreading
+05052020      Include AdamW as new optimizer function
 """
 
 import chainer
@@ -295,6 +296,18 @@ class TripTrainer(object):
                 else:
                     self.optimizer = optimizers.Adam()
                 #self.optimizer = optimizers.Adam()
+            # 05052020
+            elif optimizer_info[0] == 'adamw':
+                if len(optimizer_info) == 3:
+                    learning_rate = float(optimizer_info[1].strip())
+                    weight_decay = float(optimizer_info[2].strip())
+                    self.optimizer = optimizers.AdamW(alpha=learning_rate, weight_decay_rate=weight_decay)
+                elif len(optimizer_info) == 2:
+                    learning_rate = float(optimizer_info[1].strip())
+                    self.optimizer = optimizers.AdamW(alpha=learning_rate)
+                else:
+                    self.optimizer = optimizers.AdamW()
+            # end 05052020
             elif optimizer_info[0] == 'adadelta':
                 self.optimizer = optimizers.AdaDelta()
             elif optimizer_info[0] == 'adagrad':
