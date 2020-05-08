@@ -676,7 +676,7 @@ def main_traffic_manager():
     world = client.load_world("Town04")
     try:
         parser = argparse.ArgumentParser(description='dataset_maker')
-        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town04\Phase 9', help='directory where the dataset will be created')
+        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town04\Phase 3', help='directory where the dataset will be created')
         args = parser.parse_args()
         output_dir = args.output_dir
         # 2. Start logging
@@ -725,7 +725,7 @@ def main_traffic_manager():
         spawn_points = world.get_map().get_spawn_points()
         num_spawn_points = len(spawn_points)
         #npc_amt = NPC_AMT
-        npc_amt = random.randint(100, num_spawn_points) # 02282020 #03022020 (minimum no of NPC vehicles = 100)
+        npc_amt = random.randint(150, num_spawn_points) # 02282020 #03022020 (minimum no of NPC vehicles = 100)
         
         if npc_amt <= num_spawn_points:
             random.shuffle(spawn_points)
@@ -749,11 +749,11 @@ def main_traffic_manager():
             vehicle = world.try_spawn_actor(blueprint, transform)
             #vehicle.set_autopilot(True)
             vehicle.set_autopilot(enabled=True)
-            tm.ignore_lights_percentage(vehicle, 90) # 04062020
+#            tm.ignore_lights_percentage(vehicle, 90) # 04062020
 #            traffic_manager.vehicle_percentage_speed_difference(vehicle, -20) # 04062020
 #            traffic_manager.distance_to_leading_vehicle(vehicle, 30)
-            tm.ignore_walkers_percentage(vehicle, 80)
-            tm.ignore_vehicles_percentage(vehicle, 90)
+#            tm.ignore_walkers_percentage(vehicle, 80)
+#            tm.ignore_vehicles_percentage(vehicle, 90)
 #            traffic_manager.auto_lane_change(vehicle, False)
             vehicle_list.append(vehicle)            
         # ----------------------
@@ -765,7 +765,7 @@ def main_traffic_manager():
         # 6.2.1 take all random locations to spawn
         spawn_points = []
         #npc_walker_amt = NPC_WALKER_AMT
-        npc_walker_amt = random.randint(90, npc_amt) # 02282020 #03022020 (minimum number of NPC walker = 50)
+        npc_walker_amt = random.randint(100, npc_amt) # 02282020 #03022020 (minimum number of NPC walker = 50)
         '''
         if npc_walker_amt > npc_amt:
             npc_walker_amt = npc_amt
@@ -844,15 +844,15 @@ def main_traffic_manager():
         # 7.1 Spawn test agents to simulation
         test_agent = world.try_spawn_actor(test_agent_bp, transform)
         test_agent.set_autopilot(True)
-        test_agent.apply_control(carla.VehicleControl(gear=2, throttle=1.0, steer=0.0, hand_brake=False))
+        test_agent.apply_control(carla.VehicleControl(gear=1, throttle=1.0, steer=0.5, hand_brake=False))
 #        test_agent.apply_control(carla.VehicleControl(throttle=1.0, steer=0.0, hand_brake=False))
         # 7.1.1 Setting Traffic Manager to test agent (04162020)
-#        tm.distance_to_leading_vehicle(test_agent, 1)
+        tm.distance_to_leading_vehicle(test_agent, 1)
         tm.ignore_walkers_percentage(test_agent, 80)
         tm.ignore_vehicles_percentage(test_agent, 90)
         tm.ignore_lights_percentage(test_agent, 90)
-        tm.auto_lane_change(test_agent, True)
-#        tm.force_lane_change(test_agent, False)
+#        tm.auto_lane_change(test_agent, True)
+        tm.force_lane_change(test_agent, True)
 #        tm.vehicle_percentage_speed_difference(test_agent, -20)
         actor_list.append(test_agent)
         # 7.2 Spawn sensor, attach to test vehicle
@@ -1005,8 +1005,8 @@ def generate_data():
 #        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='directory where the dataset will be created')
 #        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='input directory')
 #        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='directory where the dataset will be created')
-        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town02', help='input directory')
-        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town02', help='directory where the dataset will be created')
+        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town04', help='input directory')
+        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town04', help='directory where the dataset will be created')
 #        parser.add_argument('--layer_name_list', default='conv33,conv39,conv45', help='list of hidden layers name to extract features')
         parser.add_argument('--layer_name_list', default='conv33', help='list of hidden layers name to extract features')
         args = parser.parse_args()
@@ -1107,8 +1107,8 @@ if __name__ == '__main__':
 #        spawn_motorbike()
 #        spawn_bicycle()
 #        main()
-        main_traffic_manager()
-#        generate_data()
+#        main_traffic_manager()
+        generate_data()
 #        predict_traffic_risk()
 #        start_replay()
     except KeyboardInterrupt:

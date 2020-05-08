@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{b57b2640-9936-4bd4-b586-92cd2040eaae}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>estimation\dataset_generator\dataset_generator_two.py</StartupFile>
+    <StartupFile>risk_prediction\main_trip_vpredictor.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -92,6 +92,9 @@
     <Compile Include="risk_prediction\main_trip_prediction.py" />
     <Compile Include="risk_prediction\main_trip_repeat_training.py" />
     <Compile Include="risk_prediction\main_trip_training.py" />
+    <Compile Include="risk_prediction\main_trip_training_multiprocessing.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="risk_prediction\main_trip_vpredictor.py" />
     <Compile Include="risk_prediction\trip_c_lstm.py" />
     <Compile Include="risk_prediction\trip_dataset.py" />
@@ -110,6 +113,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="trip_combined.py" />
+    <Compile Include="trip_parallel_combined.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="carla_sim\" />
