@@ -29,6 +29,8 @@ Date          Comment
 04162020      Implement Traffic Manager module during spawning AI and test agent (CARLA v0.9.8)
 04172020      Implement Traffic Manager module to every spawn function
 04252020      New function to spawn test agent and AI and implement Traffic Manager
+05082020      Separate vehicle list into 3 individual lists according to vehicle type (4 wheels, 2 wheels - bikes, bicycle),
+              Implement collision detector in test agent
 """
 import sys
 import glob
@@ -67,6 +69,9 @@ actor_list = []
 vehicle_list = []
 walker_list = []
 all_id = []
+# 05082020
+car_list = []
+bike_list = []
 
 # Process image function
 def process_img(image):
@@ -667,11 +672,263 @@ def spawn_npc():
         print("\nDestroying %d walkers" % len(walker_list))
         client.apply_batch_sync([carla.command.DestroyActor(x) for x in all_id])
 
+# 05082020
+def main_traffic_manager_2():
+    # 1. Set up CARLA client connection
+    client = carla.Client('localhost', 2000)
+    client.set_timeout(3.0)
+    tm = client.get_trafficmanager() # default port = 8000
+#    world = client.load_world("Town04")
+    try:
+        # Create output directory for img capture
+        parser = argparse.ArgumentParser(description='dataset_maker')
+        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town04\Phase 3', help='directory where the dataset will be created')
+        args = parser.parse_args()
+        output_dir = args.output_dir
+        # 2. Start logging
+        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+        # 2.1
+        world = client.get_world()
+        print(world.get_map().name)
+        blueprint_library = world.get_blueprint_library()
+        # 4. Create test agents
+        test_agent_bp = blueprint_library.filter('vehicle.*')
+        test_agent_bp = random.choice([x for x in test_agent_bp if int(x.get_attribute('number_of_wheels')) == 4])
+        test_cam_bp = blueprint_library.find('sensor.camera.rgb')
+        test_collision_bp = blueprint_library.find('sensor.other.collision')
+        test_li_bp = blueprint_library.find('sensor.other.lane_invasion')
+        # 4.1 Print test agents blueprints
+        print(test_agent_bp)
+        print(test_cam_bp)
+
+        # Start recording process
+        # Log will automatically be saved to CarlaUE4\Saved folder as 
+        # 'filename.log' if no specific folder is mentioned in parameter
+        print("Recording on file: %s" % client.start_recorder("test_record_01.log"))
+
+        # 5. Set attribute for test agents
+        test_agent_bp.set_attribute('color', '204, 0, 255') # set color as purple
+        test_agent_bp.set_attribute('role_name', 'autopilot')
+        test_cam_bp.set_attribute('image_size_x', f'{IMAGE_WIDTH}')
+        test_cam_bp.set_attribute('image_size_y', f'{IMAGE_HEIGHT}')
+        test_cam_bp.set_attribute("fov", f"100")
+        
+        world.wait_for_tick()
+        # 6 Spawn NPC agents in environment
+        npc_vehicle_bp = blueprint_library.filter('vehicle.*')
+        npc_walker_bp = blueprint_library.filter('walker.pedestrian.*')
+        # Avoid spawning NPC prone to accident
+#        npc_vehicle_bp = [x for x in npc_vehicle_bp if not x.id.endswith('isetta')]
+        npc_vehicle_bp = [x for x in npc_vehicle_bp if not x.id.endswith('carlacola')]
+        # Categorize vehicle bp to 4 wheels and 2 wheels
+        npc_car_bp = [x for x in npc_vehicle_bp if int(x.get_attribute('number_of_wheels')) == 4]
+        npc_bike_bp = [x for x in npc_vehicle_bp if int(x.get_attribute('number_of_wheels')) == 2]
+        # ---------------------
+        # 6.1 Spawn NPC vehicle    
+        # ---------------------
+        spawn_points = world.get_map().get_spawn_points()
+        num_spawn_points = len(spawn_points)
+        print("Number of spawn points: %d" % str(num_spawn_points))
+        npc_amt = int(num_spawn_points / 2)
+        
+        if npc_amt <= num_spawn_points:
+            random.shuffle(spawn_points)
+        elif npc_amt > num_spawn_points:
+            msg = 'Requested %d vehicles, but could only find %d spawn points'
+            logging.warning(msg, npc_amt, num_spawn_points)
+            print('Requested %d vehicles, but could only find %d spawn points' % (npc_amt, num_spawn_points))
+            npc_amt = int(num_spawn_points / 2)  # Assign half number of spawn points to NPC to prevent spawning error
+
+        npc_car_amt = int(npc_amt / 2) 
+        npc_bike_amt =  npc_amt - npc_car_amt
+        #---------------------
+        # 6.1.1 Spawn NPC car
+        #---------------------
+        for n, transform in enumerate(spawn_points):
+            if n >= npc_car_amt:
+                break
+            blueprint = random.choice(npc_car_bp)
+            if blueprint.has_attribute('color'):
+                color = random.choice(blueprint.get_attribute('color').recommended_values)
+                blueprint.set_attribute('color', color)
+            if blueprint.has_attribute('driver_id'):
+                driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
+                blueprint.set_attribute('driver_id', driver_id)
+            blueprint.set_attribute('role_name', 'autopilot')
+            car = world.try_spawn_actor(blueprint, transform)
+            car.set_autopilot(enabled=True)
+#            tm.ignore_lights_percentage(car, 90) # 04062020
+#            traffic_manager.vehicle_percentage_speed_difference(car, -20) # 04062020
+#            traffic_manager.distance_to_leading_vehicle(car, 30)
+#            tm.ignore_walkers_percentage(car, 80)
+#            tm.ignore_vehicles_percentage(car, 90)
+#            traffic_manager.auto_lane_change(car, False)
+            car_list.append(car)    
+        #------------------------
+        # 6.1.2 Spawn NPC bicycle
+        #------------------------
+        for n, transform in enumerate(spawn_points):
+            if n >= npc_bike_amt:
+                break
+            blueprint = random.choice(npc_bike_bp)
+            if blueprint.has_attribute('color'):
+                color = random.choice(blueprint.get_attribute('color').recommended_values)
+                blueprint.set_attribute('color', color)
+            if blueprint.has_attribute('driver_id'):
+                driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
+                blueprint.set_attribute('driver_id', driver_id)
+            blueprint.set_attribute('role_name', 'autopilot')
+            bike = world.try_spawn_actor(blueprint, transform)
+            bike.set_autopilot(enabled=True)
+#            tm.ignore_lights_percentage(bike, 90) # 04062020
+#            traffic_manager.vehicle_percentage_speed_difference(bike, -20) # 04062020
+#            traffic_manager.distance_to_leading_vehicle(bike, 30)
+#            tm.ignore_walkers_percentage(bike, 80)
+#            tm.ignore_vehicles_percentage(bike, 90)
+#            traffic_manager.auto_lane_change(bike, False)
+            bike_list.append(bike)
+        # ----------------------
+        # 6.2 Spawn NPC walkers    
+        # ----------------------
+        # some settings
+        percentagePedestriansRunning = 40.0      # how many pedestrians will run
+        percentagePedestriansCrossing = 70.0     # how many pedestrians will walk through the road
+        # 6.2.1 take all random locations to spawn
+        spawn_points = []
+        #npc_walker_amt = NPC_WALKER_AMT
+        #npc_walker_amt = random.randint(100, npc_amt) # 02282020 #03022020 (minimum number of NPC walker = 50)
+        npc_walker_amt = int(num_spawn_points / 2)
+        '''
+        if npc_walker_amt > npc_amt:
+            npc_walker_amt = npc_amt
+            npc_walker_amt = int(npc_walker_amt / 2)
+        else:
+            npc_walker_amt = npc_walker_amt
+        '''
+        for i in range(npc_walker_amt):
+            spawn_point = carla.Transform()
+            loc = world.get_random_location_from_navigation()
+            if (loc != None):
+                spawn_point.location = loc
+                spawn_points.append(spawn_point)
+        # 6.2.2 spawn walker object
+        batch = []
+        walker_speed = []
+        for spawn_point in spawn_points:
+            walker_bp = random.choice(npc_walker_bp)
+            # set as not invincible
+            if walker_bp.has_attribute('is_invincible'):
+                walker_bp.set_attribute('is_invincible', 'false')
+            # set max speed
+            if walker_bp.has_attribute('speed'):
+                if(random.random() > percentagePedestriansRunning):
+                    # walking
+                    walker_speed.append(walker_bp.get_attribute('speed').recommended_values[1])
+                else:
+                    # running
+                    walker_speed.append(walker_bp.get_attribute('speed').recommended_values[2])
+            else:
+                print("Walker has no speed")
+                walker_speed.append(0.0)
+            batch.append(carla.command.SpawnActor(walker_bp, spawn_point))
+        results = client.apply_batch_sync(batch, True)
+        walker_speed2 = []
+        for i in range(len(results)):
+            if results[i].error:
+                logging.error(results[i].error)
+            else:
+                walker_list.append({"id": results[i].actor_id})
+                walker_speed2.append(walker_speed[i])
+        walker_speed = walker_speed2
+        # 6.2.3 spawn walker controller
+        batch = []
+        walker_controller_bp = world.get_blueprint_library().find('controller.ai.walker')
+        for i in range(len(walker_list)):
+            batch.append(carla.command.SpawnActor(walker_controller_bp, carla.Transform(), walker_list[i]["id"]))
+        results = client.apply_batch_sync(batch, True)
+        for i in range(len(results)):
+            if results[i].error:
+                logging.error(results[i].error)
+            else:
+                walker_list[i]["con"] = results[i].actor_id
+        # 6.2.4 we put altogether the walkers and controllers id to get the objects from their id
+        for i in range(len(walker_list)):
+            all_id.append(walker_list[i]["con"])
+            all_id.append(walker_list[i]["id"])
+        all_actors = world.get_actors(all_id)
+
+        # 6.2.5 initialize each controller and set target to walk to (list is [controler, actor, controller, actor ...])
+        # set how many pedestrians can cross the road
+        world.set_pedestrians_cross_factor(percentagePedestriansCrossing)
+        for i in range(0, len(all_id), 2):
+            # start walker
+            all_actors[i].start()
+            # set walk to random point
+            all_actors[i].go_to_location(world.get_random_location_from_navigation())
+            # max speed
+            all_actors[i].set_max_speed(float(walker_speed[int(i/2)]))
+            
+        print('Spawned %d cars, %d bikes and %d walkers.' % (len(car_list), len(bike_list), len(walker_list)))
+        
+        # 7. Define spawn point (manual) for test agents
+        transform = random.choice(world.get_map().get_spawn_points())
+        transform_2 = carla.Transform(carla.Location(x=2.5, y=1.1, z=0.7))
+        transform_3 = carla.Transform(carla.Location(x=2.6, y=1.1, z=0.7))
+        # 7.1 Spawn test agents to simulation
+        test_agent = world.try_spawn_actor(test_agent_bp, transform)
+        test_agent.set_autopilot(enabled=True)
+        test_agent.apply_control(carla.VehicleControl(gear=1, throttle=1.0, steer=0.5, hand_brake=False))
+#        test_agent.apply_control(carla.VehicleControl(throttle=1.0, steer=0.0, hand_brake=False))
+        # 7.1.1 Setting Traffic Manager to test agent (04162020)
+        tm.distance_to_leading_vehicle(test_agent, 1)
+        tm.ignore_walkers_percentage(test_agent, 80)
+        tm.ignore_vehicles_percentage(test_agent, 90)
+        tm.ignore_lights_percentage(test_agent, 90)
+#        tm.auto_lane_change(test_agent, True)
+        tm.force_lane_change(test_agent, True)
+#        tm.vehicle_percentage_speed_difference(test_agent, -20)
+        actor_list.append(test_agent)
+        # 7.2 Spawn sensor, attach to test vehicle
+        test_cam = world.try_spawn_actor(test_cam_bp, transform_2, attach_to=test_agent)
+        test_collision = world.try_spawn_actor(test_collision_bp, transform_3, attach_to=test_agent)
+#        test_cam.listen(lambda image: process_img(image))
+        test_cam.listen(lambda image: predict_risk_img(image, output_dir))
+        actor_list.append(test_cam)
+        actor_list.append(test_collision)
+
+        print('spawned %d test agents, press Ctrl+C to exit.' % len(actor_list))
+
+        while True:
+            world.wait_for_tick() # wait for world to get actors
+            time.sleep(1)
+        
+    finally:
+        print("\nDestroying %d actors" % len(actor_list))
+        client.apply_batch_sync([carla.command.DestroyActor(x) for x in actor_list])
+        print("\nDestroying %d cars" % len(car_list))
+        client.apply_batch_sync([carla.command.DestroyActor(x) for x in car_list])        
+        print("\nDestroying %d bikes" % len(bike_list))
+        client.apply_batch_sync([carla.command.DestroyActor(x) for x in bike_list])        
+        # stop walker controllers (list is [controller, actor, controller, actor ...])
+        for i in range(0, len(all_id), 2):
+            all_actors[i].stop()
+        
+        print("\nDestroying %d walkers" % len(walker_list))
+        client.apply_batch_sync([carla.command.DestroyActor(x) for x in all_id])        
+        print("\n Reset traffic lights")
+        tm.reset_traffic_lights()
+        # Stop recording
+        print("\nStop recording")
+        client.stop_recorder()
+#        generate_data()
+        print("\nAll cleaned up.")
+
 # 04252020
 def main_traffic_manager():
     # 1. Set up CARLA client connection
     client = carla.Client('localhost', 2000)
     client.set_timeout(4.0)
+    # 1.1 Create traffic manager client
     tm = client.get_trafficmanager() # default port = 8000
     world = client.load_world("Town04")
     try:
@@ -685,7 +942,6 @@ def main_traffic_manager():
         world = client.get_world()
         print(world.get_map().name)
         blueprint_library = world.get_blueprint_library()
-        # 3.2 Create traffic manager client
         # 3.3 Setting synchronous mode (04172020)
 #        synchronous_master = False
 #        settings = world.get_settings()
@@ -878,10 +1134,10 @@ def main_traffic_manager():
         
         print("\nDestroying %d walkers" % len(walker_list))
         client.apply_batch_sync([carla.command.DestroyActor(x) for x in all_id])        
-        print("\n reset traffic lights")
+        print("\n Reset traffic lights")
         tm.reset_traffic_lights()
         # Stop recording
-        print("Stop recording")
+        print("\nStop recording")
         client.stop_recorder()
 #        generate_data()
         print("\nAll cleaned up.")
@@ -1107,8 +1363,8 @@ if __name__ == '__main__':
 #        spawn_motorbike()
 #        spawn_bicycle()
 #        main()
-#        main_traffic_manager()
-        generate_data()
+        main_traffic_manager()
+#        generate_data()
 #        predict_traffic_risk()
 #        start_replay()
     except KeyboardInterrupt:
