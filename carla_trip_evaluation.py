@@ -678,11 +678,11 @@ def main_traffic_manager_2():
     client = carla.Client('localhost', 2000)
     client.set_timeout(3.0)
     tm = client.get_trafficmanager() # default port = 8000
-#    world = client.load_world("Town04")
+    world = client.load_world("Town05")
     try:
         # Create output directory for img capture
         parser = argparse.ArgumentParser(description='dataset_maker')
-        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town04\Phase 3', help='directory where the dataset will be created')
+        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town05\Phase 1', help='directory where the dataset will be created')
         args = parser.parse_args()
         output_dir = args.output_dir
         # 2. Start logging
@@ -728,7 +728,7 @@ def main_traffic_manager_2():
         # ---------------------
         spawn_points = world.get_map().get_spawn_points()
         num_spawn_points = len(spawn_points)
-        print("Number of spawn points: %d" % str(num_spawn_points))
+        print("Number of spawn points: %d" % int(num_spawn_points))
         npc_amt = int(num_spawn_points / 2)
         
         if npc_amt <= num_spawn_points:
@@ -779,7 +779,7 @@ def main_traffic_manager_2():
                 blueprint.set_attribute('driver_id', driver_id)
             blueprint.set_attribute('role_name', 'autopilot')
             bike = world.try_spawn_actor(blueprint, transform)
-            bike.set_autopilot(enabled=True)
+#            bike.set_autopilot(enabled=True)
 #            tm.ignore_lights_percentage(bike, 90) # 04062020
 #            traffic_manager.vehicle_percentage_speed_difference(bike, -20) # 04062020
 #            traffic_manager.distance_to_leading_vehicle(bike, 30)
@@ -1261,8 +1261,8 @@ def generate_data():
 #        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='directory where the dataset will be created')
 #        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='input directory')
 #        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='directory where the dataset will be created')
-        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town04', help='input directory')
-        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town04', help='directory where the dataset will be created')
+        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town05', help='input directory')
+        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town05', help='directory where the dataset will be created')
 #        parser.add_argument('--layer_name_list', default='conv33,conv39,conv45', help='list of hidden layers name to extract features')
         parser.add_argument('--layer_name_list', default='conv33', help='list of hidden layers name to extract features')
         args = parser.parse_args()
@@ -1363,7 +1363,8 @@ if __name__ == '__main__':
 #        spawn_motorbike()
 #        spawn_bicycle()
 #        main()
-        main_traffic_manager()
+#        main_traffic_manager()
+         main_traffic_manager_2()
 #        generate_data()
 #        predict_traffic_risk()
 #        start_replay()
