@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{b57b2640-9936-4bd4-b586-92cd2040eaae}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>risk_prediction\main_trip_vpredictor.py</StartupFile>
+    <StartupFile>estimation\file_editing\parameter_file_writing.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -87,6 +87,9 @@
     <Compile Include="estimation\file_editing\folder.py" />
     <Compile Include="estimation\file_editing\gta2yolo.py" />
     <Compile Include="estimation\file_editing\make_result_table_vpredict.py" />
+    <Compile Include="estimation\file_editing\parameter_file_writing.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="estimation\file_editing\weighttonpz.py" />
     <Compile Include="carla_trip_evaluation.py" />
     <Compile Include="risk_prediction\main_trip_prediction.py" />
