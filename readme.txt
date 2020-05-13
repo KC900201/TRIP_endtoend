@@ -114,7 +114,13 @@ Updates
 2020/04/19 - Implement both ReLU and RReLU together in new model architecture (trip_c_lstm.py)
 2020/04/28 - Implement both ReLU and ELU in new model architecture (trip_c_lstm.py)
 2020/04/30 - Replace multithread iterator with multiprocess iterator to reduce training time and increase efficiency (trip_trainer.py)
-
+2020/05/04 - Revert to multithreading
+2020/05/05 - Include adamw optimizer (trip_trainer.py)
+2020/05/08 - Update changes to carla_trip_evalution.py
+2020/05/09 - Separate vehicle list into 3 individual lists according to vehicle type (4 wheels, 2 wheels - bikes, bicycle)  
+	     Implement collision detector in test agent (carla_trip_evaluation.py)
+2020/05/13 - New source code to automate parameter file writing (parameter_file_writing.py)
+	   - Implement checking of None object type if spawning actors and test agents (carla_trip_evaluation.py)
 
 	     
 
