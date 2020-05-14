@@ -32,6 +32,7 @@ Date          Comment
 05082020      Separate vehicle list into 3 individual lists according to vehicle type (4 wheels, 2 wheels - bikes, bicycle),
               Implement collision detector in test agent
 05132020      Implement checking of None object type if spawning actors and test agents
+05142020      Fix spawning of 2 wheel and 4 wheel type vehicles in same enumeration
 """
 import sys
 import glob
@@ -720,7 +721,8 @@ def main_traffic_manager_2():
         npc_vehicle_bp = blueprint_library.filter('vehicle.*')
         npc_walker_bp = blueprint_library.filter('walker.pedestrian.*')
         # Avoid spawning NPC prone to accident
-#        npc_vehicle_bp = [x for x in npc_vehicle_bp if not x.id.endswith('isetta')]
+#        npc_vehicle_bp = [x for x in npc_vehicle_bp if int(x.get_attribute('number_of_wheels')) == 4]
+        npc_vehicle_bp = [x for x in npc_vehicle_bp if not x.id.endswith('isetta')]
         npc_vehicle_bp = [x for x in npc_vehicle_bp if not x.id.endswith('carlacola')]
         # Categorize vehicle bp to 4 wheels and 2 wheels
 #        print(npc_car_bp.get_attribute('id'))
@@ -749,7 +751,9 @@ def main_traffic_manager_2():
         for n, transform in enumerate(spawn_points):
             if n >= npc_car_amt:
                 break
-            blueprint = random.choice([x for x in npc_vehicle_bp if int(x.get_attribute('number_of_wheels')) == 4 and x is not None])
+            # 05142020
+#            blueprint = random.choice([x for x in npc_vehicle_bp if int(x.get_attribute('number_of_wheels')) == 4])
+            blueprint = random.choice(npc_vehicle_bp)            
 #            print(blueprint)
             if blueprint.has_attribute('color'):
                 color = random.choice(blueprint.get_attribute('color').recommended_values)
@@ -758,23 +762,36 @@ def main_traffic_manager_2():
                 driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
                 blueprint.set_attribute('driver_id', driver_id)
             blueprint.set_attribute('role_name', 'autopilot')
-            car = world.try_spawn_actor(blueprint, transform)
-            if(not isinstance(car, type(None))): # 05132020
-                car.set_autopilot(enabled=True)
+            if(int(blueprint.get_attribute('number_of_wheels')) == 4):
+                car = world.try_spawn_actor(blueprint, transform)
+                if not (isinstance(car, type(None))): # 05132020
+                    car.set_autopilot(enabled=True)
 #            tm.ignore_lights_percentage(car, 90) # 04062020
 #            traffic_manager.vehicle_percentage_speed_difference(car, -20) # 04062020
 #            traffic_manager.distance_to_leading_vehicle(car, 30)
 #            tm.ignore_walkers_percentage(car, 80)
 #            tm.ignore_vehicles_percentage(car, 90)
 #            traffic_manager.auto_lane_change(car, False)
-                car_list.append(car)    
+                    car_list.append(car)  
+            else:
+                bike = world.try_spawn_actor(blueprint, transform)
+                if not (isinstance(bike, type(None))): # 05132020
+                    bike.set_autopilot(enabled=True)
+#            tm.ignore_lights_percentage(car, 90) # 04062020
+#            traffic_manager.vehicle_percentage_speed_difference(car, -20) # 04062020
+#            traffic_manager.distance_to_leading_vehicle(car, 30)
+#            tm.ignore_walkers_percentage(car, 80)
+#            tm.ignore_vehicles_percentage(car, 90)
+#            traffic_manager.auto_lane_change(car, False)
+                    bike_list.append(bike)
         #------------------------
         # 6.1.2 Spawn NPC bicycle
         #------------------------
+        '''        
         for n, transform in enumerate(spawn_points):
             if n >= npc_bike_amt:
                 break
-            blueprint = random.choice([x for x in npc_vehicle_bp if int(x.get_attribute('number_of_wheels')) == 2 and x is not None])
+            blueprint = random.choice([x for x in npc_vehicle_bp if int(x.get_attribute('number_of_wheels')) == 2])
             print(blueprint)
             if blueprint.has_attribute('color'):
                 color = random.choice(blueprint.get_attribute('color').recommended_values)
@@ -784,7 +801,7 @@ def main_traffic_manager_2():
                 blueprint.set_attribute('driver_id', driver_id)
             blueprint.set_attribute('role_name', 'autopilot')
             bike = world.try_spawn_actor(blueprint, transform)
-            if(not isinstance(bike, type(None))): # 05132020
+            if not (isinstance(bike, type(None))): # 05132020
 #                print(type(bike))
                 bike.set_autopilot(enabled=True)
 #            tm.ignore_lights_percentage(bike, 90) # 04062020
@@ -793,13 +810,14 @@ def main_traffic_manager_2():
 #            tm.ignore_walkers_percentage(bike, 80)
 #            tm.ignore_vehicles_percentage(bike, 90)
 #            traffic_manager.auto_lane_change(bike, False)
-                bike_list.append(bike)
+                bike_list.append(bike)  
+        '''
         # ----------------------
         # 6.2 Spawn NPC walkers    
         # ----------------------
         # some settings
-        percentagePedestriansRunning = 40.0      # how many pedestrians will run
-        percentagePedestriansCrossing = 70.0     # how many pedestrians will walk through the road
+        percentagePedestriansRunning = 10.0      # how many pedestrians will run
+        percentagePedestriansCrossing = 30.0     # how many pedestrians will walk through the road
         # 6.2.1 take all random locations to spawn
         spawn_points = []
         #npc_walker_amt = NPC_WALKER_AMT
@@ -883,7 +901,7 @@ def main_traffic_manager_2():
         transform_3 = carla.Transform(carla.Location(x=2.6, y=1.1, z=0.7))
         # 7.1 Spawn test agents to simulation
         test_agent = world.try_spawn_actor(test_agent_bp, transform)
-        if(not isinstance(test_agent, type(None))): # 05132020
+        if not (isinstance(test_agent, type(None))): # 05132020
             test_agent.set_autopilot(enabled=True)
             test_agent.apply_control(carla.VehicleControl(gear=1, throttle=1.0, steer=0.5, hand_brake=False))
     #        test_agent.apply_control(carla.VehicleControl(throttle=1.0, steer=0.0, hand_brake=False))
@@ -899,7 +917,7 @@ def main_traffic_manager_2():
         # 7.2 Spawn sensor, attach to test vehicle
         test_cam = world.try_spawn_actor(test_cam_bp, transform_2, attach_to=test_agent)
         test_collision = world.try_spawn_actor(test_collision_bp, transform_3, attach_to=test_agent)
-        if(not (isinstance(test_cam, type(None)) or isinstance(test_collision, type(None)))): # 05132020
+        if not ((isinstance(test_cam, type(None)) or isinstance(test_collision, type(None)))): # 05132020
 #        test_cam.listen(lambda image: process_img(image))
             test_cam.listen(lambda image: predict_risk_img(image, output_dir))
             actor_list.append(test_cam)
@@ -924,7 +942,7 @@ def main_traffic_manager_2():
         
         print("\nDestroying %d walkers" % len(walker_list))
         client.apply_batch_sync([carla.command.DestroyActor(x) for x in all_id])        
-        print("\n Reset traffic lights")
+        print("\nReset traffic lights")
         tm.reset_traffic_lights()
         # Stop recording
         print("\nStop recording")
