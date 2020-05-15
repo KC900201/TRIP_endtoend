@@ -680,12 +680,12 @@ def main_traffic_manager_2():
     client = carla.Client('localhost', 2000)
     client.set_timeout(3.0)
     tm = client.get_trafficmanager() # default port = 8000
-#    world = client.load_world("Town05")
+    world = client.load_world("Town05")
     try:
         # Create output directory for img capture
         parser = argparse.ArgumentParser(description='dataset_maker')
-#        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town05\Phase 1', help='directory where the dataset will be created')
-        parser.add_argument('--output_dir', default=r'C:\Users\user\Pictures\CARLA_dataset\test_2\training\Town05\Phase 1', help='directory where the dataset will be created')
+        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town05\Phase 1', help='directory where the dataset will be created')
+#        parser.add_argument('--output_dir', default=r'C:\Users\user\Pictures\CARLA_dataset\test_2\training\Town05\Phase 1', help='directory where the dataset will be created')
         args = parser.parse_args()
         output_dir = args.output_dir
         # 2. Start logging
@@ -746,7 +746,7 @@ def main_traffic_manager_2():
         npc_car_amt = int(npc_amt / 2) 
         npc_bike_amt =  npc_amt - npc_car_amt
         #---------------------
-        # 6.1.1 Spawn NPC car
+        # 6.1.1 Spawn NPC vehicle
         #---------------------
         for n, transform in enumerate(spawn_points):
             if n >= npc_car_amt:
@@ -762,6 +762,7 @@ def main_traffic_manager_2():
                 driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
                 blueprint.set_attribute('driver_id', driver_id)
             blueprint.set_attribute('role_name', 'autopilot')
+            # Spawn NPC car
             if(int(blueprint.get_attribute('number_of_wheels')) == 4):
                 car = world.try_spawn_actor(blueprint, transform)
                 if not (isinstance(car, type(None))): # 05132020
@@ -774,6 +775,7 @@ def main_traffic_manager_2():
 #            traffic_manager.auto_lane_change(car, False)
                     car_list.append(car)  
             else:
+            # Spawn NPC bike
                 bike = world.try_spawn_actor(blueprint, transform)
                 if not (isinstance(bike, type(None))): # 05132020
                     bike.set_autopilot(enabled=True)
@@ -784,40 +786,12 @@ def main_traffic_manager_2():
 #            tm.ignore_vehicles_percentage(car, 90)
 #            traffic_manager.auto_lane_change(car, False)
                     bike_list.append(bike)
-        #------------------------
-        # 6.1.2 Spawn NPC bicycle
-        #------------------------
-        '''        
-        for n, transform in enumerate(spawn_points):
-            if n >= npc_bike_amt:
-                break
-            blueprint = random.choice([x for x in npc_vehicle_bp if int(x.get_attribute('number_of_wheels')) == 2])
-            print(blueprint)
-            if blueprint.has_attribute('color'):
-                color = random.choice(blueprint.get_attribute('color').recommended_values)
-                blueprint.set_attribute('color', color)
-            if blueprint.has_attribute('driver_id'):
-                driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
-                blueprint.set_attribute('driver_id', driver_id)
-            blueprint.set_attribute('role_name', 'autopilot')
-            bike = world.try_spawn_actor(blueprint, transform)
-            if not (isinstance(bike, type(None))): # 05132020
-#                print(type(bike))
-                bike.set_autopilot(enabled=True)
-#            tm.ignore_lights_percentage(bike, 90) # 04062020
-#            traffic_manager.vehicle_percentage_speed_difference(bike, -20) # 04062020
-#            traffic_manager.distance_to_leading_vehicle(bike, 30)
-#            tm.ignore_walkers_percentage(bike, 80)
-#            tm.ignore_vehicles_percentage(bike, 90)
-#            traffic_manager.auto_lane_change(bike, False)
-                bike_list.append(bike)  
-        '''
         # ----------------------
         # 6.2 Spawn NPC walkers    
         # ----------------------
         # some settings
-        percentagePedestriansRunning = 10.0      # how many pedestrians will run
-        percentagePedestriansCrossing = 30.0     # how many pedestrians will walk through the road
+        percentagePedestriansRunning = 40.0      # how many pedestrians will run
+        percentagePedestriansCrossing = 70.0     # how many pedestrians will walk through the road
         # 6.2.1 take all random locations to spawn
         spawn_points = []
         #npc_walker_amt = NPC_WALKER_AMT
