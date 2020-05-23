@@ -34,6 +34,8 @@ Date          Comment
 05132020      Implement checking of None object type if spawning actors and test agents
 05142020      Fix spawning of 2 wheel and 4 wheel type vehicles in same enumeration
 05152020      Create function to display collision info, Fix delegation of spawning
+05212020      Test input text in created image 
+05232020      Further test input text in created image
 """
 import sys
 import glob
@@ -66,6 +68,8 @@ from risk_prediction.trip_vpredictor import TripVPredictor
 
 IMAGE_WIDTH = 1280
 IMAGE_HEIGHT = 720
+# Global variable for collision info
+COLLISION_INFO = ''
 
 # Create list of actors for test agent, NPC (vehicles, pedestrians)
 actor_list = []
@@ -75,6 +79,7 @@ all_id = []
 # 05082020
 car_list = []
 bike_list = []
+# 05232020
 
 # Process image function
 def process_img(image):
@@ -87,14 +92,64 @@ def process_img(image):
     image.save_to_disk('_out/%08d' % image.frame) # 02282020
     return i3 / 255.0
 
+def test_write_text_img():    
+    # Create a black image
+    #img = np.zeros((512,512,3), np.uint8)
+    
+    # load an image from existing dataset
+    img = cv2.imread("C:/Users/atsumilab/Pictures/CARLA_dataset/test_2/training/Town05/Phase 1/orig_img/00004969.png", cv2.IMREAD_COLOR)
+    
+    # Write some Text
+    
+    font                   = cv2.FONT_HERSHEY_SIMPLEX
+    bottomLeftCornerOfText = (10,500)
+    fontScale              = 1
+    fontColor              = (0,0,0)
+    lineType               = 2
+    
+    cv2.putText(img,'Hello World!', 
+        bottomLeftCornerOfText, 
+        font, 
+        fontScale,
+        fontColor,
+        lineType)
+    
+    #Display the image
+    cv2.imshow("img",img)
+    
+    #Save image
+    cv2.imwrite("out.png", img)
+    
+    cv2.waitKey(0)
+    print("Finished testing")
+
 # 03132020   
 def predict_risk_img(image, output_dir):
     # Process image
     i = np.array(image.raw_data)
     i2 = i.reshape((IMAGE_HEIGHT, IMAGE_WIDTH, 4))
     i3 = i2[:, :, :3] # height, width, first 3 rgb value
-    cv2.imshow("", i3)
-    cv2.waitKey(2) # delay 2 seconds
+    
+    # 05212020
+    font = cv2.FONT_HERSHEY_COMPLEX
+    bottomleft = (10,500)
+    fontScale = 10
+    fontColor = (0,0,0)
+    lineType = 2
+        
+    # 05232020
+    print(len(COLLISION_INFO))
+    img = cv2.putText(i3,str(COLLISION_INFO), 
+        bottomleft, 
+        font, 
+        fontScale,
+        fontColor,
+        lineType)  
+    # end 05212020
+#    cv2.imwrite("out.jpg", i3)
+    cv2.imshow("image", img)
+    
+    cv2.waitKey(1) # delay 1 seconds
     # save image
 #    image.save_to_disk(output_dir + '/test/orig_img/%08d' % image.frame)
 #    image.save_to_disk(output_dir + '/Town01/orig_img/%08d' % image.frame)
@@ -108,8 +163,18 @@ def get_actor_display_name(actor, truncate=250):
 
 def get_collision_info(event):
     actor_type = get_actor_display_name(event.other_actor)
-    print('Collision with %r' % actor_type)
-
+    COLLISION_INFO = 'Collision with ' + str(actor_type)
+#    print('Collision with %r' % actor_type)
+    print(COLLISION_INFO)
+    
+'''
+def callback(event):
+    for actor_id in event:
+        vehicle = world_ref().get_actor(actor_id)
+        print('Vehicle too close: %s' % vehicle.type_id)
+'''
+# end 05152020
+    
 # Function to return percentage (int) of whole number
 # Used to delegate ratio of NPC spawning by category (car, bike, pedestrian)
 def percentage(percent, whole):
@@ -695,11 +760,11 @@ def main_traffic_manager_2():
     client = carla.Client('localhost', 2000)
     client.set_timeout(3.0)
     tm = client.get_trafficmanager() # default port = 8000
-    world = client.load_world("Town05")
+#    world = client.load_world("Town05")
     try:
         # Create output directory for img capture
         parser = argparse.ArgumentParser(description='dataset_maker')
-        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town05\Phase 3', help='directory where the dataset will be created')
+        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town05\Phase 4', help='directory where the dataset will be created')
 #        parser.add_argument('--output_dir', default=r'C:\Users\user\Pictures\CARLA_dataset\test_2\training\Town05\Phase 1', help='directory where the dataset will be created')
         args = parser.parse_args()
         output_dir = args.output_dir
@@ -714,10 +779,11 @@ def main_traffic_manager_2():
         test_agent_bp = random.choice([x for x in test_agent_bp if int(x.get_attribute('number_of_wheels')) == 4 and x is not None])
         test_cam_bp = blueprint_library.find('sensor.camera.rgb')
         test_collision_bp = blueprint_library.find('sensor.other.collision')
-        test_li_bp = blueprint_library.find('sensor.other.lane_invasion')
+#        test_li_bp = blueprint_library.find('sensor.other.lane_invasion')
         # 4.1 Print test agents blueprints
         print(test_agent_bp)
         print(test_cam_bp)
+        print(test_collision_bp)
 
         # Start recording process
         # Log will automatically be saved to CarlaUE4\Saved folder as 
@@ -730,7 +796,8 @@ def main_traffic_manager_2():
         test_cam_bp.set_attribute('image_size_x', f'{IMAGE_WIDTH}')
         test_cam_bp.set_attribute('image_size_y', f'{IMAGE_HEIGHT}')
         test_cam_bp.set_attribute("fov", f"100")
-        
+        test_collision_bp.set_attribute("role_name", 'autopilot')   # 05152020     
+
         world.wait_for_tick()
         # 6 Spawn NPC agents in environment
         npc_vehicle_bp = blueprint_library.filter('vehicle.*')
@@ -749,9 +816,9 @@ def main_traffic_manager_2():
         num_spawn_points = len(spawn_points)
         print("Number of spawn points: %d" % int(num_spawn_points))
         #npc_amt = int(num_spawn_points / 2)
-        npc_amt = percentage(80, num_spawn_points) # 05152020
-        npc_car_amt = percentage(15, num_spawn_points)
-        npc_bike_amt = percentage(15, num_spawn_points)
+        npc_amt = percentage(70, num_spawn_points) # 05152020
+        npc_car_amt = percentage(25, num_spawn_points)
+        npc_bike_amt = percentage(25, num_spawn_points)
         
         if npc_amt <= num_spawn_points:
             random.shuffle(spawn_points)
@@ -843,14 +910,14 @@ def main_traffic_manager_2():
         # 6.2 Spawn NPC walkers    
         # ----------------------
         # some settings
-        percentagePedestriansRunning = 30.0      # how many pedestrians will run
-        percentagePedestriansCrossing = 90.0     # how many pedestrians will walk through the road
+        percentagePedestriansRunning = 40.0      # how many pedestrians will run
+        percentagePedestriansCrossing = 70.0     # how many pedestrians will walk through the road
         # 6.2.1 take all random locations to spawn
         spawn_points = []
         #npc_walker_amt = NPC_WALKER_AMT
         #npc_walker_amt = random.randint(100, npc_amt) # 02282020 #03022020 (minimum number of NPC walker = 50)
         #npc_walker_amt = int(num_spawn_points / 2)
-        npc_walker_amt = percentage(70, num_spawn_points)
+        npc_walker_amt = percentage(15, num_spawn_points)
         '''
         if npc_walker_amt > npc_amt:
             npc_walker_amt = npc_amt
@@ -926,7 +993,7 @@ def main_traffic_manager_2():
         # 7. Define spawn point (manual) for test agents
         transform = random.choice(world.get_map().get_spawn_points())
         transform_2 = carla.Transform(carla.Location(x=2.5, y=1.1, z=0.7))
-#        transform_3 = carla.Transform(carla.Location(x=2.6, y=1.1, z=0.7))
+        transform_3 = carla.Transform(carla.Location(x=2.5, y=2.1, z=0.7))
         # 7.1 Spawn test agents to simulation
         test_agent = world.try_spawn_actor(test_agent_bp, transform)
         if not (isinstance(test_agent, type(None))): # 05132020
@@ -935,21 +1002,23 @@ def main_traffic_manager_2():
     #        test_agent.apply_control(carla.VehicleControl(throttle=1.0, steer=0.0, hand_brake=False))
             # 7.1.1 Setting Traffic Manager to test agent (04162020)
 #            tm.distance_to_leading_vehicle(test_agent, 1)
-            tm.ignore_walkers_percentage(test_agent, 100)
-            tm.ignore_vehicles_percentage(test_agent, 40)
-            tm.ignore_lights_percentage(test_agent, 90)
+            tm.ignore_walkers_percentage(test_agent, 50)
+            tm.ignore_vehicles_percentage(test_agent, 80)
+            tm.ignore_lights_percentage(test_agent, 70)
     #        tm.auto_lane_change(test_agent, True)
             tm.force_lane_change(test_agent, True)
     #        tm.vehicle_percentage_speed_difference(test_agent, -20)
             actor_list.append(test_agent)
         # 7.2 Spawn sensor, attach to test vehicle
-        test_cam = world.try_spawn_actor(test_cam_bp, transform_2, attach_to=test_agent)
-#        test_collision = world.try_spawn_actor(test_collision_bp, transform_3, attach_to=test_agent)
-        if not ((isinstance(test_cam, type(None)))): # 05132020
 #        test_cam.listen(lambda image: process_img(image))
+        test_collision = world.try_spawn_actor(test_collision_bp, transform_3, attach_to=test_agent)
+        test_cam = world.try_spawn_actor(test_cam_bp, transform_2, attach_to=test_agent, attachment_type=carla.AttachmentType.Rigid)
+        if not ((isinstance(test_collision, type(None)))): # 05132020
+            test_collision.listen(lambda event: get_collision_info(event))
+            actor_list.append(test_collision)
+        if not ((isinstance(test_cam, type(None)))): # 05132020
             test_cam.listen(lambda image: predict_risk_img(image, output_dir))
             actor_list.append(test_cam)
-#            actor_list.append(test_collision)
 
         print('spawned %d test agents, press Ctrl+C to exit.' % len(actor_list))
 
@@ -985,10 +1054,10 @@ def main_traffic_manager():
     client.set_timeout(4.0)
     # 1.1 Create traffic manager client
     tm = client.get_trafficmanager() # default port = 8000
-    world = client.load_world("Town04")
+    world = client.load_world("Town05")
     try:
         parser = argparse.ArgumentParser(description='dataset_maker')
-        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town04\Phase 3', help='directory where the dataset will be created')
+        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town05\Phase 4', help='directory where the dataset will be created')
         args = parser.parse_args()
         output_dir = args.output_dir
         # 2. Start logging
@@ -1005,6 +1074,8 @@ def main_traffic_manager():
         test_agent_bp = blueprint_library.filter('vehicle.*')
         test_agent_bp = random.choice([x for x in test_agent_bp if int(x.get_attribute('number_of_wheels')) == 4])
         test_cam_bp = blueprint_library.find('sensor.camera.rgb')
+        test_collision_bp = blueprint_library.find('sensor.other.collision')
+#        test_li_bp = blueprint_library.find('sensor.other.lane_invasion')
         # 4.1 Print test agents blueprints
         print(test_agent_bp)
         print(test_cam_bp)
@@ -1020,7 +1091,8 @@ def main_traffic_manager():
         test_cam_bp.set_attribute('image_size_x', f'{IMAGE_WIDTH}')
         test_cam_bp.set_attribute('image_size_y', f'{IMAGE_HEIGHT}')
         test_cam_bp.set_attribute("fov", f"110")
-                        
+        test_collision_bp.set_attribute("role_name", 'autopilot')   # 05152020     
+        
         world.wait_for_tick()
         
         # 6 Spawn NPC agents in environment
@@ -1058,15 +1130,15 @@ def main_traffic_manager():
                 blueprint.set_attribute('driver_id', driver_id)
             blueprint.set_attribute('role_name', 'autopilot')
             vehicle = world.try_spawn_actor(blueprint, transform)
-            #vehicle.set_autopilot(True)
-            vehicle.set_autopilot(enabled=True)
-#            tm.ignore_lights_percentage(vehicle, 90) # 04062020
-#            traffic_manager.vehicle_percentage_speed_difference(vehicle, -20) # 04062020
-#            traffic_manager.distance_to_leading_vehicle(vehicle, 30)
-#            tm.ignore_walkers_percentage(vehicle, 80)
-#            tm.ignore_vehicles_percentage(vehicle, 90)
-#            traffic_manager.auto_lane_change(vehicle, False)
-            vehicle_list.append(vehicle)            
+            if not (isinstance(vehicle, type(None))): # 05132020
+                vehicle.set_autopilot(enabled=True)
+    #            tm.ignore_lights_percentage(vehicle, 90) # 04062020
+    #            traffic_manager.vehicle_percentage_speed_difference(vehicle, -20) # 04062020
+    #            traffic_manager.distance_to_leading_vehicle(vehicle, 30)
+    #            tm.ignore_walkers_percentage(vehicle, 80)
+    #            tm.ignore_vehicles_percentage(vehicle, 90)
+    #            traffic_manager.auto_lane_change(vehicle, False)
+                vehicle_list.append(vehicle)            
         # ----------------------
         # 6.2 Spawn NPC walkers    
         # ----------------------
@@ -1151,26 +1223,34 @@ def main_traffic_manager():
         
         # 7. Define spawn point (manual) for test agents
         transform = random.choice(world.get_map().get_spawn_points())
-        transform_2 = carla.Transform(carla.Location(x=2.5, y=1.1, z=0.7))
+        transform_2 = carla.Transform(carla.Location(x=2.5, y=1.1, z=0.6))
+#        transform_2 = random.choice(world.get_map().get_spawn_points())
+        transform_3 = carla.Transform(carla.Location(x=2.5, y=2.1, z=0.7))
         # 7.1 Spawn test agents to simulation
         test_agent = world.try_spawn_actor(test_agent_bp, transform)
-        test_agent.set_autopilot(True)
-        test_agent.apply_control(carla.VehicleControl(gear=1, throttle=1.0, steer=0.5, hand_brake=False))
-#        test_agent.apply_control(carla.VehicleControl(throttle=1.0, steer=0.0, hand_brake=False))
-        # 7.1.1 Setting Traffic Manager to test agent (04162020)
-        tm.distance_to_leading_vehicle(test_agent, 1)
-        tm.ignore_walkers_percentage(test_agent, 80)
-        tm.ignore_vehicles_percentage(test_agent, 90)
-        tm.ignore_lights_percentage(test_agent, 90)
-#        tm.auto_lane_change(test_agent, True)
-        tm.force_lane_change(test_agent, True)
-#        tm.vehicle_percentage_speed_difference(test_agent, -20)
-        actor_list.append(test_agent)
+        if not (isinstance(test_agent, type(None))): # 05132020
+            test_agent.set_autopilot(True)
+            test_agent.apply_control(carla.VehicleControl(gear=1, throttle=1.0, steer=0.5, hand_brake=False))
+    #        test_agent.apply_control(carla.VehicleControl(throttle=1.0, steer=0.0, hand_brake=False))
+            # 7.1.1 Setting Traffic Manager to test agent (04162020)
+            tm.distance_to_leading_vehicle(test_agent, 1)
+            tm.ignore_walkers_percentage(test_agent, 80)
+            tm.ignore_vehicles_percentage(test_agent, 90)
+            tm.ignore_lights_percentage(test_agent, 90)
+    #        tm.auto_lane_change(test_agent, True)
+            tm.force_lane_change(test_agent, True)
+    #        tm.vehicle_percentage_speed_difference(test_agent, -20)
+            actor_list.append(test_agent)
         # 7.2 Spawn sensor, attach to test vehicle
-        test_cam = world.try_spawn_actor(test_cam_bp, transform_2, attach_to=test_agent)
+        test_cam = world.try_spawn_actor(test_cam_bp, transform_2, attach_to=test_agent, attachment_type=carla.AttachmentType.Rigid)
+        test_collision = world.try_spawn_actor(test_collision_bp, transform_3, attach_to=test_agent)
 #        test_cam.listen(lambda image: process_img(image))
-        test_cam.listen(lambda image: predict_risk_img(image, output_dir))
-        actor_list.append(test_cam)
+        if not ((isinstance(test_cam, type(None)))): # 05132020
+            test_cam.listen(lambda image: predict_risk_img(image, output_dir))
+            actor_list.append(test_cam)
+        if not ((isinstance(test_cam, type(None)))): # 05132020
+            test_collision.listen(lambda event: get_collision_info(event))
+            actor_list.append(test_collision)
 
         print('spawned %d test agents, press Ctrl+C to exit.' % len(actor_list))
 
@@ -1419,6 +1499,7 @@ if __name__ == '__main__':
 #        spawn_bicycle()
 #        main()
 #        main_traffic_manager()
+#        test_write_text_img()
          main_traffic_manager_2()
 #        generate_data()
 #        predict_traffic_risk()
