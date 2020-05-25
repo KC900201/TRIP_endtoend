@@ -20,6 +20,7 @@ Created on Mon May 25 17:23:23 2020
 Date          Comment
 ========================
 05252020      First revision 
+05252020      Include Traffic Manager
 """
 
 from __future__ import print_function
@@ -312,9 +313,10 @@ def generate_data():
 # ==============================================================================
 
 class World(object):
-    def __init__(self, carla_world, hud, args):
+    def __init__(self, carla_world, traffic_manager, hud, args):
         self.world = carla_world
         self.actor_role_name = args.rolename
+        self.traffic_manager = traffic_manager # 05252020
         try:
             self.map = self.world.get_map()
         except RuntimeError as error:
@@ -370,6 +372,10 @@ class World(object):
             spawn_point.rotation.pitch = 0.0
             self.destroy()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
+            # 05252020
+            self.traffic_manager.ignore_walkers_percentage(self.player, 50)
+            self.traffic_manager.ignore_vehicles_percentage(self.player, 80)
+            self.traffic_manager.ignore_lights_percentage(self.player, 70)
         while self.player is None:
             if not self.map.get_spawn_points():
                 print('There are no spawn points available in your map/town.')
@@ -378,11 +384,15 @@ class World(object):
             spawn_points = self.map.get_spawn_points()
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
+            # 05252020
+            self.traffic_manager.ignore_walkers_percentage(self.player, 50)
+            self.traffic_manager.ignore_vehicles_percentage(self.player, 80)
+            self.traffic_manager.ignore_lights_percentage(self.player, 70)
         # Set up the sensors.
         self.collision_sensor = CollisionSensor(self.player, self.hud)
         self.lane_invasion_sensor = LaneInvasionSensor(self.player, self.hud)
-#        self.gnss_sensor = GnssSensor(self.player)
-#        self.imu_sensor = IMUSensor(self.player)
+        self.gnss_sensor = GnssSensor(self.player)
+        self.imu_sensor = IMUSensor(self.player)
         self.camera_manager = CameraManager(self.player, self.hud, self._gamma)
         self.camera_manager.transform_index = cam_pos_index
         self.camera_manager.set_sensor(cam_index, notify=False)
@@ -395,14 +405,14 @@ class World(object):
         preset = self._weather_presets[self._weather_index]
         self.hud.notification('Weather: %s' % preset[1])
         self.player.get_world().set_weather(preset[0])
-    """
+    
     def toggle_radar(self):
         if self.radar_sensor is None:
             self.radar_sensor = RadarSensor(self.player)
         elif self.radar_sensor.sensor is not None:
             self.radar_sensor.sensor.destroy()
             self.radar_sensor = None
-    """
+    
     def tick(self, clock):
         self.hud.tick(self, clock)
 
@@ -422,8 +432,8 @@ class World(object):
             self.camera_manager.sensor,
             self.collision_sensor.sensor,
             self.lane_invasion_sensor.sensor,
-            self.gnss_sensor.sensor,
-            self.imu_sensor.sensor,
+#            self.gnss_sensor.sensor,
+#            self.imu_sensor.sensor,
             self.player]
         for actor in actors:
             if actor is not None:
@@ -645,7 +655,7 @@ class HUD(object):
         mono = pygame.font.match_font(mono)
         self._font_mono = pygame.font.Font(mono, 12 if os.name == 'nt' else 14)
         self._notifications = FadingText(font, (width, 40), (0, height - 40))
-#        self.help = HelpText(pygame.font.Font(mono, 16), width, height)
+        self.help = HelpText(pygame.font.Font(mono, 16), width, height)
         self.server_fps = 0
         self.frame = 0
         self.simulation_time = 0
@@ -797,6 +807,35 @@ class FadingText(object):
         display.blit(self.surface, self.pos)
 
 # ==============================================================================
+# -- HelpText ------------------------------------------------------------------
+# ==============================================================================
+
+
+class HelpText(object):
+    """Helper class to handle text output using pygame"""
+    def __init__(self, font, width, height):
+        lines = __doc__.split('\n')
+        self.font = font
+        self.line_space = 18
+        self.dim = (780, len(lines) * self.line_space + 12)
+        self.pos = (0.5 * width - 0.5 * self.dim[0], 0.5 * height - 0.5 * self.dim[1])
+        self.seconds_left = 0
+        self.surface = pygame.Surface(self.dim)
+        self.surface.fill((0, 0, 0, 0))
+        for n, line in enumerate(lines):
+            text_texture = self.font.render(line, True, (255, 255, 255))
+            self.surface.blit(text_texture, (22, n * self.line_space))
+            self._render = False
+        self.surface.set_alpha(220)
+
+    def toggle(self):
+        self._render = not self._render
+
+    def render(self, display):
+        if self._render:
+            display.blit(self.surface, self.pos)
+
+# ==============================================================================
 # -- CollisionSensor -----------------------------------------------------------
 # ==============================================================================
 
@@ -862,9 +901,138 @@ class LaneInvasionSensor(object):
         self.hud.notification('Crossed line %s' % ' and '.join(text))
 
 # ==============================================================================
-# -- CameraManager -------------------------------------------------------------
+# -- GnssSensor ----------------------------------------------------------------
 # ==============================================================================
 
+
+class GnssSensor(object):
+    def __init__(self, parent_actor):
+        self.sensor = None
+        self._parent = parent_actor
+        self.lat = 0.0
+        self.lon = 0.0
+        world = self._parent.get_world()
+        bp = world.get_blueprint_library().find('sensor.other.gnss')
+        self.sensor = world.spawn_actor(bp, carla.Transform(carla.Location(x=1.0, z=2.8)), attach_to=self._parent)
+        # We need to pass the lambda a weak reference to self to avoid circular
+        # reference.
+        weak_self = weakref.ref(self)
+        self.sensor.listen(lambda event: GnssSensor._on_gnss_event(weak_self, event))
+
+    @staticmethod
+    def _on_gnss_event(weak_self, event):
+        self = weak_self()
+        if not self:
+            return
+        self.lat = event.latitude
+        self.lon = event.longitude
+
+
+# ==============================================================================
+# -- IMUSensor -----------------------------------------------------------------
+# ==============================================================================
+
+
+class IMUSensor(object):
+    def __init__(self, parent_actor):
+        self.sensor = None
+        self._parent = parent_actor
+        self.accelerometer = (0.0, 0.0, 0.0)
+        self.gyroscope = (0.0, 0.0, 0.0)
+        self.compass = 0.0
+        world = self._parent.get_world()
+        bp = world.get_blueprint_library().find('sensor.other.imu')
+        self.sensor = world.spawn_actor(
+            bp, carla.Transform(), attach_to=self._parent)
+        # We need to pass the lambda a weak reference to self to avoid circular
+        # reference.
+        weak_self = weakref.ref(self)
+        self.sensor.listen(
+            lambda sensor_data: IMUSensor._IMU_callback(weak_self, sensor_data))
+
+    @staticmethod
+    def _IMU_callback(weak_self, sensor_data):
+        self = weak_self()
+        if not self:
+            return
+        limits = (-99.9, 99.9)
+        self.accelerometer = (
+            max(limits[0], min(limits[1], sensor_data.accelerometer.x)),
+            max(limits[0], min(limits[1], sensor_data.accelerometer.y)),
+            max(limits[0], min(limits[1], sensor_data.accelerometer.z)))
+        self.gyroscope = (
+            max(limits[0], min(limits[1], math.degrees(sensor_data.gyroscope.x))),
+            max(limits[0], min(limits[1], math.degrees(sensor_data.gyroscope.y))),
+            max(limits[0], min(limits[1], math.degrees(sensor_data.gyroscope.z))))
+        self.compass = math.degrees(sensor_data.compass)
+
+
+# ==============================================================================
+# -- RadarSensor ---------------------------------------------------------------
+# ==============================================================================
+
+
+class RadarSensor(object):
+    def __init__(self, parent_actor):
+        self.sensor = None
+        self._parent = parent_actor
+        self.velocity_range = 7.5 # m/s
+        world = self._parent.get_world()
+        self.debug = world.debug
+        bp = world.get_blueprint_library().find('sensor.other.radar')
+        bp.set_attribute('horizontal_fov', str(35))
+        bp.set_attribute('vertical_fov', str(20))
+        self.sensor = world.spawn_actor(
+            bp,
+            carla.Transform(
+                carla.Location(x=2.8, z=1.0),
+                carla.Rotation(pitch=5)),
+            attach_to=self._parent)
+        # We need a weak reference to self to avoid circular reference.
+        weak_self = weakref.ref(self)
+        self.sensor.listen(
+            lambda radar_data: RadarSensor._Radar_callback(weak_self, radar_data))
+
+    @staticmethod
+    def _Radar_callback(weak_self, radar_data):
+        self = weak_self()
+        if not self:
+            return
+        # To get a numpy [[vel, altitude, azimuth, depth],...[,,,]]:
+        # points = np.frombuffer(radar_data.raw_data, dtype=np.dtype('f4'))
+        # points = np.reshape(points, (len(radar_data), 4))
+
+        current_rot = radar_data.transform.rotation
+        for detect in radar_data:
+            azi = math.degrees(detect.azimuth)
+            alt = math.degrees(detect.altitude)
+            # The 0.25 adjusts a bit the distance so the dots can
+            # be properly seen
+            fw_vec = carla.Vector3D(x=detect.depth - 0.25)
+            carla.Transform(
+                carla.Location(),
+                carla.Rotation(
+                    pitch=current_rot.pitch + alt,
+                    yaw=current_rot.yaw + azi,
+                    roll=current_rot.roll)).transform(fw_vec)
+
+            def clamp(min_v, max_v, value):
+                return max(min_v, min(value, max_v))
+
+            norm_velocity = detect.velocity / self.velocity_range # range [-1, 1]
+            r = int(clamp(0.0, 1.0, 1.0 - norm_velocity) * 255.0)
+            g = int(clamp(0.0, 1.0, 1.0 - abs(norm_velocity)) * 255.0)
+            b = int(abs(clamp(- 1.0, 0.0, - 1.0 - norm_velocity)) * 255.0)
+            self.debug.draw_point(
+                radar_data.transform.location + fw_vec,
+                size=0.075,
+                life_time=0.06,
+                persistent_lines=False,
+                color=carla.Color(r, g, b))
+
+# ==============================================================================
+# -- CameraManager -------------------------------------------------------------
+# ==============================================================================
 
 class CameraManager(object):
     def __init__(self, parent_actor, hud, gamma_correction):
@@ -991,18 +1159,22 @@ def game_loop(args):
     pygame.init()
     pygame.font.init()
     world = None
+    traffic_manager = None
+    
+    client = carla.Client(args.host, args.port)
+    client.set_timeout(4.0)
+    traffic_manager = client.get_trafficmanager()
+    hud = HUD(args.width, args.height)
+   
+    world = World(client.load_world(TOWN_MAP[4]), traffic_manager, hud, args)
 
     try:
-        client = carla.Client(args.host, args.port)
-        client.set_timeout(2.0)
-
         display = pygame.display.set_mode(
             (args.width, args.height),
             pygame.HWSURFACE | pygame.DOUBLEBUF)
 
-        hud = HUD(args.width, args.height)
+#        hud = HUD(args.width, args.height)
 #        world = World(client.get_world(), hud, args)
-        world = World(client.load_world(TOWN_MAP[0]), hud, args)
         controller = KeyboardControl(world, args.autopilot)
 
         clock = pygame.time.Clock()
@@ -1050,7 +1222,7 @@ def main():
     argparser.add_argument(
         '-a', '--autopilot',
         action='store_true',
-        default='y',
+        default=True,
         help='enable autopilot')
     argparser.add_argument(
         '--res',
