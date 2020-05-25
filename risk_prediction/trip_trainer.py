@@ -22,6 +22,7 @@ Date          Comment
 04302020      Replace Multithreading with Multiprocessing (first trial in learn_model_mix())
 05042020      Revert to Multithreading
 05052020      Include AdamW as new optimizer function
+05252020      Re-modify training adjustment to determine further training
 """
 
 import chainer
@@ -570,13 +571,27 @@ class TripTrainer(object):
                 epoch = train_iterator1.epoch + 1
                 cur_epoch = start_epoch + epoch
                 # 12182019
-                if cur_epoch == 26: #current epoch == 26,
-                    if self.previous_train_acc < 90: # 12232019
-                        break
-                    else:                        
-                        if self.previous_acc < 65: # if accuracy at epoch 25 does not reach 70
-                            break                  # break loop, skip training and jump to next trial
+                if cur_epoch == 26: #current epoch == 26,                    
+                #    if self.previous_train_acc < 90: # 12232019
+                #        break
+                #    else:            
+                        # if accuracy at epoch 25 does not reach 70
+                        # break loop, skip training and jump to next trial            
+                #        if self.previous_acc < 65: 
+                #            break                 
+                    # 05252020
+                    if self.previous_acc < 65:
+                        if self.previous_train_acc < 90:
+                            break
                 # end 12182019
+                # 05252020
+                if cur_epoch == 31:
+                    if self.previous_train_acc >= 90:
+                        if self.previous_acc < 65:
+                            break
+                    else:
+                        break
+                # end 05252020
                 print('Epoch: {0:d}'.format(cur_epoch))
                 if self.tlogf is not None:
                     self.tlogf.write('Epoch: {0:d}\n'.format(cur_epoch))
