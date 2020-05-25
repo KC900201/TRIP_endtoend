@@ -36,6 +36,7 @@ Date          Comment
 05152020      Create function to display collision info, Fix delegation of spawning
 05212020      Test input text in created image 
 05232020      Further test input text in created image
+05252020      Change to released CARLA_0.9.8 version library
 """
 import sys
 import glob
@@ -48,8 +49,8 @@ import time
 import argparse
 
 try:
-    sys.path.append(glob.glob(r'CARLA_0.9.8_project/PythonAPI/carla/dist/carla-*%d.%d-%s.egg' % ( # 04162020
-#    sys.path.append(glob.glob(r'CARLA_0.9.7_project/PythonAPI/carla/dist/carla-*%d.%d-%s.egg' % (        
+    sys.path.append(glob.glob(r'CARLA_0.9.8/PythonAPI/carla/dist/carla-*%d.%d-%s.egg' % ( # 05252020
+#    sys.path.append(glob.glob(r'CARLA_0.9.8_project/PythonAPI/carla/dist/carla-*%d.%d-%s.egg' % ( # 04162020
 #    sys.path.append(glob.glob(r'../carla/dist/carla-*%d.%d-%s.egg' % (
         sys.version_info.major,
         sys.version_info.minor,
@@ -760,7 +761,7 @@ def main_traffic_manager_2():
     client = carla.Client('localhost', 2000)
     client.set_timeout(3.0)
     tm = client.get_trafficmanager() # default port = 8000
-#    world = client.load_world("Town05")
+    world = client.load_world("Town05")
     try:
         # Create output directory for img capture
         parser = argparse.ArgumentParser(description='dataset_maker')
@@ -1488,7 +1489,6 @@ def predict_traffic_risk():
         trip_predictor.set_video_out(video_out_path) 
     trip_predictor.vpredict()   
  
-
 if __name__ == '__main__':
     try:
         # Run main method
