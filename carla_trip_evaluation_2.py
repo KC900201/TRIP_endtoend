@@ -339,10 +339,6 @@ class World(object):
         self._weather_index = 0
         self._actor_filter = args.filter
         self._gamma = args.gamma
-        self.restart()
-        self.world.on_tick(hud.on_world_tick)
-        self.recording_enabled = False
-        self.recording_start = 0
         # 05262020
         self.npc_car = []
         self.npc_bike = []
@@ -350,6 +346,10 @@ class World(object):
         self.npc_walker_id = []
         self.all_actors = None
         # End 05262020
+        self.restart()
+        self.world.on_tick(hud.on_world_tick)
+        self.recording_enabled = False
+        self.recording_start = 0
 
     def restart(self):
         self.player_max_speed = 1.589
@@ -529,8 +529,8 @@ class World(object):
         # 6.2.3 spawn walker controller
         batch = []
         walker_controller_bp = self.world.get_blueprint_library().find('controller.ai.walker')
-        for i in range(len(walker_list)):
-            batch.append(carla.command.SpawnActor(walker_controller_bp, carla.Transform(), walker_list[i]["id"]))
+        for i in range(len(self.npc_walker)):
+            batch.append(carla.command.SpawnActor(walker_controller_bp, carla.Transform(), self.npc_walker[i]["id"]))
         results = self.client.apply_batch_sync(batch, True)
         for i in range(len(results)):
             if results[i].error:
@@ -603,16 +603,25 @@ class World(object):
         # 05262020
         # Destroy NPC car
         print("\nDestroying %d NPC cars" % len(self.npc_car))
-        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_car])
+        for car in self.npc_car:
+            if car is not None:
+                self.client.apply_batch_sync(carla.command.DestroyActor(car))
+#        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_car])
         # Destroy NPC bike
         print("\nDestroying %d NPC bikes" % len(self.npc_bike))
-        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_bike])
+        for bike in self.npc_bike:
+            if bike is not None:
+                self.client.apply_batch_sync(carla.command.DestroyActor(bike))
+#        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_bike])
         # Destroy NPC walkers
         # stop walker controllers (list is [controller, actor, controller, actor ...])
         for i in range(0, len(self.npc_walker_id), 2):
             self.all_actors[i].stop()
         print("\nDestroying %d NPC walkers" % len(self.npc_walker))
-        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_walker_id])
+        for walker_id in self.npc_walker_id:
+            if walker_id is not None:
+                self.client.apply_batch_sync(carla.command.DestroyActor(walker_id))
+#        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_walker_id])
         
 # ==============================================================================
 # -- KeyboardControl -----------------------------------------------------------
@@ -1020,6 +1029,7 @@ class CollisionSensor(object):
         self.history = []
         self._parent = parent_actor
         self.hud = hud
+        self.collision_info = None # 05262020
         world = self._parent.get_world()
         bp = world.get_blueprint_library().find('sensor.other.collision')
         self.sensor = world.spawn_actor(bp, carla.Transform(), attach_to=self._parent)
@@ -1041,6 +1051,7 @@ class CollisionSensor(object):
             return
         actor_type = get_actor_display_name(event.other_actor)
         self.hud.notification('Collision with %r' % actor_type)
+        self.collision_info = 'Collision with ' + str(actor_type)
         impulse = event.normal_impulse
         intensity = math.sqrt(impulse.x**2 + impulse.y**2 + impulse.z**2)
         self.history.append((event.frame, intensity))
@@ -1215,6 +1226,7 @@ class CameraManager(object):
         self._parent = parent_actor
         self.hud = hud
         self.recording = False
+        self.collision_info = None
         bound_y = 0.5 + self._parent.bounding_box.extent.y
         Attachment = carla.AttachmentType
         self._camera_transforms = [
@@ -1322,6 +1334,23 @@ class CameraManager(object):
             self.surface = pygame.surfarray.make_surface(array.swapaxes(0, 1))
         if self.recording:
 #            image.save_to_disk('_out/%08d' % image.frame)
+            # Process image
+            i = np.array(image.raw_data)
+            i2 = i.reshape((IMAGE_HEIGHT, IMAGE_WIDTH, 4))
+            i3 = i2[:, :, :3] # height, width, first 3 rgb value
+
+            font = cv2.FONT_HERSHEY_COMPLEX
+            bottomleft = (10,500)
+            fontScale = 10
+            fontColor = (0,0,0)
+            lineType = 2
+            img = cv2.putText(i3,str(self.collision_info), 
+                    bottomleft, 
+                    font, 
+                    fontScale,
+                    fontColor,
+                    lineType) 
+            cv2.imwrite("out.jpg", img)
             image.save_to_disk(output_dir + '/orig_img/%08d' % image.frame)
 
 # ==============================================================================
@@ -1340,8 +1369,9 @@ def game_loop(args):
     traffic_manager = client.get_trafficmanager()
     hud = HUD(args.width, args.height)
    
-    world = World(client, client.load_world(TOWN_MAP[4]), traffic_manager, hud, args)
-
+#    world = World(client, client.load_world(TOWN_MAP[4]), traffic_manager, hud, args)
+    world = World(client, client.get_world(), traffic_manager, hud, args)
+    
     try:
         display = pygame.display.set_mode(
             (args.width, args.height),
