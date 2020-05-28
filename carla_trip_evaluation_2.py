@@ -383,9 +383,9 @@ class World(object):
             self.destroy()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
             # 05252020
-            self.traffic_manager.ignore_walkers_percentage(self.player, 50)
-            self.traffic_manager.ignore_vehicles_percentage(self.player, 80)
-            self.traffic_manager.ignore_lights_percentage(self.player, 70)
+            self.traffic_manager.ignore_walkers_percentage(self.player, 60)
+            self.traffic_manager.ignore_vehicles_percentage(self.player, 85)
+            self.traffic_manager.ignore_lights_percentage(self.player, 75)
         while self.player is None:
             if not self.map.get_spawn_points():
                 print('There are no spawn points available in your map/town.')
@@ -395,9 +395,9 @@ class World(object):
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
             # 05252020
-            self.traffic_manager.ignore_walkers_percentage(self.player, 50)
-            self.traffic_manager.ignore_vehicles_percentage(self.player, 80)
-            self.traffic_manager.ignore_lights_percentage(self.player, 70)
+            self.traffic_manager.ignore_walkers_percentage(self.player, 40)
+            self.traffic_manager.ignore_vehicles_percentage(self.player, 60)
+            self.traffic_manager.ignore_lights_percentage(self.player, 80)
         # Set up the sensors.
         self.collision_sensor = CollisionSensor(self.player, self.hud)
         self.lane_invasion_sensor = LaneInvasionSensor(self.player, self.hud)
@@ -421,8 +421,8 @@ class World(object):
         num_spawn_points = len(spawn_points)
         print("Number of spawn points: %d" % int(num_spawn_points))
         npc_amt = percentage(70, num_spawn_points) # 05152020
-        npc_car_amt = percentage(25, num_spawn_points)
-        npc_bike_amt = percentage(25, num_spawn_points)
+        npc_car_amt = percentage(20, num_spawn_points)
+        npc_bike_amt = percentage(60, num_spawn_points)
 
         if npc_amt <= num_spawn_points:
             random.shuffle(spawn_points)
@@ -489,7 +489,7 @@ class World(object):
         percentagePedestriansCrossing = 70.0     # how many pedestrians will walk through the road
         # Take all random locations to spawn
         spawn_points = []
-        npc_walker_amt = percentage(15, num_spawn_points)
+        npc_walker_amt = percentage(20, num_spawn_points)
         
         for i in range(npc_walker_amt):
             spawn_point = carla.Transform()
@@ -603,25 +603,25 @@ class World(object):
         # 05262020
         # Destroy NPC car
         print("\nDestroying %d NPC cars" % len(self.npc_car))
-        for car in self.npc_car:
-            if car is not None:
-                self.client.apply_batch_sync(carla.command.DestroyActor(car))
-#        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_car])
+#        for car in self.npc_car:
+#            if car is not None:
+#                self.client.apply_batch_sync(carla.command.DestroyActor(car))
+        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_car])
         # Destroy NPC bike
         print("\nDestroying %d NPC bikes" % len(self.npc_bike))
-        for bike in self.npc_bike:
-            if bike is not None:
-                self.client.apply_batch_sync(carla.command.DestroyActor(bike))
-#        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_bike])
+#        for bike in self.npc_bike:
+#            if bike is not None:
+#                self.client.apply_batch_sync(carla.command.DestroyActor(bike))
+        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_bike])
         # Destroy NPC walkers
         # stop walker controllers (list is [controller, actor, controller, actor ...])
         for i in range(0, len(self.npc_walker_id), 2):
             self.all_actors[i].stop()
         print("\nDestroying %d NPC walkers" % len(self.npc_walker))
-        for walker_id in self.npc_walker_id:
-            if walker_id is not None:
-                self.client.apply_batch_sync(carla.command.DestroyActor(walker_id))
-#        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_walker_id])
+#        for walker_id in self.npc_walker_id:
+#            if walker_id is not None:
+#                self.client.apply_batch_sync(carla.command.DestroyActor(walker_id))
+        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_walker_id])
         
 # ==============================================================================
 # -- KeyboardControl -----------------------------------------------------------
@@ -1305,7 +1305,7 @@ class CameraManager(object):
     @staticmethod
     def _parse_image(weak_self, image):
         parser = argparse.ArgumentParser(description='dataset_maker')
-        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town05\Phase 4', help='directory where the dataset will be created')
+        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_3\training\Town03\Phase 2', help='directory where the dataset will be created')
         args = parser.parse_args()
         output_dir = args.output_dir
 
@@ -1369,8 +1369,8 @@ def game_loop(args):
     traffic_manager = client.get_trafficmanager()
     hud = HUD(args.width, args.height)
    
-#    world = World(client, client.load_world(TOWN_MAP[4]), traffic_manager, hud, args)
-    world = World(client, client.get_world(), traffic_manager, hud, args)
+#    world = World(client, client.load_world(TOWN_MAP[2]), traffic_manager, hud, args)
+#    world = World(client, client.get_world(), traffic_manager, hud, args)
     
     try:
         display = pygame.display.set_mode(
@@ -1379,6 +1379,8 @@ def game_loop(args):
 
 #        hud = HUD(args.width, args.height)
 #        world = World(client.get_world(), hud, args)
+        world = World(client, client.load_world(TOWN_MAP[2]), traffic_manager, hud, args)
+
         controller = KeyboardControl(world, args.autopilot)
 
         clock = pygame.time.Clock()
