@@ -23,6 +23,8 @@ Date          Comment
 05252020      Include Traffic Manager module for traffic scenario manipulation
 05262020      Create NPC spawning - car; bikes and bicycles; pedestrians
               Reset Traffic Manager module
+06012020      Revert NPC spawning method to not classify type of vehicles 
+              Default set sef.player to be as 4 wheel vehicles
 """
 
 from __future__ import print_function
@@ -346,6 +348,7 @@ class World(object):
         self.npc_walker_id = []
         self.all_actors = None
         # End 05262020
+        self.reset_traffic_manager()
         self.restart()
         self.world.on_tick(hud.on_world_tick)
         self.recording_enabled = False
@@ -358,7 +361,14 @@ class World(object):
         cam_index = self.camera_manager.index if self.camera_manager is not None else 0
         cam_pos_index = self.camera_manager.transform_index if self.camera_manager is not None else 0
         # Get a random blueprint.
-        blueprint = random.choice(self.world.get_blueprint_library().filter(self._actor_filter))
+#        blueprint = random.choice(self.world.get_blueprint_library().filter(self._actor_filter))
+        # 06012020
+        blueprint = self.world.get_blueprint_library().filter(self._actor_filter)
+        blueprint = [x for x in blueprint if int(x.get_attribute('number_of_wheels')) == 4]
+        blueprint = [x for x in blueprint if not x.id.endswith('isetta')]
+        blueprint = [x for x in blueprint if not x.id.endswith('carlacola')]
+        blueprint = random.choice(blueprint)
+        # end 06012020
         blueprint.set_attribute('role_name', self.actor_role_name)
         if blueprint.has_attribute('color'):
             color = random.choice(blueprint.get_attribute('color').recommended_values)
@@ -395,9 +405,12 @@ class World(object):
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
             # 05252020
-            self.traffic_manager.ignore_walkers_percentage(self.player, 40)
-            self.traffic_manager.ignore_vehicles_percentage(self.player, 60)
-            self.traffic_manager.ignore_lights_percentage(self.player, 80)
+            self.traffic_manager.ignore_walkers_percentage(self.player, 100)
+            self.traffic_manager.ignore_vehicles_percentage(self.player, 50)
+            self.traffic_manager.ignore_lights_percentage(self.player, 70)
+#            self.traffic_manager.vehicle_percentage_speed_difference(self.player, -10) # 04062020
+            self.traffic_manager.distance_to_leading_vehicle(self.player, 10)
+            self.traffic_manager.auto_lane_change(self.player, True)
         # Set up the sensors.
         self.collision_sensor = CollisionSensor(self.player, self.hud)
         self.lane_invasion_sensor = LaneInvasionSensor(self.player, self.hud)
@@ -412,6 +425,7 @@ class World(object):
         npc_vehicle_bp = self.world.get_blueprint_library().filter('vehicle.*')
         npc_walker_bp = self.world.get_blueprint_library().filter('walker.pedestrian.*')
         # Avoid spawning NPC prone to accident
+#        npc_vehicle_bp = [x for x in npc_vehicle_bp if int(x.get_attribute('number_of_wheels')) == 4]
         npc_vehicle_bp = [x for x in npc_vehicle_bp if not x.id.endswith('isetta')]
         npc_vehicle_bp = [x for x in npc_vehicle_bp if not x.id.endswith('carlacola')]
         # ---------------------
@@ -420,9 +434,9 @@ class World(object):
         spawn_points = self.world.get_map().get_spawn_points()
         num_spawn_points = len(spawn_points)
         print("Number of spawn points: %d" % int(num_spawn_points))
-        npc_amt = percentage(70, num_spawn_points) # 05152020
-        npc_car_amt = percentage(20, num_spawn_points)
-        npc_bike_amt = percentage(60, num_spawn_points)
+        npc_amt = percentage(20, num_spawn_points) # 05152020
+#        npc_car_amt = percentage(20, num_spawn_points)
+#        npc_bike_amt = percentage(60, num_spawn_points)
 
         if npc_amt <= num_spawn_points:
             random.shuffle(spawn_points)
@@ -431,6 +445,7 @@ class World(object):
             logging.warning(msg, npc_amt, num_spawn_points)
             print('Requested %d vehicles, but could only find %d spawn points' % (npc_amt, num_spawn_points))
             npc_amt = int(num_spawn_points / 2)  # Assign half number of spawn points to NPC to prevent spawning error
+        '''
         #---------------------
         # Spawn NPC car
         #---------------------
@@ -449,12 +464,12 @@ class World(object):
             car = self.world.try_spawn_actor(blueprint_car, transform)
             if not (isinstance(car, type(None))): # 05132020
                 car.set_autopilot(enabled=True)
-#                self.traffic_manager.ignore_lights_percentage(car, 90) # 04062020
-#                self.traffic_manager.vehicle_percentage_speed_difference(car, -20) # 04062020
-#                self.traffic_manager.distance_to_leading_vehicle(car, 30)
-#                self.traffic_manager.ignore_walkers_percentage(car, 80)
-#                self.traffic_manager.ignore_vehicles_percentage(car, 90)
-#                self.traffic_manager.auto_lane_change(car, False)
+                self.traffic_manager.ignore_lights_percentage(car, 90) # 04062020
+                self.traffic_manager.vehicle_percentage_speed_difference(car, -20) # 04062020
+                self.traffic_manager.distance_to_leading_vehicle(car, 30)
+                self.traffic_manager.ignore_walkers_percentage(car, 80)
+                self.traffic_manager.ignore_vehicles_percentage(car, 90)
+                self.traffic_manager.auto_lane_change(car, False)
                 self.npc_car.append(car)
         #-----------------------------
         # Spawn NPC bikes and bicycles
@@ -474,22 +489,46 @@ class World(object):
             bike = self.world.try_spawn_actor(blueprint_bike, transform)
             if not (isinstance(bike, type(None))): # 05132020
                 bike.set_autopilot(enabled=True)
-#                self.traffic_manager.ignore_lights_percentage(bike, 90) # 04062020
-#                self.traffic_manager.vehicle_percentage_speed_difference(bike, -20) # 04062020
-#                self.traffic_manager.distance_to_leading_vehicle(bike, 30)
-#                self.traffic_manager.ignore_walkers_percentage(bike, 80)
-#                self.traffic_manager.ignore_vehicles_percentage(bike, 90)
-#                self.traffic_manager.auto_lane_change(bike, False)
+                self.traffic_manager.ignore_lights_percentage(bike, 90) # 04062020
+                self.traffic_manager.vehicle_percentage_speed_difference(bike, -20) # 04062020
+                self.traffic_manager.distance_to_leading_vehicle(bike, 30)
+                self.traffic_manager.ignore_walkers_percentage(bike, 80)
+                self.traffic_manager.ignore_vehicles_percentage(bike, 90)
+                self.traffic_manager.auto_lane_change(bike, False)
                 self.npc_bike.append(bike)
+        '''
+        # 06012020
+        for n, transform in enumerate(spawn_points):
+            if n >= npc_amt:
+                break
+            blueprint = random.choice(npc_vehicle_bp)
+            if blueprint.has_attribute('color'):
+                color = random.choice(blueprint.get_attribute('color').recommended_values)
+                blueprint.set_attribute('color', color)
+            if blueprint.has_attribute('driver_id'):
+                driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
+                blueprint.set_attribute('driver_id', driver_id)
+            blueprint.set_attribute('role_name', 'autopilot')
+            vehicle = self.world.try_spawn_actor(blueprint, transform)
+            if not (isinstance(vehicle, type(None))): # 05132020
+                vehicle.set_autopilot(enabled=True)
+                self.traffic_manager.ignore_lights_percentage(vehicle, 70) # 04062020
+#                self.traffic_manager.vehicle_percentage_speed_difference(vehicle, -10) # 04062020
+#                self.traffic_manager.distance_to_leading_vehicle(vehicle, 10)
+                self.traffic_manager.ignore_walkers_percentage(vehicle, 100)
+                self.traffic_manager.ignore_vehicles_percentage(vehicle, 50)
+                self.traffic_manager.auto_lane_change(vehicle, False)
+                self.npc_car.append(vehicle)            
+        # End 06012020
         #----------------------
         # Spawn NPC walkers    
         #----------------------      
         # Some settings
-        percentagePedestriansRunning = 40.0      # how many pedestrians will run
-        percentagePedestriansCrossing = 70.0     # how many pedestrians will walk through the road
+        percentagePedestriansRunning = 35.0      # how many pedestrians will run
+        percentagePedestriansCrossing = 90.0     # how many pedestrians will walk through the road
         # Take all random locations to spawn
         spawn_points = []
-        npc_walker_amt = percentage(20, num_spawn_points)
+        npc_walker_amt = percentage(80, num_spawn_points)
         
         for i in range(npc_walker_amt):
             spawn_point = carla.Transform()
@@ -554,8 +593,8 @@ class World(object):
             # max speed
             self.all_actors[i].set_max_speed(float(walker_speed[int(i/2)]))
             
-        print('Spawned %d cars, %d bikes and %d walkers.' % (len(self.npc_car), len(self.npc_bike), len(self.npc_walker)))
-
+#        print('Spawned %d cars, %d bikes and %d walkers.' % (len(self.npc_car), len(self.npc_bike), len(self.npc_walker)))
+        print('Spawned %d NPC vehicles and %d walkers.' % (len(self.npc_car), len(self.npc_walker)))
 
     def next_weather(self, reverse=False):
         self._weather_index += -1 if reverse else 1
@@ -608,11 +647,11 @@ class World(object):
 #                self.client.apply_batch_sync(carla.command.DestroyActor(car))
         self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_car])
         # Destroy NPC bike
-        print("\nDestroying %d NPC bikes" % len(self.npc_bike))
+#        print("\nDestroying %d NPC bikes" % len(self.npc_bike))
 #        for bike in self.npc_bike:
 #            if bike is not None:
 #                self.client.apply_batch_sync(carla.command.DestroyActor(bike))
-        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_bike])
+#        self.client.apply_batch_sync([carla.command.DestroyActor(x) for x in self.npc_bike])
         # Destroy NPC walkers
         # stop walker controllers (list is [controller, actor, controller, actor ...])
         for i in range(0, len(self.npc_walker_id), 2):
@@ -1305,8 +1344,9 @@ class CameraManager(object):
     @staticmethod
     def _parse_image(weak_self, image):
         parser = argparse.ArgumentParser(description='dataset_maker')
-        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_3\training\Town03\Phase 2', help='directory where the dataset will be created')
-        args = parser.parse_args()
+#        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_3\training\Town03\Phase 2', help='directory where the dataset will be created')
+        parser.add_argument('--output_dir', default=r'C:\Users\user\Pictures\CARLA_dataset\test_3\training\Town03\Phase 7', help='directory where the dataset will be created')
+        args = parser.parse_args() 
         output_dir = args.output_dir
 
         self = weak_self()
@@ -1335,6 +1375,7 @@ class CameraManager(object):
         if self.recording:
 #            image.save_to_disk('_out/%08d' % image.frame)
             # Process image
+            '''
             i = np.array(image.raw_data)
             i2 = i.reshape((IMAGE_HEIGHT, IMAGE_WIDTH, 4))
             i3 = i2[:, :, :3] # height, width, first 3 rgb value
@@ -1351,6 +1392,7 @@ class CameraManager(object):
                     fontColor,
                     lineType) 
             cv2.imwrite("out.jpg", img)
+            '''
             image.save_to_disk(output_dir + '/orig_img/%08d' % image.frame)
 
 # ==============================================================================
@@ -1369,8 +1411,8 @@ def game_loop(args):
     traffic_manager = client.get_trafficmanager()
     hud = HUD(args.width, args.height)
    
-#    world = World(client, client.load_world(TOWN_MAP[2]), traffic_manager, hud, args)
-#    world = World(client, client.get_world(), traffic_manager, hud, args)
+#    world = World(client, client.load_world(TOWN_MAP[5]), traffic_manager, hud, args)
+    world = World(client, client.get_world(), traffic_manager, hud, args)
     
     try:
         display = pygame.display.set_mode(
@@ -1379,7 +1421,8 @@ def game_loop(args):
 
 #        hud = HUD(args.width, args.height)
 #        world = World(client.get_world(), hud, args)
-        world = World(client, client.load_world(TOWN_MAP[2]), traffic_manager, hud, args)
+#        world = World(client, client.get_world(), traffic_manager, hud, args)
+#        world = World(client, client.load_world(TOWN_MAP[5]), traffic_manager, hud, args)
 
         controller = KeyboardControl(world, args.autopilot)
 
@@ -1400,7 +1443,7 @@ def game_loop(args):
         if world is not None:
             world.destroy()
             # Reset traffic manager module in simulation
-            world.reset_traffic_manager() 
+#            world.reset_traffic_manager() 
         pygame.quit()
 
 # ==============================================================================

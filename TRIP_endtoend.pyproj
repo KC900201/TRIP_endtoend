@@ -116,7 +116,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="trip_combined.py" />
-    <Compile Include="trip_parallel_combined.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="carla_sim\" />
