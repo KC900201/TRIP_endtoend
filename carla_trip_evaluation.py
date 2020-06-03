@@ -1500,8 +1500,8 @@ if __name__ == '__main__':
 #        main()
 #        main_traffic_manager()
 #        test_write_text_img()
-         main_traffic_manager_2()
-#        generate_data()
+#         main_traffic_manager_2()
+        generate_data()
 #        predict_traffic_risk()
 #        start_replay()
     except KeyboardInterrupt:

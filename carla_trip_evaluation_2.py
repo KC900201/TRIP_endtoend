@@ -405,11 +405,11 @@ class World(object):
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
             # 05252020
-            self.traffic_manager.ignore_walkers_percentage(self.player, 100)
-            self.traffic_manager.ignore_vehicles_percentage(self.player, 50)
+            self.traffic_manager.ignore_walkers_percentage(self.player, 80)
+            self.traffic_manager.ignore_vehicles_percentage(self.player, 60)
             self.traffic_manager.ignore_lights_percentage(self.player, 70)
 #            self.traffic_manager.vehicle_percentage_speed_difference(self.player, -10) # 04062020
-            self.traffic_manager.distance_to_leading_vehicle(self.player, 10)
+#            self.traffic_manager.distance_to_leading_vehicle(self.player, 10)
             self.traffic_manager.auto_lane_change(self.player, True)
         # Set up the sensors.
         self.collision_sensor = CollisionSensor(self.player, self.hud)
@@ -434,7 +434,7 @@ class World(object):
         spawn_points = self.world.get_map().get_spawn_points()
         num_spawn_points = len(spawn_points)
         print("Number of spawn points: %d" % int(num_spawn_points))
-        npc_amt = percentage(20, num_spawn_points) # 05152020
+        npc_amt = percentage(65, num_spawn_points) # 05152020
 #        npc_car_amt = percentage(20, num_spawn_points)
 #        npc_bike_amt = percentage(60, num_spawn_points)
 
@@ -513,22 +513,22 @@ class World(object):
             if not (isinstance(vehicle, type(None))): # 05132020
                 vehicle.set_autopilot(enabled=True)
                 self.traffic_manager.ignore_lights_percentage(vehicle, 70) # 04062020
-#                self.traffic_manager.vehicle_percentage_speed_difference(vehicle, -10) # 04062020
-#                self.traffic_manager.distance_to_leading_vehicle(vehicle, 10)
-                self.traffic_manager.ignore_walkers_percentage(vehicle, 100)
-                self.traffic_manager.ignore_vehicles_percentage(vehicle, 50)
-                self.traffic_manager.auto_lane_change(vehicle, False)
+#                self.traffic_manager.vehicle_percentage_speed_difference(vehicle, 10) # 04062020
+#                self.traffic_manager.distance_to_leading_vehicle(vehicle, -10)
+                self.traffic_manager.ignore_walkers_percentage(vehicle, 80)
+                self.traffic_manager.ignore_vehicles_percentage(vehicle, 60)
+                self.traffic_manager.auto_lane_change(vehicle, True)
                 self.npc_car.append(vehicle)            
         # End 06012020
         #----------------------
         # Spawn NPC walkers    
         #----------------------      
         # Some settings
-        percentagePedestriansRunning = 35.0      # how many pedestrians will run
-        percentagePedestriansCrossing = 90.0     # how many pedestrians will walk through the road
+        percentagePedestriansRunning = 10.0      # how many pedestrians will run
+        percentagePedestriansCrossing = 70.0     # how many pedestrians will walk through the road
         # Take all random locations to spawn
         spawn_points = []
-        npc_walker_amt = percentage(80, num_spawn_points)
+        npc_walker_amt = percentage(55, num_spawn_points)
         
         for i in range(npc_walker_amt):
             spawn_point = carla.Transform()
@@ -1345,7 +1345,9 @@ class CameraManager(object):
     def _parse_image(weak_self, image):
         parser = argparse.ArgumentParser(description='dataset_maker')
 #        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_3\training\Town03\Phase 2', help='directory where the dataset will be created')
-        parser.add_argument('--output_dir', default=r'C:\Users\user\Pictures\CARLA_dataset\test_3\training\Town03\Phase 7', help='directory where the dataset will be created')
+#        parser.add_argument('--output_dir', default=r'C:\Users\user\Pictures\CARLA_dataset\test_3\training\Town03\Phase 7', help='directory where the dataset will be created')
+        parser.add_argument('--output_dir', default=r'E:\TRIP\Datasets\CARLA_dataset\test_3\training\Town04\Phase 1', help='directory where the dataset will be created')
+
         args = parser.parse_args() 
         output_dir = args.output_dir
 
@@ -1411,8 +1413,8 @@ def game_loop(args):
     traffic_manager = client.get_trafficmanager()
     hud = HUD(args.width, args.height)
    
-#    world = World(client, client.load_world(TOWN_MAP[5]), traffic_manager, hud, args)
-    world = World(client, client.get_world(), traffic_manager, hud, args)
+    world = World(client, client.load_world(TOWN_MAP[3]), traffic_manager, hud, args)
+#    world = World(client, client.get_world(), traffic_manager, hud, args)
     
     try:
         display = pygame.display.set_mode(
