@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{b57b2640-9936-4bd4-b586-92cd2040eaae}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>estimation\file_editing\parameter_file_writing.py</StartupFile>
+    <StartupFile>estimation\file_editing\copyfiles.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -66,8 +66,7 @@
     <Content Include="spec_files\video_prediction\prediction_v3_1_tbox_spec.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="carla_sim\PythonAPI\KC_test\carla_trip_eval_1.py" />
-    <Compile Include="carla_sim\PythonAPI\KC_test\carla_trip_eval_2.py" />
+    <Compile Include="carla_trip_evaluation_2.py" />
     <Compile Include="estimation\dataset_generator\dataset_generator_function.py" />
     <Compile Include="estimation\dataset_generator\dataset_generator_img.py" />
     <Compile Include="estimation\dataset_generator\dataset_generator_two.py" />
@@ -95,33 +94,17 @@
     <Compile Include="risk_prediction\main_trip_prediction.py" />
     <Compile Include="risk_prediction\main_trip_repeat_training.py" />
     <Compile Include="risk_prediction\main_trip_training.py" />
-    <Compile Include="risk_prediction\main_trip_training_multiprocessing.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="risk_prediction\main_trip_vpredictor.py" />
     <Compile Include="risk_prediction\trip_c_lstm.py" />
     <Compile Include="risk_prediction\trip_dataset.py" />
-    <Compile Include="risk_prediction\trip_dataset_carla.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="risk_prediction\trip_dataset_v.py" />
     <Compile Include="risk_prediction\trip_lstm.py" />
     <Compile Include="risk_prediction\trip_predictor.py" />
-    <Compile Include="risk_prediction\trip_predictor_carla.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="risk_prediction\trip_trainer.py" />
     <Compile Include="risk_prediction\trip_vpredictor.py" />
-    <Compile Include="risk_prediction\trip_vpredictor_carla.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="trip_combined.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="carla_sim\" />
-    <Folder Include="carla_sim\PythonAPI\" />
-    <Folder Include="carla_sim\PythonAPI\carla\" />
-    <Folder Include="carla_sim\PythonAPI\KC_test\" />
     <Folder Include="estimation" />
     <Folder Include="estimation\dataset_generator" />
     <Folder Include="estimation\dataset_generator\lib" />

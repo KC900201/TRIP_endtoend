@@ -16,6 +16,7 @@ Date          Comment
 12172019      Modify new function to delete "img" folder in virtual data directory
 12262019      New function to separate A3D datasets (< 100 img and >= 100 img)
 01082020      Temporary modifications to edit A3D datasets to separate accident and non-accident 
+06072020      Function to rename all images to follow usual format for CARLA-based dataset
 """
 
 import shutil
@@ -135,7 +136,24 @@ def moveTree(src, dst, symlinks = False, ignore = None):
                 elif os.path.isdir(s):
                   moveTree(s, d, symlinks, ignore)
                 else:
-                  shutil.move(s, d)                           
+                  shutil.move(s, d)
+            else:
+                s = os.path.join(src, item)
+                d = os.path.join(dst, item)
+                if symlinks and os.path.islink(s):
+                  if os.path.lexists(d):
+                    os.remove(d)
+                  os.symlink(os.readlink(s), d)
+                  try:
+                    st = os.lstat(s)
+                    mode = stat.S_IMODE(st.st_mode)
+                    os.lchmod(d, mode)
+                  except:
+                    pass # lchmod not available
+                elif os.path.isdir(s):
+                  moveTree(s, d, symlinks, ignore)
+                else:
+                  shutil.move(s, d) 
         else: # found special characters in file name
             if 'e' in filename:
                 fileno = int(filename.strip('e').lstrip().rstrip())
@@ -146,6 +164,23 @@ def moveTree(src, dst, symlinks = False, ignore = None):
                 new_filename = filename.replace(str(fileno), "0" + str(new_fileno)) if (new_fileno < 10 or new_fileno == 50) else filename.replace(str(fileno), str(new_fileno))
                 s = os.path.join(src, item)
                 d = os.path.join(dst, item.replace(filename, new_filename))
+                if symlinks and os.path.islink(s):
+                  if os.path.lexists(d):
+                    os.remove(d)
+                  os.symlink(os.readlink(s), d)
+                  try:
+                    st = os.lstat(s)
+                    mode = stat.S_IMODE(st.st_mode)
+                    os.lchmod(d, mode)
+                  except:
+                    pass # lchmod not available
+                elif os.path.isdir(s):
+                  moveTree(s, d, symlinks, ignore)
+                else:
+                  shutil.move(s, d)
+            else:                
+                s = os.path.join(src, item)
+                d = os.path.join(dst, item)
                 if symlinks and os.path.islink(s):
                   if os.path.lexists(d):
                     os.remove(d)
@@ -426,7 +461,29 @@ def countFilesFolders(dir, list):
                     #folders += len(dirnames2)
     print('' + str(files) + ' files in '  + dir)
     #print('' + str(files) + ' files, ' + str(folders) + ' folders found ' + dir)
-        
+
+# 06072020
+def rename_carla(dir):
+    files = 0
+    
+    for _, dirnames, filenames in os.walk(dir):
+        if os.path.basename(_) in folder_name:
+            if os.path.basename(_) == folder_name[4]:
+                shutil.rmtree(_)
+            else:
+                for i in range (len(filenames)):      
+                    item = filenames[i]           
+                    filename = str(os.path.splitext(os.path.basename(filenames[i]))[0])
+                    if "_" in filename:
+                        filename = filename.split("_")[0]
+                    new_filename = ""
+                    if filename.startswith("e"):
+                        new_filename = str("e" + ('%06d' % (i+1)))
+                    else: 
+                        new_filename = str('%06d' % (i+1))
+                    s = os.path.join(_, item)
+                    os.rename(s, os.path.join(_, item.replace(filename, new_filename)))
+
 if __name__ == '__main__':
     testdir = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3\test0\*')
     testdir1 = glob.glob(r'E:\AtsumiLabMDS-2\TRIP\Trip2018Q1\Dashcam\ds3\test1\*')
@@ -478,13 +535,35 @@ if __name__ == '__main__':
     a3d_test_dir_c = r'E:\TRIP\Datasets\A3D\selected\test_50'
     a3d_use_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\non_accident\*")
     a3d_after_100_dir = glob.glob(r"D:\TRIP\Datasets\A3D\selected\others\after_100\*")
-    
-    countFilesFolders(traindir_mixed0, [])
-    countFilesFolders(traindir_mixed1, [])
-    countFilesFolders(traindir_dashcam0, [])
-    countFilesFolders(traindir_dashcam1, [])
-    countFilesFolders(traindir_viena0, [])
-    countFilesFolders(traindir_viena1, [])
+    carla_dir = r'E:\TRIP\Datasets\CARLA_dataset\test_3\training'   
+    carla_t1_dir = glob.glob(r"E:\TRIP\Datasets\CARLA_dataset\test_3\training\Town01\*") 
+    carla_t2_dir = glob.glob(r"E:\TRIP\Datasets\CARLA_dataset\test_3\training\Town02\*") 
+    carla_t3_dir = glob.glob(r"E:\TRIP\Datasets\CARLA_dataset\test_3\training\Town03\*") 
+    carla_t4_dir = glob.glob(r"E:\TRIP\Datasets\CARLA_dataset\test_3\training\Town04\*") 
+    carla_t5_dir = glob.glob(r"E:\TRIP\Datasets\CARLA_dataset\test_3\training\Town05\*") 
+    carla_t6_dir = glob.glob(r"E:\TRIP\Datasets\CARLA_dataset\test_3\training\Town06\*") 
+    carla_t7_dir = glob.glob(r"E:\TRIP\Datasets\CARLA_dataset\test_3\training\Town07\*") 
+
+    carla_glob_dir = glob.glob(r"E:\TRIP\Datasets\CARLA_dataset\test_3\training\*")
+
+#    rename_carla(carla_dir)
+    moveTreeFormatA3D(carla_t1_dir, carla_glob_dir, "non_accident")
+    moveTreeFormatA3D(carla_t2_dir, carla_glob_dir, "non_accident")
+    moveTreeFormatA3D(carla_t3_dir, carla_glob_dir, "non_accident")
+    moveTreeFormatA3D(carla_t4_dir, carla_glob_dir, "non_accident")
+    moveTreeFormatA3D(carla_t5_dir, carla_glob_dir, "non_accident")
+    moveTreeFormatA3D(carla_t6_dir, carla_glob_dir, "non_accident")
+    moveTreeFormatA3D(carla_t7_dir, carla_glob_dir, "non_accident")
+
+#    moveTreeFormatA3D(a3d_test_dir, a3d_sel_dir, "accident")
+#    moveTreeFormatA3D(a3d_dir, a3d_sel_dir, folder_name_a3d[0])
+
+#    countFilesFolders(traindir_mixed0, [])
+#    countFilesFolders(traindir_mixed1, [])
+#    countFilesFolders(traindir_dashcam0, [])
+#    countFilesFolders(traindir_dashcam1, [])
+#    countFilesFolders(traindir_viena0, [])
+#    countFilesFolders(traindir_viena1, [])
     
     #delTreeFormatA3D(a3d_test_dir)
     #delTreeFormatA3D(a3d_test_dir)
