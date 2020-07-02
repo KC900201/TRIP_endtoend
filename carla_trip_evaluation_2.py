@@ -23,9 +23,9 @@ Date          Comment
 05252020      Include Traffic Manager module for traffic scenario manipulation
 05262020      Create NPC spawning - car; bikes and bicycles; pedestrians
               Reset Traffic Manager module
-06012020      Revert NPC spawning method to not classify type of vehicles 
+06122020      Revert NPC spawning method to not classify type of vehicles 
               Default set sef.player to be as 4 wheel vehicles
-06062020      Split NPC spawning and self.player spawning        
+06162020      Split NPC spawning and self.player spawning        
 """
 
 from __future__ import print_function
@@ -395,9 +395,9 @@ class World(object):
             self.destroy()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
             # 05252020
-            self.traffic_manager.ignore_walkers_percentage(self.player, 70)
-            self.traffic_manager.ignore_vehicles_percentage(self.player, 55)
-            self.traffic_manager.ignore_lights_percentage(self.player, 65)
+            self.traffic_manager.ignore_walkers_percentage(self.player, 80)
+            self.traffic_manager.ignore_vehicles_percentage(self.player, 70)
+            self.traffic_manager.ignore_lights_percentage(self.player, 70)
             self.traffic_manager.auto_lane_change(self.player, True)        # Set up the sensors.
         while self.player is None:
             if not self.map.get_spawn_points():
@@ -408,9 +408,9 @@ class World(object):
             spawn_point = random.choice(spawn_points) if spawn_points else carla.Transform()
             self.player = self.world.try_spawn_actor(blueprint, spawn_point)
             # 05252020
-#            self.traffic_manager.ignore_walkers_percentage(self.player, 70)
-#            self.traffic_manager.ignore_vehicles_percentage(self.player, 55)
-#            self.traffic_manager.ignore_lights_percentage(self.player, 65)
+            self.traffic_manager.ignore_walkers_percentage(self.player, 70)
+            self.traffic_manager.ignore_vehicles_percentage(self.player, 70)
+            self.traffic_manager.ignore_lights_percentage(self.player, 65)
 #            self.traffic_manager.vehicle_percentage_speed_difference(self.player, -10) # 04062020
 #            self.traffic_manager.distance_to_leading_vehicle(self.player, 10)
             self.traffic_manager.auto_lane_change(self.player, True)        # Set up the sensors.
@@ -490,7 +490,7 @@ class World(object):
         spawn_points = self.world.get_map().get_spawn_points()
         num_spawn_points = len(spawn_points)
         print("Number of spawn points: %d" % int(num_spawn_points))
-        npc_amt = percentage(90, num_spawn_points) # 05152020
+        npc_amt = percentage(40, num_spawn_points) # 05152020
 #        npc_car_amt = percentage(20, num_spawn_points)
 #        npc_bike_amt = percentage(60, num_spawn_points)
         if npc_amt <= num_spawn_points:
@@ -515,11 +515,11 @@ class World(object):
             vehicle = self.world.try_spawn_actor(blueprint, transform)
             if not (isinstance(vehicle, type(None))): # 05132020
                 vehicle.set_autopilot(enabled=True)
-                self.traffic_manager.ignore_lights_percentage(vehicle, 60) # 04062020
+                self.traffic_manager.ignore_lights_percentage(vehicle, 70) # 04062020
 #                self.traffic_manager.vehicle_percentage_speed_difference(vehicle, 10) # 04062020
 #                self.traffic_manager.distance_to_leading_vehicle(vehicle, -10)
-                self.traffic_manager.ignore_walkers_percentage(vehicle, 60)
-                self.traffic_manager.ignore_vehicles_percentage(vehicle, 60)
+                self.traffic_manager.ignore_walkers_percentage(vehicle, 90)
+                self.traffic_manager.ignore_vehicles_percentage(vehicle, 80)
                 self.traffic_manager.auto_lane_change(vehicle, True)
                 self.npc_car.append(vehicle)            
         # End 06012020
@@ -527,11 +527,11 @@ class World(object):
         # Spawn NPC walkers    
         #----------------------      
         # Some settings
-        percentagePedestriansRunning = 30.0      # how many pedestrians will run
+        percentagePedestriansRunning = 35.0      # how many pedestrians will run
         percentagePedestriansCrossing = 70.0     # how many pedestrians will walk through the road
         # Take all random locations to spawn
         spawn_points = []
-        npc_walker_amt = percentage(10, num_spawn_points)
+        npc_walker_amt = percentage(55, num_spawn_points)
         
         for i in range(npc_walker_amt):
             spawn_point = carla.Transform()
@@ -1351,7 +1351,7 @@ class CameraManager(object):
         parser = argparse.ArgumentParser(description='dataset_maker')
 #        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_3\training\Town03\Phase 2', help='directory where the dataset will be created')
 #        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_3\training\Town07\T7_S3', help='directory where the dataset will be created')
-        parser.add_argument('--output_dir', default=r'E:\TRIP\Datasets\CARLA_dataset\test_3\training\Town03\T3_S13', help='directory where the dataset will be created')
+        parser.add_argument('--output_dir', default=r'E:\TRIP\Datasets\CARLA_dataset\test_3\original_files\Town01\T1_S13', help='directory where the dataset will be created')
  
         args = parser.parse_args()
         output_dir = args.output_dir

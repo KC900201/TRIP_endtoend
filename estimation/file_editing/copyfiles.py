@@ -30,7 +30,9 @@ from folder import Folder
 
 folder_name = ['conv33', 'conv39', 'conv45', 'ebox', 'img', 'orig_img']
 folder_name_2 = ['conv33', 'conv39', 'conv45', 'ebox', 'orig_img']
+#folder_name_2 = ['orig_img']
 folder_name_a3d = ['conv33', 'conv39', 'conv45', 'ebox', 'img', 'orig_img', 'images']
+folder_name_carla = ['conv33', 'conv39', 'conv45', 'ebox', 'img', 'orig_img']
 
 def copyDirectory(src, dest):
     try:
@@ -137,23 +139,6 @@ def moveTree(src, dst, symlinks = False, ignore = None):
                   moveTree(s, d, symlinks, ignore)
                 else:
                   shutil.move(s, d)
-            else:
-                s = os.path.join(src, item)
-                d = os.path.join(dst, item)
-                if symlinks and os.path.islink(s):
-                  if os.path.lexists(d):
-                    os.remove(d)
-                  os.symlink(os.readlink(s), d)
-                  try:
-                    st = os.lstat(s)
-                    mode = stat.S_IMODE(st.st_mode)
-                    os.lchmod(d, mode)
-                  except:
-                    pass # lchmod not available
-                elif os.path.isdir(s):
-                  moveTree(s, d, symlinks, ignore)
-                else:
-                  shutil.move(s, d) 
         else: # found special characters in file name
             if 'e' in filename:
                 fileno = int(filename.strip('e').lstrip().rstrip())
@@ -178,24 +163,7 @@ def moveTree(src, dst, symlinks = False, ignore = None):
                   moveTree(s, d, symlinks, ignore)
                 else:
                   shutil.move(s, d)
-            else:                
-                s = os.path.join(src, item)
-                d = os.path.join(dst, item)
-                if symlinks and os.path.islink(s):
-                  if os.path.lexists(d):
-                    os.remove(d)
-                  os.symlink(os.readlink(s), d)
-                  try:
-                    st = os.lstat(s)
-                    mode = stat.S_IMODE(st.st_mode)
-                    os.lchmod(d, mode)
-                  except:
-                    pass # lchmod not available
-                elif os.path.isdir(s):
-                  moveTree(s, d, symlinks, ignore)
-                else:
-                  shutil.move(s, d)
-
+          
 def moveTreeVirtual(src, dst, symlinks = False, ignore = None):
   if not os.path.exists(dst):
     os.makedirs(dst)
@@ -339,8 +307,8 @@ def delTreeA3D(src, symlinks = False, ignore = None):
       if item in folder_name_a3d: # copy directory
         s = os.path.join(src, item)
         if item == folder_name_a3d[6]: # 12172019
-#            shutil.rmtree(s)
-            os.rename(s, os.path.join(src, "orig_img"))
+            shutil.rmtree(s)
+#            os.rename(s, os.path.join(src, "orig_img"))
         else:
             if os.path.isdir(s):            
                 delTreeA3D(s, symlinks, ignore)
@@ -369,6 +337,25 @@ def delTreeA3D(src, symlinks = False, ignore = None):
 #            os.rename(s, os.path.join(src, item.replace(filename, new_filename)))
 #            count = count + 1
              os.remove(s)
+
+def delTreeCARLA(src, symlinks = False, ignore = None):
+    lst = os.listdir(src)
+    count = 1
+    if ignore:
+        excl = ignore(src, lst)
+        lst = [x for x in lst if x not in excl]
+    for item in lst:
+      new_fileno = count 
+      if item in folder_name_carla: # copy directory
+        s = os.path.join(src, item)
+        if item in folder_name_carla[0:5]: # 12172019
+            shutil.rmtree(s)
+#            os.rename(s, os.path.join(src, "orig_img"))
+        else:
+            if os.path.isdir(s):            
+                delTreeCARLA(s, symlinks, ignore)
+            else:
+                continue
 
 def copyTreeFormat(src, dst, list, oname):
     for dir in src:
@@ -437,7 +424,8 @@ def delTreeFormatA3D(src):
         if os.path.isdir(dir):
             file_name = os.path.basename(dir)
             print("Folder: " + str(dir))
-            delTreeA3D(dir)
+            delTreeCARLA(dir)
+#            delTreeA3D(dir)
 
 # 12062019
 def countFilesFolders(dir, list):
@@ -545,18 +533,31 @@ if __name__ == '__main__':
     carla_t7_dir = glob.glob(r"E:\TRIP\Datasets\CARLA_dataset\test_3\training\Town07\*") 
 
     carla_glob_dir = glob.glob(r"E:\TRIP\Datasets\CARLA_dataset\test_3\training\*")
+    carla_acc_dir = glob.glob(r"E:\TRIP\Datasets\CARLA_dataset\test_3\training\accident\*")                      
+    carla_dummy_dir = glob.glob(r"E:\TRIP\Datasets\CARLA_dataset\test_3\training\dummy\*")
+    carla_non_acc_dir = glob.glob(r"E:\TRIP\Datasets\CARLA_dataset\test_3\training\non_accident\*")
+    carla_dir_acc = r'E:\TRIP\Datasets\CARLA_dataset\test_3\training\accident'
+    carla_dir_non_acc = r'E:\TRIP\Datasets\CARLA_dataset\test_3\training\non_accident'
+    carla_ds4_acc = r'E:\TRIP\Datasets\YOLO_KitDashV\ds4\ctrain1'
+    carla_ds4_non_acc = r'E:\TRIP\Datasets\YOLO_KitDashV\ds4\ctrain0'
+
 
 #    rename_carla(carla_dir)
-    moveTreeFormatA3D(carla_t1_dir, carla_glob_dir, "non_accident")
-    moveTreeFormatA3D(carla_t2_dir, carla_glob_dir, "non_accident")
-    moveTreeFormatA3D(carla_t3_dir, carla_glob_dir, "non_accident")
-    moveTreeFormatA3D(carla_t4_dir, carla_glob_dir, "non_accident")
-    moveTreeFormatA3D(carla_t5_dir, carla_glob_dir, "non_accident")
-    moveTreeFormatA3D(carla_t6_dir, carla_glob_dir, "non_accident")
-    moveTreeFormatA3D(carla_t7_dir, carla_glob_dir, "non_accident")
+#    moveTreeFormatA3D(carla_t1_dir, carla_glob_dir, "accident")
+#    moveTreeFormatA3D(carla_t2_dir, carla_glob_dir, "accident")
+#    moveTreeFormatA3D(carla_t3_dir, carla_glob_dir, "accident")
+#    moveTreeFormatA3D(carla_t4_dir, carla_glob_dir, "accident")
+#    moveTreeFormatA3D(carla_t5_dir, carla_glob_dir, "accident")
+#    moveTreeFormatA3D(carla_t6_dir, carla_glob_dir, "accident")
+#    moveTreeFormatA3D(carla_t7_dir, carla_glob_dir, "accident")
 
 #    moveTreeFormatA3D(a3d_test_dir, a3d_sel_dir, "accident")
 #    moveTreeFormatA3D(a3d_dir, a3d_sel_dir, folder_name_a3d[0])
+
+    countFilesFolders(carla_dir_acc, [])
+    countFilesFolders(carla_dir_non_acc, [])
+#    countFilesFolders(carla_ds4_acc, [])
+#    countFilesFolders(carla_ds4_non_acc, [])
 
 #    countFilesFolders(traindir_mixed0, [])
 #    countFilesFolders(traindir_mixed1, [])
@@ -565,6 +566,9 @@ if __name__ == '__main__':
 #    countFilesFolders(traindir_viena0, [])
 #    countFilesFolders(traindir_viena1, [])
     
+#    delTreeFormatA3D(carla_acc_dir)
+#    delTreeFormatA3D(carla_non_acc_dir)
+
     #delTreeFormatA3D(a3d_test_dir)
     #delTreeFormatA3D(a3d_test_dir)
     #countFilesFolders(a3d_test_dir_c, [])
