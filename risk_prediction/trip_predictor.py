@@ -21,8 +21,8 @@ from risk_prediction.trip_lstm import TripLSTM
 #from trip_lstm import TripLSTM
 import os
 # <ADD>
-#from risk_prediction.trip_c_lstm import TripCLSTM
-from trip_c_lstm import TripCLSTM
+from risk_prediction.trip_c_lstm import TripCLSTM
+#from trip_c_lstm import TripCLSTM
 # </ADD>
 
 class TripPredictor(object):
