@@ -1386,9 +1386,12 @@ def generate_data():
         # 1.1 Initialize TRIP module (dataset generator)
         parser = argparse.ArgumentParser(description='dataset_maker')
         parser.add_argument('--object_model_type', choices=('yolo_v2', 'yolo_v3'), default='yolo_v3')
-        parser.add_argument('--object_model_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\accident_KitDashV_6000.npz')
-        parser.add_argument('--object_label_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\obj.names') # must be specified other than 'coco' and 'voc'    
-        parser.add_argument('--object_cfg_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\yolo-obj.cfg')
+#        parser.add_argument('--object_model_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\accident_KitDashV_6000.npz')
+#        parser.add_argument('--object_label_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\obj.names') # must be specified other than 'coco' and 'voc'    
+#        parser.add_argument('--object_cfg_path', default=r'C:\Users\atsumilab\Documents\Projects\TRIP_endtoend\estimation\model_v3\yolo-obj.cfg')
+        parser.add_argument('--object_model_path', default=r'C:\Users\user\Documents\Projects\TRIP_endtoend\estimation\model_v3\accident_KitDashV_6000.npz')
+        parser.add_argument('--object_label_path', default=r'C:\Users\user\Documents\Projects\TRIP_endtoend\estimation\model_v3\obj.names') # must be specified other than 'coco' and 'voc'    
+        parser.add_argument('--object_cfg_path', default=r'C:\Users\user\Documents\Projects\TRIP_endtoend\estimation\model_v3\yolo-obj.cfg')
         parser.add_argument('--object_detection_threshold', type=float, default=0.1)
         parser.add_argument('--gpu', type=int, default=0)
         parser.add_argument('--save_img', type=bool, default=True, help='save_img option')
@@ -1397,8 +1400,10 @@ def generate_data():
 #        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\TRIP_dataset\carla_trip', help='directory where the dataset will be created')
 #        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='input directory')
 #        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2', help='directory where the dataset will be created')
-        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town05', help='input directory')
-        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town05', help='directory where the dataset will be created')
+#        parser.add_argument('--input_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town06', help='input directory')
+#        parser.add_argument('--output_dir', default=r'C:\Users\atsumilab\Pictures\CARLA_dataset\test_2\training\Town06', help='directory where the dataset will be created')
+        parser.add_argument('--input_dir', default=r'E:\TRIP\Datasets\CARLA_dataset\test_3\training\Town07', help='input directory')
+        parser.add_argument('--output_dir', default=r'E:\TRIP\Datasets\CARLA_dataset\test_3\training\Town07', help='directory where the dataset will be created')
 #        parser.add_argument('--layer_name_list', default='conv33,conv39,conv45', help='list of hidden layers name to extract features')
         parser.add_argument('--layer_name_list', default='conv33', help='list of hidden layers name to extract features')
         args = parser.parse_args()
