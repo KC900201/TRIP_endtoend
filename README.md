@@ -33,7 +33,7 @@ Python
 2. [Traffic Risk Estimation from On-vehicle Video by Region-based Spatio-temporal DNN trained using Comparative Loss](https://www.jstage.jst.go.jp/article/pjsai/JSAI2019/0/JSAI2019_3Rin201/_pdf)
 
 ## Contacts
-Ng Kwong Cheong (e18m5252@soka-u.jp);
+Ng Kwong Cheong (nkc900201@gmail.com);
 Yuki Murata (e19d5202@soka-u.jp);
 Masayasu Atsumi (matsumi@soka.ac.jp);
 
